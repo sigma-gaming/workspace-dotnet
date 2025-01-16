@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using Games.Domain.Enums;
+
+namespace Games.Infrastructure.Models;
+
+public partial class Account
+{
+    public Guid Id { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
+
+    public string ProviderUserId { get; set; } = null!;
+
+    public string? ProviderUsername { get; set; }
+
+    public string ProviderUserFirstName { get; set; } = null!;
+
+    public string? ProviderUserLastName { get; set; }
+
+    public string? ProviderUserImage { get; set; }
+
+    public Guid UserId { get; set; }
+
+    public AccountProvider Provider { get; set; }
+
+    public virtual User User { get; set; } = null!;
+}
