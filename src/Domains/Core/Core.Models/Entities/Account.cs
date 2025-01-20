@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public partial class Account
+public sealed record Account
 {
     public Guid Id { get; set; }
 
@@ -26,5 +24,5 @@ public partial class Account
 
     public AccountProvider Provider { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

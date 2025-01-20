@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Core.Models.Entities;
 
-namespace Core.Domain.Entities;
-
-public partial class ReferralCampaign
+public sealed record ReferralCampaign
 {
     public DateTime CreatedAt { get; set; }
 
@@ -19,9 +16,9 @@ public partial class ReferralCampaign
 
     public Guid Id { get; set; }
 
-    public virtual User? Referrer { get; set; }
+    public User? Referrer { get; set; }
 
-    public virtual ICollection<ReferrerTransaction> ReferrerTransactions { get; set; } = new List<ReferrerTransaction>();
+    public ICollection<ReferrerTransaction> ReferrerTransactions { get; set; } = new List<ReferrerTransaction>();
 
-    public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();
+    public ICollection<Session> Sessions { get; set; } = new List<Session>();
 }

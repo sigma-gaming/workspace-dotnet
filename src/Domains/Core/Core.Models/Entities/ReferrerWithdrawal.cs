@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Core.Models.Entities;
 
-namespace Core.Domain.Entities;
-
-public partial class ReferrerWithdrawal
+public sealed record ReferrerWithdrawal
 {
     public DateTime CreatedAt { get; set; }
 
@@ -13,5 +10,5 @@ public partial class ReferrerWithdrawal
 
     public Guid Id { get; set; }
 
-    public virtual User? Referrer { get; set; }
+    public User? Referrer { get; set; }
 }

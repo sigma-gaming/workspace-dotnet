@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Core.Domain.Entities;
 using System.Reflection;
+using Core.Models.Entities;
 
 namespace Core.Database.Context;
 
@@ -27,7 +28,7 @@ public class CoreDbContext : DbContext
 
     public virtual DbSet<Deposit> Deposits { get; set; }
 
-    public virtual DbSet<Core.Domain.Entities.Domain> Domains { get; set; }
+    public virtual DbSet<Models.Entities.Domain> Domains { get; set; }
 
     public virtual DbSet<GameRecord> GameRecords { get; set; }
 

@@ -1,5 +1,6 @@
-using Core.Domain.Data;
 using Core.Domain.Entities;
+using Core.Models.Data;
+using Core.Models.Entities;
 
 namespace Core.Domain.Entities;
 

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public partial class ChatMessage
+public sealed record ChatMessage
 {
     public Guid TrackingId { get; set; }
 
@@ -32,7 +30,7 @@ public partial class ChatMessage
 
     public UserRole[] SenderRoles { get; set; } = Array.Empty<UserRole>();
 
-    public virtual Profile? Profile { get; set; }
+    public Profile? Profile { get; set; }
 
-    public virtual User? User { get; set; }
+    public User? User { get; set; }
 }

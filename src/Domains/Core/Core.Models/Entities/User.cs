@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public partial class User
+public sealed record User
 {
     public Guid Id { get; set; }
 
@@ -24,53 +22,53 @@ public partial class User
 
     public UserRole[] Roles { get; set; } = Array.Empty<UserRole>();
 
-    public virtual ICollection<Account> Accounts { get; set; } = new List<Account>();
+    public ICollection<Account> Accounts { get; set; } = new List<Account>();
 
-    public virtual Balance? Balance { get; set; }
+    public Balance? Balance { get; set; }
 
-    public virtual ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
+    public ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
 
-    public virtual ICollection<Deposit> Deposits { get; set; } = new List<Deposit>();
+    public ICollection<Deposit> Deposits { get; set; } = new List<Deposit>();
 
-    public virtual ICollection<GameRecord> GameRecords { get; set; } = new List<GameRecord>();
+    public ICollection<GameRecord> GameRecords { get; set; } = new List<GameRecord>();
 
-    public virtual ICollection<User> InverseReferrer { get; set; } = new List<User>();
+    public ICollection<User> InverseReferrer { get; set; } = new List<User>();
 
-    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
-    public virtual Profile? Profile { get; set; }
+    public Profile? Profile { get; set; }
 
-    public virtual ICollection<Promocode> PromocodeCreatedByNavigations { get; set; } = new List<Promocode>();
+    public ICollection<Promocode> PromocodeCreatedByNavigations { get; set; } = new List<Promocode>();
 
-    public virtual ICollection<PromocodeUsage> PromocodeUsages { get; set; } = new List<PromocodeUsage>();
+    public ICollection<PromocodeUsage> PromocodeUsages { get; set; } = new List<PromocodeUsage>();
 
-    public virtual ICollection<Promocode> PromocodeUsers { get; set; } = new List<Promocode>();
+    public ICollection<Promocode> PromocodeUsers { get; set; } = new List<Promocode>();
 
-    public virtual ICollection<ReferralCampaign> ReferralCampaigns { get; set; } = new List<ReferralCampaign>();
+    public ICollection<ReferralCampaign> ReferralCampaigns { get; set; } = new List<ReferralCampaign>();
 
-    public virtual User? Referrer { get; set; }
+    public User? Referrer { get; set; }
 
-    public virtual ReferrerBalance? ReferrerBalance { get; set; }
+    public ReferrerBalance? ReferrerBalance { get; set; }
 
-    public virtual ReferrerPayout? ReferrerPayout { get; set; }
+    public ReferrerPayout? ReferrerPayout { get; set; }
 
-    public virtual ReferrerSettings? ReferrerSettings { get; set; }
+    public ReferrerSettings? ReferrerSettings { get; set; }
 
-    public virtual ICollection<ReferrerTransaction> ReferrerTransactionReferrals { get; set; } = new List<ReferrerTransaction>();
+    public ICollection<ReferrerTransaction> ReferrerTransactionReferrals { get; set; } = new List<ReferrerTransaction>();
 
-    public virtual ICollection<ReferrerTransaction> ReferrerTransactionReferrers { get; set; } = new List<ReferrerTransaction>();
+    public ICollection<ReferrerTransaction> ReferrerTransactionReferrers { get; set; } = new List<ReferrerTransaction>();
 
-    public virtual ICollection<ReferrerWithdrawal> ReferrerWithdrawals { get; set; } = new List<ReferrerWithdrawal>();
+    public ICollection<ReferrerWithdrawal> ReferrerWithdrawals { get; set; } = new List<ReferrerWithdrawal>();
 
-    public virtual ICollection<Session> SessionReferrers { get; set; } = new List<Session>();
+    public ICollection<Session> SessionReferrers { get; set; } = new List<Session>();
 
-    public virtual ICollection<Session> SessionUsers { get; set; } = new List<Session>();
+    public ICollection<Session> SessionUsers { get; set; } = new List<Session>();
 
-    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+    public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
-    public virtual UserSecurity? UserSecurity { get; set; }
+    public UserSecurity? UserSecurity { get; set; }
 
-    public virtual UserStats? UserStats { get; set; }
+    public UserStats? UserStats { get; set; }
 
-    public virtual ICollection<Withdrawal> Withdrawals { get; set; } = new List<Withdrawal>();
+    public ICollection<Withdrawal> Withdrawals { get; set; } = new List<Withdrawal>();
 }

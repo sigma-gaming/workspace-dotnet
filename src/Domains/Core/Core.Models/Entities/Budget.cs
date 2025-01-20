@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Core.Models.Entities;
 
-namespace Core.Domain.Entities;
-
-public partial class Budget
+public sealed record Budget
 {
     public int Id { get; set; }
 

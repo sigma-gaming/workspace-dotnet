@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public partial class Domain
+public sealed record Domain
 {
     public string Host { get; set; } = null!;
 

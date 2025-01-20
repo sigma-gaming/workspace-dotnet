@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Core.Models.Entities;
 
-namespace Core.Domain.Entities;
-
-public partial class UserSecurity
+public sealed record UserSecurity
 {
     public string? LastIp { get; set; }
 
@@ -57,5 +54,5 @@ public partial class UserSecurity
 
     public int AddressSolScore { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

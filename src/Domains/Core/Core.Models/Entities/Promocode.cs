@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public partial class Promocode
+public sealed record Promocode
 {
     public Guid Id { get; set; }
 
@@ -32,9 +30,9 @@ public partial class Promocode
 
     public PromocodeBonusType BonusType { get; set; }
 
-    public virtual User? CreatedByNavigation { get; set; }
+    public User? CreatedByNavigation { get; set; }
 
-    public virtual ICollection<PromocodeUsage> PromocodeUsages { get; set; } = new List<PromocodeUsage>();
+    public ICollection<PromocodeUsage> PromocodeUsages { get; set; } = new List<PromocodeUsage>();
 
-    public virtual User? User { get; set; }
+    public User? User { get; set; }
 }

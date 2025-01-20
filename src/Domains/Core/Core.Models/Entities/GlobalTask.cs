@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public class GlobalTask
+public sealed record GlobalTask
 {
     public GlobalTaskKey Key { get; set; }
 

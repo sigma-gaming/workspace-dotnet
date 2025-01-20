@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Core.Models.Entities;
 
-namespace Core.Domain.Entities;
-
-public partial class ReferrerBalance
+public sealed record ReferrerBalance
 {
     public Guid ReferrerId { get; set; }
 
     public long Available { get; set; }
 
-    public virtual User Referrer { get; set; } = null!;
+    public User Referrer { get; set; } = null!;
 }

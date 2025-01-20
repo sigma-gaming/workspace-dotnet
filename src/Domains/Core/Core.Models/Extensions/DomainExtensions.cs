@@ -1,11 +1,11 @@
-using Core.Domain.Data;
 using Core.Domain.Entities;
+using Core.Models.Data;
 
 namespace Core.Domain.Entities;
 
 public static class DomainExtensions
 {
-    public static DomainData ToData(this Core.Domain.Entities.Domain entity)
+    public static DomainData ToData(this Models.Entities.Domain entity)
     {
         return new DomainData
         {

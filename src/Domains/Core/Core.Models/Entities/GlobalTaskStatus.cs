@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public class GlobalTaskStatus
+public sealed record GlobalTaskStatus
 {
     public GlobalTaskKey TaskKey { get; set; }
     public Core.Domain.Enums.TaskStatus Status { get; set; }
     public Guid UserId { get; set; }
-    public virtual User User { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

@@ -1,10 +1,10 @@
 using Core.Database.Context;
 using Core.Domain.Caching;
-using Core.Domain.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Core.Domain.Entities;
 using Core.Domain.Enums;
+using Core.Models.Data;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Core.API.Controllers;

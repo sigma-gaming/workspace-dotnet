@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public class Notification
+public sealed record Notification
 {
     public NotificationKind Kind { get; set; }
 
@@ -26,5 +24,5 @@ public class Notification
 
     public Guid? UserId { get; set; }
 
-    public virtual User? User { get; set; }
+    public User? User { get; set; }
 }

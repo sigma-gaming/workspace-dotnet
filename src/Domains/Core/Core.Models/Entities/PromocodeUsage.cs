@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public partial class PromocodeUsage
+public sealed record PromocodeUsage
 {
     public DateTime CreatedAt { get; set; }
 
@@ -16,7 +14,7 @@ public partial class PromocodeUsage
 
     public PromocodeUsageStatus Status { get; set; }
 
-    public virtual Promocode Promocode { get; set; } = null!;
+    public Promocode Promocode { get; set; } = null!;
 
-    public virtual User User { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

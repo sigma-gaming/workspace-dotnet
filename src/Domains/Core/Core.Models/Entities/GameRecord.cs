@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public class GameRecord
+public sealed record GameRecord
 {
     public Game Game { get; set; }
     public GameOutcome Outcome { get; set; }
@@ -17,8 +15,8 @@ public class GameRecord
     public Guid UserId { get; set; }
     public Guid? TransactionId { get; set; }
     public Guid Id { get; set; }
-    public virtual ICollection<Balance> BalanceMaxMultiplierGames { get; set; } = new List<Balance>();
-    public virtual ICollection<Balance> BalanceMaxWinGames { get; set; } = new List<Balance>();
-    public virtual Transaction? Transaction { get; set; }
-    public virtual User User { get; set; } = null!;
+    public ICollection<Balance> BalanceMaxMultiplierGames { get; set; } = new List<Balance>();
+    public ICollection<Balance> BalanceMaxWinGames { get; set; } = new List<Balance>();
+    public Transaction? Transaction { get; set; }
+    public User User { get; set; } = null!;
 }

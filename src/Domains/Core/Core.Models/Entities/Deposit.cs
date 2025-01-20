@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public partial class Deposit
+public sealed record Deposit
 {
     public DateTime CreatedAt { get; set; }
 
@@ -36,7 +34,7 @@ public partial class Deposit
 
     public DepositType Type { get; set; }
 
-    public virtual Transaction? Transaction { get; set; }
+    public Transaction? Transaction { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

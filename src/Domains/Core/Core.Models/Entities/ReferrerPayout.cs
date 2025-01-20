@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Core.Models.Entities;
 
-namespace Core.Domain.Entities;
-
-public partial class ReferrerPayout
+public sealed record ReferrerPayout
 {
     public Guid ReferrerId { get; set; }
 
@@ -11,5 +8,5 @@ public partial class ReferrerPayout
 
     public DateTime? LastPayoutAt { get; set; }
 
-    public virtual User Referrer { get; set; } = null!;
+    public User Referrer { get; set; } = null!;
 }

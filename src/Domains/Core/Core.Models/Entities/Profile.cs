@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Domain.Enums;
+﻿using Core.Domain.Enums;
 
-namespace Core.Domain.Entities;
+namespace Core.Models.Entities;
 
-public partial class Profile
+public sealed record Profile
 {
     public DateTime CreatedAt { get; set; }
 
@@ -24,7 +22,7 @@ public partial class Profile
 
     public AccountProvider UsedProvider { get; set; }
 
-    public virtual ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
+    public ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
 
-    public virtual User User { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

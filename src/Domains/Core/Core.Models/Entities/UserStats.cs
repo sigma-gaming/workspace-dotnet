@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Core.Models.Entities;
 
-namespace Core.Domain.Entities;
-
-public partial class UserStats
+public sealed record UserStats
 {
     public Guid UserId { get; set; }
 
@@ -11,5 +8,5 @@ public partial class UserStats
 
     public int WithdrawCount { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

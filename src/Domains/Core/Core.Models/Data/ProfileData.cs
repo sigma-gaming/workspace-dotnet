@@ -1,7 +1,6 @@
-using System;
 using Core.Domain.Enums;
 
-namespace Core.Domain.Data;
+namespace Core.Models.Data;
 
 public sealed record ProfileData
 {

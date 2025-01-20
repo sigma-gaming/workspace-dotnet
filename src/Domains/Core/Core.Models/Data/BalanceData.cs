@@ -1,6 +1,4 @@
-using System;
-
-namespace Core.Domain.Data;
+namespace Core.Models.Data;
 
 public sealed record BalanceData
 {
