@@ -1,6 +1,0 @@
-@Core.API_HostAddress = https://api.sigma.local:5052
-
-GET {{Core.API_HostAddress}}/
-Accept: text/plain
-
-###

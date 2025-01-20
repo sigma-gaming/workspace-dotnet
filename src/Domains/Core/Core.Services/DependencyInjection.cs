@@ -1,7 +1,7 @@
-using Core.Domain.Caching;
+using Core.Services.Caching;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Core.Domain.Services;
+namespace Core.Services;
 
 public static class DependencyInjection
 {

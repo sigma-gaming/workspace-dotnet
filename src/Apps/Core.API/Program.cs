@@ -1,7 +1,7 @@
 using Core.Infrastructure;
-using Core.Domain.Services;
 using Common.OpenApi.Extensions;
 using Core.API.Configuration;
+using Core.Services;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);

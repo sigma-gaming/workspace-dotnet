@@ -22,7 +22,7 @@ namespace Core.Migrations.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Core.Domain.Entities.Account", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Account", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -81,7 +81,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("account", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Balance", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Balance", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -152,7 +152,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("balance", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Budget", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Budget", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -200,7 +200,7 @@ namespace Core.Migrations.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ChatMessage", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ChatMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -277,7 +277,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("chat_message", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Config", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Config", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -325,7 +325,7 @@ namespace Core.Migrations.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Deposit", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Deposit", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -406,7 +406,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("deposit", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Domain", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Domain", b =>
                 {
                     b.Property<string>("Host")
                         .HasColumnType("text")
@@ -427,7 +427,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("domain", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.GameRecord", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.GameRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -488,7 +488,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("game_record", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.GlobalTask", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.GlobalTask", b =>
                 {
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -522,7 +522,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("global_task", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.GlobalTaskStatus", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.GlobalTaskStatus", b =>
                 {
                     b.Property<short>("Status")
                         .HasColumnType("smallint")
@@ -541,7 +541,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("global_task_status", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Notification", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Notification", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -596,7 +596,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("notification", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Profile", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Profile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -655,7 +655,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("profile", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Promocode", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Promocode", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -729,7 +729,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("promocode", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.PromocodeUsage", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.PromocodeUsage", b =>
                 {
                     b.Property<Guid>("PromocodeId")
                         .HasColumnType("uuid")
@@ -760,7 +760,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("promocode_usage", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferralCampaign", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferralCampaign", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -810,7 +810,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("referral_campaign", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferrerBalance", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferrerBalance", b =>
                 {
                     b.Property<Guid>("ReferrerId")
                         .HasColumnType("uuid")
@@ -827,7 +827,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("referrer_balance", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferrerPayout", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferrerPayout", b =>
                 {
                     b.Property<Guid>("ReferrerId")
                         .HasColumnType("uuid")
@@ -846,7 +846,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("referrer_payout", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferrerSettings", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferrerSettings", b =>
                 {
                     b.Property<Guid>("ReferrerId")
                         .HasColumnType("uuid")
@@ -863,7 +863,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("referrer_settings", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferrerTransaction", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferrerTransaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -916,7 +916,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("referrer_transaction", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferrerWithdrawal", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferrerWithdrawal", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -945,7 +945,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("referrer_withdrawal", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Session", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Session", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -984,7 +984,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("session", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Transaction", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Transaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1027,7 +1027,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("transaction", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.User", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1083,7 +1083,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("user", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.UserSecurity", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.UserSecurity", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -1222,7 +1222,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("user_security", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.UserStats", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.UserStats", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -1245,7 +1245,7 @@ namespace Core.Migrations.Migrations
                     b.ToTable("user_stats", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Withdrawal", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Withdrawal", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1317,9 +1317,9 @@ namespace Core.Migrations.Migrations
                     b.ToTable("withdrawal", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Account", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Account", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany("Accounts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1328,21 +1328,21 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Balance", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Balance", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.GameRecord", "MaxMultiplierGame")
+                    b.HasOne("Core.Contracts.Entities.GameRecord", "MaxMultiplierGame")
                         .WithMany("BalanceMaxMultiplierGames")
                         .HasForeignKey("MaxMultiplierGameId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Core.Domain.Entities.GameRecord", "MaxWinGame")
+                    b.HasOne("Core.Contracts.Entities.GameRecord", "MaxWinGame")
                         .WithMany("BalanceMaxWinGames")
                         .HasForeignKey("MaxWinGameId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithOne("Balance")
-                        .HasForeignKey("Core.Domain.Entities.Balance", "UserId")
+                        .HasForeignKey("Core.Contracts.Entities.Balance", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1353,14 +1353,14 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ChatMessage", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ChatMessage", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Profile", "Profile")
+                    b.HasOne("Core.Contracts.Entities.Profile", "Profile")
                         .WithMany("ChatMessages")
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany("ChatMessages")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1370,14 +1370,14 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Deposit", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Deposit", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Transaction", "Transaction")
+                    b.HasOne("Core.Contracts.Entities.Transaction", "Transaction")
                         .WithMany("Deposits")
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany("Deposits")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1388,14 +1388,14 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.GameRecord", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.GameRecord", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Transaction", "Transaction")
+                    b.HasOne("Core.Contracts.Entities.Transaction", "Transaction")
                         .WithMany("GameRecords")
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany("GameRecords")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1406,9 +1406,9 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.GlobalTaskStatus", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.GlobalTaskStatus", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1417,9 +1417,9 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Notification", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Notification", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1427,25 +1427,25 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Profile", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Profile", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithOne("Profile")
-                        .HasForeignKey("Core.Domain.Entities.Profile", "UserId")
+                        .HasForeignKey("Core.Contracts.Entities.Profile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Promocode", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Promocode", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "CreatedByNavigation")
+                    b.HasOne("Core.Contracts.Entities.User", "CreatedByNavigation")
                         .WithMany("PromocodeCreatedByNavigations")
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany("PromocodeUsers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1455,15 +1455,15 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.PromocodeUsage", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.PromocodeUsage", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Promocode", "Promocode")
+                    b.HasOne("Core.Contracts.Entities.Promocode", "Promocode")
                         .WithMany("PromocodeUsages")
                         .HasForeignKey("PromocodeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany("PromocodeUsages")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1474,9 +1474,9 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferralCampaign", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferralCampaign", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "Referrer")
+                    b.HasOne("Core.Contracts.Entities.User", "Referrer")
                         .WithMany("ReferralCampaigns")
                         .HasForeignKey("ReferrerId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1484,52 +1484,52 @@ namespace Core.Migrations.Migrations
                     b.Navigation("Referrer");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferrerBalance", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferrerBalance", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "Referrer")
+                    b.HasOne("Core.Contracts.Entities.User", "Referrer")
                         .WithOne("ReferrerBalance")
-                        .HasForeignKey("Core.Domain.Entities.ReferrerBalance", "ReferrerId")
+                        .HasForeignKey("Core.Contracts.Entities.ReferrerBalance", "ReferrerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Referrer");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferrerPayout", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferrerPayout", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "Referrer")
+                    b.HasOne("Core.Contracts.Entities.User", "Referrer")
                         .WithOne("ReferrerPayout")
-                        .HasForeignKey("Core.Domain.Entities.ReferrerPayout", "ReferrerId")
+                        .HasForeignKey("Core.Contracts.Entities.ReferrerPayout", "ReferrerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Referrer");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferrerSettings", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferrerSettings", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "Referrer")
+                    b.HasOne("Core.Contracts.Entities.User", "Referrer")
                         .WithOne("ReferrerSettings")
-                        .HasForeignKey("Core.Domain.Entities.ReferrerSettings", "ReferrerId")
+                        .HasForeignKey("Core.Contracts.Entities.ReferrerSettings", "ReferrerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Referrer");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferrerTransaction", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferrerTransaction", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.ReferralCampaign", "ReferralCampaign")
+                    b.HasOne("Core.Contracts.Entities.ReferralCampaign", "ReferralCampaign")
                         .WithMany("ReferrerTransactions")
                         .HasForeignKey("ReferralCampaignId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Core.Domain.Entities.User", "Referral")
+                    b.HasOne("Core.Contracts.Entities.User", "Referral")
                         .WithMany("ReferrerTransactionReferrals")
                         .HasForeignKey("ReferralId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Core.Domain.Entities.User", "Referrer")
+                    b.HasOne("Core.Contracts.Entities.User", "Referrer")
                         .WithMany("ReferrerTransactionReferrers")
                         .HasForeignKey("ReferrerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1542,9 +1542,9 @@ namespace Core.Migrations.Migrations
                     b.Navigation("Referrer");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferrerWithdrawal", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferrerWithdrawal", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "Referrer")
+                    b.HasOne("Core.Contracts.Entities.User", "Referrer")
                         .WithMany("ReferrerWithdrawals")
                         .HasForeignKey("ReferrerId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1552,19 +1552,19 @@ namespace Core.Migrations.Migrations
                     b.Navigation("Referrer");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Session", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Session", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.ReferralCampaign", "ReferralCampaign")
+                    b.HasOne("Core.Contracts.Entities.ReferralCampaign", "ReferralCampaign")
                         .WithMany("Sessions")
                         .HasForeignKey("ReferralCampaignId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Core.Domain.Entities.User", "Referrer")
+                    b.HasOne("Core.Contracts.Entities.User", "Referrer")
                         .WithMany("SessionReferrers")
                         .HasForeignKey("ReferrerId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany("SessionUsers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1577,9 +1577,9 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Transaction", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Transaction", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany("Transactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -1587,9 +1587,9 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.User", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.User", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "Referrer")
+                    b.HasOne("Core.Contracts.Entities.User", "Referrer")
                         .WithMany("InverseReferrer")
                         .HasForeignKey("ReferrerId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -1597,36 +1597,36 @@ namespace Core.Migrations.Migrations
                     b.Navigation("Referrer");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.UserSecurity", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.UserSecurity", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithOne("UserSecurity")
-                        .HasForeignKey("Core.Domain.Entities.UserSecurity", "UserId")
+                        .HasForeignKey("Core.Contracts.Entities.UserSecurity", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.UserStats", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.UserStats", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithOne("UserStats")
-                        .HasForeignKey("Core.Domain.Entities.UserStats", "UserId")
+                        .HasForeignKey("Core.Contracts.Entities.UserStats", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Withdrawal", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Withdrawal", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Transaction", "Transaction")
+                    b.HasOne("Core.Contracts.Entities.Transaction", "Transaction")
                         .WithMany("Withdrawals")
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Core.Domain.Entities.User", "User")
+                    b.HasOne("Core.Contracts.Entities.User", "User")
                         .WithMany("Withdrawals")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1637,31 +1637,31 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.GameRecord", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.GameRecord", b =>
                 {
                     b.Navigation("BalanceMaxMultiplierGames");
 
                     b.Navigation("BalanceMaxWinGames");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Profile", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Profile", b =>
                 {
                     b.Navigation("ChatMessages");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Promocode", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Promocode", b =>
                 {
                     b.Navigation("PromocodeUsages");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ReferralCampaign", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.ReferralCampaign", b =>
                 {
                     b.Navigation("ReferrerTransactions");
 
                     b.Navigation("Sessions");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Transaction", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.Transaction", b =>
                 {
                     b.Navigation("Deposits");
 
@@ -1670,7 +1670,7 @@ namespace Core.Migrations.Migrations
                     b.Navigation("Withdrawals");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.User", b =>
+            modelBuilder.Entity("Core.Contracts.Entities.User", b =>
                 {
                     b.Navigation("Accounts");
 

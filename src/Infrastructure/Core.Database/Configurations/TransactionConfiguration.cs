@@ -1,5 +1,4 @@
-using Core.Domain.Entities;
-using Core.Models.Entities;
+using Core.Contracts.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
