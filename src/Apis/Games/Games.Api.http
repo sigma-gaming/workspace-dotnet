@@ -1,6 +1,0 @@
-@Games.Api_HostAddress = https://api.sigma.local:5052
-
-GET {{Games.Api_HostAddress}}/
-Accept: text/plain
-
-###
