@@ -33,9 +33,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Migrations", "src\Infr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.OpenApi", "src\Common\Common.OpenApi\Common.OpenApi.csproj", "{4A895A37-0BD6-4F71-9EF3-81205B4B2320}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Pubsub", "src\Common\Common.Pubsub\Common.Pubsub.csproj", "{CE12DC6D-996F-4CFC-9F12-9C2C80BC1329}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.PubSub", "src\Common\Common.PubSub\Common.PubSub.csproj", "{CE12DC6D-996F-4CFC-9F12-9C2C80BC1329}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Pubsub", "src\Infrastructure\Core.Pubsub\Core.Pubsub.csproj", "{F0FE54CF-416F-4DD6-86C6-47901CDE52AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.PubSub", "src\Infrastructure\Core.PubSub\Core.PubSub.csproj", "{F0FE54CF-416F-4DD6-86C6-47901CDE52AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

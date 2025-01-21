@@ -5,6 +5,7 @@ using Core.Contracts.Data;
 using Core.Contracts.Mappers;
 using Core.Contracts.Public;
 using Core.Services.Caching;
+using Core.Services.PubSub;
 
 namespace Core.API.Controllers;
 

@@ -1,5 +1,6 @@
 using Core.Database;
 using Core.Cache;
+using Core.PubSub;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
@@ -13,6 +14,7 @@ public static class DependencyInjection
     {
         services.AddCoreDatabase(configuration);
         services.AddCoreCache(configuration);
+        services.AddCorePubSub(configuration);
 
         return services;
     }

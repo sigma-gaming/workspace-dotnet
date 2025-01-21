@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.Caching\Common.Caching.csproj" />
+    <ProjectReference Include="..\..\..\Common\Common.PubSub\Common.PubSub.csproj" />
     <ProjectReference Include="..\..\..\Infrastructure\Core.Cache\Core.Cache.csproj" />
     <ProjectReference Include="..\Core.Contracts\Core.Contracts.csproj" />
   </ItemGroup>

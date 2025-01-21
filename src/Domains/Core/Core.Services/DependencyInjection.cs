@@ -1,4 +1,5 @@
 using Core.Services.Caching;
+using Core.Services.PubSub;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Services;
@@ -9,6 +10,7 @@ public static class DependencyInjection
         this IServiceCollection services)
     {
         services.AddSingleton<CoreCacheRegistry>();
+        services.AddSingleton<CorePubSubRegistry>();
 
         return services;
     }
