@@ -22,7 +22,6 @@ public class GamesController(
     ILogger<GamesController> logger) : ControllerBase
 {
     [HttpGet("/games/play-dice")]
-    [EndpointName("Dice"), EndpointDescription("Play dice")]
     public async ValueTask<ActionResult<PlayDiceResponse>> PlayDice()
     {
         var user = await db.Users.FirstAsync();
