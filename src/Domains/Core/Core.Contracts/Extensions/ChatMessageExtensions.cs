@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class ChatMessageExtensions
 {
-    public static ChatMessageData ToData(this ChatMessage entity)
+    public static ChatMessage ToData(this ChatMessageEntity entity)
     {
-        return new ChatMessageData
+        return new ChatMessage
         {
             TrackingId = entity.TrackingId,
             CreatedAt = entity.CreatedAt,

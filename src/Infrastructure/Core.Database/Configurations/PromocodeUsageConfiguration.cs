@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class PromocodeUsageConfiguration : IEntityTypeConfiguration<PromocodeUsage>
+public class PromocodeUsageConfiguration : IEntityTypeConfiguration<PromocodeUsageEntity>
 {
-    public void Configure(EntityTypeBuilder<PromocodeUsage> entity)
+    public void Configure(EntityTypeBuilder<PromocodeUsageEntity> entity)
     {
         entity.HasKey(e => new { e.PromocodeId, e.UserId });
 

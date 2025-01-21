@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
+public class TransactionConfiguration : IEntityTypeConfiguration<TransactionEntity>
 {
-    public void Configure(EntityTypeBuilder<Transaction> entity)
+    public void Configure(EntityTypeBuilder<TransactionEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

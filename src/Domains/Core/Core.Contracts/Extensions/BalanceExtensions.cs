@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class BalanceExtensions
 {
-    public static BalanceData ToData(this Balance entity)
+    public static Balance ToData(this BalanceEntity entity)
     {
-        return new BalanceData
+        return new Balance
         {
             UserId = entity.UserId,
             Available = entity.Available,

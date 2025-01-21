@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Core.Database.Configurations;
 
-public class UserConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
 {
-    public void Configure(EntityTypeBuilder<User> entity)
+    public void Configure(EntityTypeBuilder<UserEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

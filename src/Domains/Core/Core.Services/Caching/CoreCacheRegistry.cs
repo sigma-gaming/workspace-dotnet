@@ -22,7 +22,7 @@ public class CoreCacheRegistry(IConnectionMultiplexer redis, RedisCacheOptions o
         $"{options.Version}:global:userCount",
         TimeSpan.FromDays(1));
 
-    public KeyedJsonCacheEntity<Guid, BalanceData> UserBalance { get; } = new(
+    public KeyedJsonCacheEntity<Guid, Balance> UserBalance { get; } = new(
         redis,
         userId => $"{options.Version}:balance:{userId}",
         TimeSpan.FromHours(1));

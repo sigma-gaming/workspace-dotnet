@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
+public class NotificationConfiguration : IEntityTypeConfiguration<NotificationEntity>
 {
-    public void Configure(EntityTypeBuilder<Notification> entity)
+    public void Configure(EntityTypeBuilder<NotificationEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

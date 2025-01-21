@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class BudgetConfiguration : IEntityTypeConfiguration<Budget>
+public class BudgetConfiguration : IEntityTypeConfiguration<BudgetEntity>
 {
-    public void Configure(EntityTypeBuilder<Budget> entity)
+    public void Configure(EntityTypeBuilder<BudgetEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

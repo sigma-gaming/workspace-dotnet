@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class UserSecurityConfiguration : IEntityTypeConfiguration<UserSecurity>
+public class UserSecurityConfiguration : IEntityTypeConfiguration<UserSecurityEntity>
 {
-    public void Configure(EntityTypeBuilder<UserSecurity> entity)
+    public void Configure(EntityTypeBuilder<UserSecurityEntity> entity)
     {
         entity.HasKey(e => e.UserId);
 
@@ -70,6 +70,6 @@ public class UserSecurityConfiguration : IEntityTypeConfiguration<UserSecurity>
             .HasColumnName("whitelisted");
 
         entity.HasOne(d => d.User).WithOne(p => p.UserSecurity)
-            .HasForeignKey<UserSecurity>(d => d.UserId);
+            .HasForeignKey<UserSecurityEntity>(d => d.UserId);
     }
 } 

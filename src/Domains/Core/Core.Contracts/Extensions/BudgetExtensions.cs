@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class BudgetExtensions
 {
-    public static BudgetData ToData(this Budget entity)
+    public static Budget ToData(this BudgetEntity entity)
     {
-        return new BudgetData
+        return new Budget
         {
             Id = entity.Id,
             CreatedAt = entity.CreatedAt,

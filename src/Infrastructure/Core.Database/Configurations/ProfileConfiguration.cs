@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class ProfileConfiguration : IEntityTypeConfiguration<Profile>
+public class ProfileConfiguration : IEntityTypeConfiguration<ProfileEntity>
 {
-    public void Configure(EntityTypeBuilder<Profile> entity)
+    public void Configure(EntityTypeBuilder<ProfileEntity> entity)
     {
         entity.HasKey(e => e.Id);
 
@@ -36,6 +36,6 @@ public class ProfileConfiguration : IEntityTypeConfiguration<Profile>
             .HasColumnName("used_provider");
 
         entity.HasOne(d => d.User).WithOne(p => p.Profile)
-            .HasForeignKey<Profile>(d => d.UserId);
+            .HasForeignKey<ProfileEntity>(d => d.UserId);
     }
 }

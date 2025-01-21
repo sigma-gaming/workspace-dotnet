@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class ReferralCampaignExtensions
 {
-    public static ReferralCampaignData ToData(this ReferralCampaign entity)
+    public static ReferralCampaign ToData(this ReferralCampaignEntity entity)
     {
-        return new ReferralCampaignData
+        return new ReferralCampaign
         {
             CreatedAt = entity.CreatedAt,
             Name = entity.Name,

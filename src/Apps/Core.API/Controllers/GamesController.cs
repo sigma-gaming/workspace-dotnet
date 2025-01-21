@@ -2,16 +2,16 @@ using Core.Database.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Core.Contracts.Data;
-using Core.Contracts.Extensions;
 using Core.Contracts.Mappers;
+using Core.Contracts.Public;
 using Core.Services.Caching;
 
 namespace Core.API.Controllers;
 
 public sealed record PlayDiceResponse
 {
-    public required BalanceData? Balance { get; init; }
-    public required UserData User { get; init; }
+    public required Balance? Balance { get; init; }
+    public required UserPublic User { get; init; }
 }
 
 [ApiController]
@@ -27,7 +27,7 @@ public class GamesController(
     {
         var user = await db.Users.FirstAsync();
 
-        var balance = await cache.UserBalance.GetAsync(new Guid("01947e4e-cf6a-7e76-8e38-261aef5ecf73"));
+        var balance = await cache.UserBalance.GetAsync(user.Id);
 
         logger.LogInformation("User {UserId} is playing dice!", user.Id);
         logger.LogInformation("User balance is {Balance}", balance);
@@ -35,7 +35,7 @@ public class GamesController(
         return Ok(new PlayDiceResponse
         {
             Balance = balance,
-            User = userMapper.ToData(user)
+            User = userMapper.ToPublic(user)
         });
     }
 }

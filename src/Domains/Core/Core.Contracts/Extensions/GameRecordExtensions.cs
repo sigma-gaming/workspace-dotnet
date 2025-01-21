@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class GameRecordExtensions
 {
-    public static GameRecordData ToData(this GameRecord entity)
+    public static GameRecord ToData(this GameRecordEntity entity)
     {
-        return new GameRecordData
+        return new GameRecord
         {
             Game = entity.Game,
             Outcome = entity.Outcome,

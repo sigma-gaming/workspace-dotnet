@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class ReferralCampaignConfiguration : IEntityTypeConfiguration<ReferralCampaign>
+public class ReferralCampaignConfiguration : IEntityTypeConfiguration<ReferralCampaignEntity>
 {
-    public void Configure(EntityTypeBuilder<ReferralCampaign> entity)
+    public void Configure(EntityTypeBuilder<ReferralCampaignEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

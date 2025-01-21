@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class GameRecordConfiguration : IEntityTypeConfiguration<GameRecord>
+public class GameRecordConfiguration : IEntityTypeConfiguration<GameRecordEntity>
 {
-    public void Configure(EntityTypeBuilder<GameRecord> entity)
+    public void Configure(EntityTypeBuilder<GameRecordEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

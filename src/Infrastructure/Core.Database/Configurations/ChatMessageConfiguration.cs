@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMessage>
+public class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMessageEntity>
 {
-    public void Configure(EntityTypeBuilder<ChatMessage> entity)
+    public void Configure(EntityTypeBuilder<ChatMessageEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

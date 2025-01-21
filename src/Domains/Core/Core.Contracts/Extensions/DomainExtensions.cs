@@ -4,9 +4,9 @@ namespace Core.Contracts.Extensions;
 
 public static class DomainExtensions
 {
-    public static DomainData ToData(this Contracts.Entities.Domain entity)
+    public static Domain ToData(this Contracts.Entities.DomainEntity entity)
     {
-        return new DomainData
+        return new Domain
         {
             Host = entity.Host,
             CreatedAt = entity.CreatedAt,

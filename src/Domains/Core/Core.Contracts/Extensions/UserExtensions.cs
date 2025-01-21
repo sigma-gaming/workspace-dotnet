@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class UserExtensions
 {
-    public static UserData ToData(this User entity)
+    public static User ToData(this UserEntity entity)
     {
-        return new UserData
+        return new User
         {
             Id = entity.Id,
             CreatedAt = entity.CreatedAt,

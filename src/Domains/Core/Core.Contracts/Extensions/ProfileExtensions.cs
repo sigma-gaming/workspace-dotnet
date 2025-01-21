@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class ProfileExtensions
 {
-    public static ProfileData ToData(this Profile entity)
+    public static Profile ToData(this ProfileEntity entity)
     {
-        return new ProfileData
+        return new Profile
         {
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,

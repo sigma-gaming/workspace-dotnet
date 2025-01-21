@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class UserSecurityExtensions
 {
-    public static UserSecurityData ToData(this UserSecurity entity)
+    public static UserSecurity ToData(this UserSecurityEntity entity)
     {
-        return new UserSecurityData
+        return new UserSecurity
         {
             LastIp = entity.LastIp,
             AddressUsdt = entity.AddressUsdt,

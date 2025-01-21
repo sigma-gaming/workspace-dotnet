@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class GlobalTaskStatusConfiguration : IEntityTypeConfiguration<GlobalTaskStatus>
+public class GlobalTaskStatusConfiguration : IEntityTypeConfiguration<GlobalTaskStatusEntity>
 {
-    public void Configure(EntityTypeBuilder<GlobalTaskStatus> entity)
+    public void Configure(EntityTypeBuilder<GlobalTaskStatusEntity> entity)
     {
         entity.HasNoKey();
         entity.ToTable("global_task_status");

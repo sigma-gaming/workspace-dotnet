@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class SessionExtensions
 {
-    public static SessionData ToData(this Session entity)
+    public static Session ToData(this SessionEntity entity)
     {
-        return new SessionData
+        return new Session
         {
             ExpiresAt = entity.ExpiresAt,
             UserId = entity.UserId,

@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class WithdrawalExtensions
 {
-    public static WithdrawalData ToData(this Withdrawal entity)
+    public static Withdrawal ToData(this WithdrawalEntity entity)
     {
-        return new WithdrawalData
+        return new Withdrawal
         {
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,

@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class ReferrerSettingsExtensions
 {
-    public static ReferrerSettingsData ToData(this ReferrerSettings entity)
+    public static ReferrerSettings ToData(this ReferrerSettingsEntity entity)
     {
-        return new ReferrerSettingsData
+        return new ReferrerSettings
         {
             ReferrerId = entity.ReferrerId,
             RevShare = entity.RevShare

@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class GlobalTaskExtensions
 {
-    public static GlobalTaskData ToData(this GlobalTask entity)
+    public static GlobalTask ToData(this GlobalTaskEntity entity)
     {
-        return new GlobalTaskData
+        return new GlobalTask
         {
             Key = entity.Key,
             CreatedAt = entity.CreatedAt,

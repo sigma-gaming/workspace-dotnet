@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class ConfigExtensions
 {
-    public static ConfigData ToData(this Config entity)
+    public static Config ToData(this ConfigEntity entity)
     {
-        return new ConfigData
+        return new Config
         {
             Id = entity.Id,
             CreatedAt = entity.CreatedAt,

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class ReferrerBalanceConfiguration : IEntityTypeConfiguration<ReferrerBalance>
+public class ReferrerBalanceConfiguration : IEntityTypeConfiguration<ReferrerBalanceEntity>
 {
-    public void Configure(EntityTypeBuilder<ReferrerBalance> entity)
+    public void Configure(EntityTypeBuilder<ReferrerBalanceEntity> entity)
     {
         entity.HasKey(e => e.ReferrerId);
 
@@ -20,6 +20,6 @@ public class ReferrerBalanceConfiguration : IEntityTypeConfiguration<ReferrerBal
             .HasColumnName("available");
 
         entity.HasOne(d => d.Referrer).WithOne(p => p.ReferrerBalance)
-            .HasForeignKey<ReferrerBalance>(d => d.ReferrerId);
+            .HasForeignKey<ReferrerBalanceEntity>(d => d.ReferrerId);
     }
 } 

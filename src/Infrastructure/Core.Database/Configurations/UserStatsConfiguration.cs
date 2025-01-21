@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class UserStatsConfiguration : IEntityTypeConfiguration<UserStats>
+public class UserStatsConfiguration : IEntityTypeConfiguration<UserStatsEntity>
 {
-    public void Configure(EntityTypeBuilder<UserStats> entity)
+    public void Configure(EntityTypeBuilder<UserStatsEntity> entity)
     {
         entity.HasKey(e => e.UserId);
 
@@ -23,6 +23,6 @@ public class UserStatsConfiguration : IEntityTypeConfiguration<UserStats>
             .HasColumnName("withdraw_count");
 
         entity.HasOne(d => d.User).WithOne(p => p.UserStats)
-            .HasForeignKey<UserStats>(d => d.UserId);
+            .HasForeignKey<UserStatsEntity>(d => d.UserId);
     }
 } 

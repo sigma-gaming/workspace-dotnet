@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class ConfigConfiguration : IEntityTypeConfiguration<Config>
+public class ConfigConfiguration : IEntityTypeConfiguration<ConfigEntity>
 {
-    public void Configure(EntityTypeBuilder<Config> entity)
+    public void Configure(EntityTypeBuilder<ConfigEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class NotificationExtensions
 {
-    public static NotificationData ToData(this Notification entity)
+    public static Notification ToData(this NotificationEntity entity)
     {
-        return new NotificationData
+        return new Notification
         {
             Kind = entity.Kind,
             Id = entity.Id,

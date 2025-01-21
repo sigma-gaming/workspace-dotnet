@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class AccountExtensions
 {
-    public static AccountData ToData(this Account entity)
+    public static Account ToData(this AccountEntity entity)
     {
-        return new AccountData
+        return new Account
         {
             Id = entity.Id,
             CreatedAt = entity.CreatedAt,

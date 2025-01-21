@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class ReferrerPayoutConfiguration : IEntityTypeConfiguration<ReferrerPayout>
+public class ReferrerPayoutConfiguration : IEntityTypeConfiguration<ReferrerPayoutEntity>
 {
-    public void Configure(EntityTypeBuilder<ReferrerPayout> entity)
+    public void Configure(EntityTypeBuilder<ReferrerPayoutEntity> entity)
     {
         entity.HasKey(e => e.ReferrerId);
 
@@ -23,6 +23,6 @@ public class ReferrerPayoutConfiguration : IEntityTypeConfiguration<ReferrerPayo
             .HasColumnName("next_payout_at");
 
         entity.HasOne(d => d.Referrer).WithOne(p => p.ReferrerPayout)
-            .HasForeignKey<ReferrerPayout>(d => d.ReferrerId);
+            .HasForeignKey<ReferrerPayoutEntity>(d => d.ReferrerId);
     }
 } 

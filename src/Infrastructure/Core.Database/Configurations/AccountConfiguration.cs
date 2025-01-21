@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class AccountConfiguration : IEntityTypeConfiguration<Account>
+public class AccountConfiguration : IEntityTypeConfiguration<AccountEntity>
 {
-    public void Configure(EntityTypeBuilder<Account> entity)
+    public void Configure(EntityTypeBuilder<AccountEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

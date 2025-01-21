@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class ReferrerWithdrawalExtensions
 {
-    public static ReferrerWithdrawalData ToData(this ReferrerWithdrawal entity)
+    public static ReferrerWithdrawal ToData(this ReferrerWithdrawalEntity entity)
     {
-        return new ReferrerWithdrawalData
+        return new ReferrerWithdrawal
         {
             CreatedAt = entity.CreatedAt,
             Amount = entity.Amount,

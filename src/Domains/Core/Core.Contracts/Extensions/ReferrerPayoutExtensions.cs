@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class ReferrerPayoutExtensions
 {
-    public static ReferrerPayoutData ToData(this ReferrerPayout entity)
+    public static ReferrerPayout ToData(this ReferrerPayoutEntity entity)
     {
-        return new ReferrerPayoutData
+        return new ReferrerPayout
         {
             ReferrerId = entity.ReferrerId,
             NextPayoutAt = entity.NextPayoutAt,

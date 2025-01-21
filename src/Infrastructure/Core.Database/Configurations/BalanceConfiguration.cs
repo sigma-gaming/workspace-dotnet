@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class BalanceConfiguration : IEntityTypeConfiguration<Balance>
+public class BalanceConfiguration : IEntityTypeConfiguration<BalanceEntity>
 {
-    public void Configure(EntityTypeBuilder<Balance> entity)
+    public void Configure(EntityTypeBuilder<BalanceEntity> entity)
     {
         entity.HasKey(e => e.UserId);
 
@@ -51,6 +51,6 @@ public class BalanceConfiguration : IEntityTypeConfiguration<Balance>
             .OnDelete(DeleteBehavior.Cascade);
 
         entity.HasOne(d => d.User).WithOne(p => p.Balance)
-            .HasForeignKey<Balance>(d => d.UserId);
+            .HasForeignKey<BalanceEntity>(d => d.UserId);
     }
 } 

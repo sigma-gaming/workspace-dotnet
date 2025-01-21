@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class ReferrerWithdrawalConfiguration : IEntityTypeConfiguration<ReferrerWithdrawal>
+public class ReferrerWithdrawalConfiguration : IEntityTypeConfiguration<ReferrerWithdrawalEntity>
 {
-    public void Configure(EntityTypeBuilder<ReferrerWithdrawal> entity)
+    public void Configure(EntityTypeBuilder<ReferrerWithdrawalEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

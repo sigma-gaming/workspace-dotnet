@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class PromocodeExtensions
 {
-    public static PromocodeData ToData(this Promocode entity)
+    public static Promocode ToData(this PromocodeEntity entity)
     {
-        return new PromocodeData
+        return new Promocode
         {
             Id = entity.Id,
             CreatedAt = entity.CreatedAt,

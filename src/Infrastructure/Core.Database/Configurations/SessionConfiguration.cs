@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class SessionConfiguration : IEntityTypeConfiguration<Session>
+public class SessionConfiguration : IEntityTypeConfiguration<SessionEntity>
 {
-    public void Configure(EntityTypeBuilder<Session> entity)
+    public void Configure(EntityTypeBuilder<SessionEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

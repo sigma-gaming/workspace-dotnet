@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class ReferrerSettingsConfiguration : IEntityTypeConfiguration<ReferrerSettings>
+public class ReferrerSettingsConfiguration : IEntityTypeConfiguration<ReferrerSettingsEntity>
 {
-  public void Configure(EntityTypeBuilder<ReferrerSettings> entity)
+  public void Configure(EntityTypeBuilder<ReferrerSettingsEntity> entity)
   {
     entity.HasKey(e => e.ReferrerId);
 
@@ -20,6 +20,6 @@ public class ReferrerSettingsConfiguration : IEntityTypeConfiguration<ReferrerSe
         .HasColumnName("rev_share");
 
     entity.HasOne(d => d.Referrer).WithOne(p => p.ReferrerSettings)
-        .HasForeignKey<ReferrerSettings>(d => d.ReferrerId);
+        .HasForeignKey<ReferrerSettingsEntity>(d => d.ReferrerId);
   }
 }

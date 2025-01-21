@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class WithdrawalConfiguration : IEntityTypeConfiguration<Withdrawal>
+public class WithdrawalConfiguration : IEntityTypeConfiguration<WithdrawalEntity>
 {
-    public void Configure(EntityTypeBuilder<Withdrawal> entity)
+    public void Configure(EntityTypeBuilder<WithdrawalEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

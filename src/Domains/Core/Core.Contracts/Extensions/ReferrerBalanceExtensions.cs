@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class ReferrerBalanceExtensions
 {
-    public static ReferrerBalanceData ToData(this ReferrerBalance entity)
+    public static ReferrerBalance ToData(this ReferrerBalanceEntity entity)
     {
-        return new ReferrerBalanceData
+        return new ReferrerBalance
         {
             ReferrerId = entity.ReferrerId,
             Available = entity.Available

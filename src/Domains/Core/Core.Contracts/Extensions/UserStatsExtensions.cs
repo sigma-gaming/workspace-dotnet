@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class UserStatsExtensions
 {
-    public static UserStatsData ToData(this UserStats entity)
+    public static UserStats ToData(this UserStatsEntity entity)
     {
-        return new UserStatsData
+        return new UserStats
         {
             UserId = entity.UserId,
             DepositCount = entity.DepositCount,

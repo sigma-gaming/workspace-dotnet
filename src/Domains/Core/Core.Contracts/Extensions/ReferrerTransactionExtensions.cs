@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class ReferrerTransactionExtensions
 {
-    public static ReferrerTransactionData ToData(this ReferrerTransaction entity)
+    public static ReferrerTransaction ToData(this ReferrerTransactionEntity entity)
     {
-        return new ReferrerTransactionData
+        return new ReferrerTransaction
         {
             CreatedAt = entity.CreatedAt,
             Amount = entity.Amount,

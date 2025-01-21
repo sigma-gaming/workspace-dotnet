@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class TransactionExtensions
 {
-    public static TransactionData ToData(this Transaction entity)
+    public static Transaction ToData(this TransactionEntity entity)
     {
-        return new TransactionData
+        return new Transaction
         {
             CreatedAt = entity.CreatedAt,
             Amount = entity.Amount,

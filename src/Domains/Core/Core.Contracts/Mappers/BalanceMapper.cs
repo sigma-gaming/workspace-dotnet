@@ -7,5 +7,5 @@ namespace Core.Contracts.Mappers;
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public partial class BalanceMapper
 {
-    public partial BalanceData ToData(Balance balance);
+    public partial Balance ToData(BalanceEntity balanceEntity);
 }

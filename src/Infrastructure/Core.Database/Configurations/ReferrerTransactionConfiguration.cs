@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class ReferrerTransactionConfiguration : IEntityTypeConfiguration<ReferrerTransaction>
+public class ReferrerTransactionConfiguration : IEntityTypeConfiguration<ReferrerTransactionEntity>
 {
-    public void Configure(EntityTypeBuilder<ReferrerTransaction> entity)
+    public void Configure(EntityTypeBuilder<ReferrerTransactionEntity> entity)
     {
         entity.HasKey(e => e.Id);
 

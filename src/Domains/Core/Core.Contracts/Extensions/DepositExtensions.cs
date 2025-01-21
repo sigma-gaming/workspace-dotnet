@@ -5,9 +5,9 @@ namespace Core.Contracts.Extensions;
 
 public static class DepositExtensions
 {
-    public static DepositData ToData(this Deposit entity)
+    public static Deposit ToData(this DepositEntity entity)
     {
-        return new DepositData
+        return new Deposit
         {
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,

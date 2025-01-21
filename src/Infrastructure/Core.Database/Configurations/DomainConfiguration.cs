@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class DomainConfiguration : IEntityTypeConfiguration<Contracts.Entities.Domain>
+public class DomainConfiguration : IEntityTypeConfiguration<Contracts.Entities.DomainEntity>
 {
-    public void Configure(EntityTypeBuilder<Contracts.Entities.Domain> entity)
+    public void Configure(EntityTypeBuilder<Contracts.Entities.DomainEntity> entity)
     {
         entity.HasKey(e => e.Host);
 

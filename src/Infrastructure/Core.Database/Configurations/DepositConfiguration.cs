@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Database.Configurations;
 
-public class DepositConfiguration : IEntityTypeConfiguration<Deposit>
+public class DepositConfiguration : IEntityTypeConfiguration<DepositEntity>
 {
-    public void Configure(EntityTypeBuilder<Deposit> entity)
+    public void Configure(EntityTypeBuilder<DepositEntity> entity)
     {
         entity.HasKey(e => e.Id);
 
