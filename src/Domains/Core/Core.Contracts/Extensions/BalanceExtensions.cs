@@ -13,7 +13,7 @@ public static class BalanceExtensions
             Available = entity.Available,
             WageringRequired = entity.WageringRequired,
             TotalBet = entity.TotalBet,
-            TotalWin = entity.TotalWin,
+            TotalWon = entity.TotalWon,
             TotalLost = entity.TotalLost,
             TotalBetCount = entity.TotalBetCount,
             MaxWin = entity.MaxWin,

@@ -1,5 +1,6 @@
 using Common.Caching;
 using Core.Cache.Configuration;
+using Core.Contracts.Data;
 using StackExchange.Redis;
 
 namespace Core.Services.Caching;
@@ -21,7 +22,7 @@ public class CoreCacheRegistry(IConnectionMultiplexer redis, RedisCacheOptions o
         $"{options.Version}:global:userCount",
         TimeSpan.FromDays(1));
 
-    public KeyedJsonCacheEntity<Guid, object> UserBalance { get; } = new(
+    public KeyedJsonCacheEntity<Guid, BalanceData> UserBalance { get; } = new(
         redis,
         userId => $"{options.Version}:balance:{userId}",
         TimeSpan.FromHours(1));

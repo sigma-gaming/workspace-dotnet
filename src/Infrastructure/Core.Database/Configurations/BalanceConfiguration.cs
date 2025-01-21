@@ -35,9 +35,9 @@ public class BalanceConfiguration : IEntityTypeConfiguration<Balance>
         entity.Property(e => e.TotalLost)
             .HasDefaultValue(0L)
             .HasColumnName("total_lost");
-        entity.Property(e => e.TotalWin)
+        entity.Property(e => e.TotalWon)
             .HasDefaultValue(0L)
-            .HasColumnName("total_win");
+            .HasColumnName("total_won");
         entity.Property(e => e.WageringRequired)
             .HasDefaultValue(0L)
             .HasColumnName("wagering_required");

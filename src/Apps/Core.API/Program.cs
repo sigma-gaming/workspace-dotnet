@@ -3,6 +3,7 @@ using Common.OpenApi.Extensions;
 using Core.API.Configuration;
 using Core.Services;
 using Scalar.AspNetCore;
+using Core.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,7 @@ if (apiOptions.EnableOpenApi)
 builder.Services.AddControllers();
 
 // Add Core infrastructure
-builder.Services.AddCoreInfrastructure(builder.Configuration).AddCoreDomain();
+builder.Services.AddCoreInfrastructure(builder.Configuration).AddCoreDomain().AddCoreMappers();
 
 builder.Services.AddEndpointsApiExplorer();
 

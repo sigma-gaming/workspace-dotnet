@@ -6,7 +6,7 @@ public sealed record BalanceData
     public required long Available { get; init; }
     public required long WageringRequired { get; init; }
     public required long TotalBet { get; init; }
-    public required long TotalWin { get; init; }
+    public required long TotalWon { get; init; }
     public required long TotalLost { get; init; }
     public required int TotalBetCount { get; init; }
     public required long MaxWin { get; init; }

@@ -10,7 +10,7 @@ public sealed record Balance
 
     public long TotalBet { get; set; }
 
-    public long TotalWin { get; set; }
+    public long TotalWon { get; set; }
 
     public long TotalLost { get; set; }
 

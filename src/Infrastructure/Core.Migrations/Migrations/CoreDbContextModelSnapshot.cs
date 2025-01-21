@@ -131,11 +131,11 @@ namespace Core.Migrations.Migrations
                         .HasDefaultValue(0L)
                         .HasColumnName("total_lost");
 
-                    b.Property<long>("TotalWin")
+                    b.Property<long>("TotalWon")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasDefaultValue(0L)
-                        .HasColumnName("total_win");
+                        .HasColumnName("total_won");
 
                     b.Property<long>("WageringRequired")
                         .ValueGeneratedOnAdd()

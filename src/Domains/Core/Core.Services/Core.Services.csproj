@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.Caching\Common.Caching.csproj" />
     <ProjectReference Include="..\..\..\Infrastructure\Core.Cache\Core.Cache.csproj" />
+    <ProjectReference Include="..\Core.Contracts\Core.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
