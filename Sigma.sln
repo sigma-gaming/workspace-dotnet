@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{473893
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Caching", "src\Common\Common.Caching\Common.Caching.csproj", "{C533F812-F6A7-41C7-8E2C-F270693AA9A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Database", "src\Infrastructure\Core.Database\Core.Database.csproj", "{FF3302EF-2847-4766-991B-4AD542022211}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Db", "src\Infrastructure\Core.Db\Core.Db.csproj", "{FF3302EF-2847-4766-991B-4AD542022211}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Migrations", "src\Infrastructure\Core.Migrations\Core.Migrations.csproj", "{4003FF12-C41F-4EC7-B3F8-75A1CEF05023}"
 EndProject

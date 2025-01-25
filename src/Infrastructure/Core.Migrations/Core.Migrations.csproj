@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core.Database\Core.Database.csproj" />
+    <ProjectReference Include="..\Core.Db\Core.Db.csproj" />
   </ItemGroup>
 
 </Project>

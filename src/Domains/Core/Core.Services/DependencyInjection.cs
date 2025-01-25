@@ -1,3 +1,4 @@
+using Core.Services.Auth;
 using Core.Services.Caching;
 using Core.Services.PubSub;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,8 @@ public static class DependencyInjection
     {
         services.AddSingleton<CoreCacheRegistry>();
         services.AddSingleton<CorePubSubRegistry>();
+
+        services.AddScoped<SessionService>();
 
         return services;
     }

@@ -11,6 +11,7 @@ public static class DependencyInjection
         services.AddSingleton<BalanceMapper>();
         services.AddSingleton<UserMapper>();
         services.AddSingleton<AccountMapper>();
+        services.AddSingleton<SessionMapper>();
 
         return services;
     }

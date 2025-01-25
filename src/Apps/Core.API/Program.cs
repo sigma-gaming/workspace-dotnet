@@ -4,6 +4,14 @@ using Core.API.Configuration;
 using Core.Services;
 using Scalar.AspNetCore;
 using Core.Contracts;
+using Core.Services.Auth;
+using Serilog;
+using Serilog.Formatting.Json;
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console(new JsonFormatter())
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,11 +23,14 @@ if (apiOptions.EnableOpenApi)
     builder.Services.AddCommonOpenApi();
 }
 
+builder.Services.AddSerilog();
+
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Add Core infrastructure
-builder.Services.AddCoreInfrastructure(builder.Configuration).AddCoreDomain().AddCoreMappers();
+builder.Services.AddCoreInfrastructure(builder.Configuration).AddCoreDomain().AddCoreMappers().AddSessionAuthentication();
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -40,7 +51,9 @@ if (apiOptions.EnableOpenApi)
     });
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 await app.RunAsync();

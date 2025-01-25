@@ -1,5 +1,5 @@
-using Core.Database;
-using Core.Database.Context;
+using Core.Db;
+using Core.Db.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +17,7 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddCoreDatabase(hostContext.Configuration, options =>
+        services.AddCoreDb(hostContext.Configuration, options =>
             options.UseNpgsql(x => x.MigrationsAssembly("Core.Migrations")));
     })
     .Build();

@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core.Cache\Core.Cache.csproj" />
-    <ProjectReference Include="..\Core.Database\Core.Database.csproj" />
+    <ProjectReference Include="..\Core.Db\Core.Db.csproj" />
     <ProjectReference Include="..\Core.PubSub\Core.PubSub.csproj" />
   </ItemGroup>
 
