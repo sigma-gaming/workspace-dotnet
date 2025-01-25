@@ -8,11 +8,6 @@ using Core.Services.Auth;
 using Serilog;
 using Serilog.Formatting.Json;
 
-Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console(new JsonFormatter())
-    .CreateLogger();
-
 var builder = WebApplication.CreateBuilder(args);
 
 var apiOptions = new ApiOptions();
@@ -35,6 +30,21 @@ builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    Log.Logger = new LoggerConfiguration()
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .CreateLogger();
+}
+else
+{
+    Log.Logger = new LoggerConfiguration()
+        .Enrich.FromLogContext()
+        .WriteTo.Console(new JsonFormatter())
+        .CreateLogger();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
