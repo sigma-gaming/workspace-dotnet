@@ -7,7 +7,6 @@ using Core.Contracts.Public;
 using Core.Services.Auth;
 using Core.Services.Caching;
 using Microsoft.AspNetCore.Authorization;
-using Serilog;
 
 namespace Core.API.Controllers;
 
@@ -19,6 +18,7 @@ public sealed record PlayDiceResponse
 
 [ApiController]
 public class GamesController(
+    ILogger<GamesController> logger,
     CoreDbContext db,
     CoreCacheRegistry cache,
     UserMapper userMapper) : ControllerBase
@@ -28,20 +28,20 @@ public class GamesController(
     public async ValueTask<ActionResult<PlayDiceResponse>> PlayDice()
     {
         var userId = HttpContext.GetUserId();
-        Log.Information("UserId: {UserId}", userId);
-        
+        logger.LogInformation("UserId: {UserId}", userId);
+
         var user = await db.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
 
         if (user == null)
         {
-            Log.Warning("User {UserId} is not found", userId);
+            logger.LogWarning("User {UserId} is not found", userId);
             return Unauthorized();
         }
-        
+
         var balance = await cache.UserBalance.GetAsync(userId);
 
-        Log.Information("User {UserId} is playing dice!", userId);
-        Log.Information("User balance is {Balance}", balance);
+        logger.LogInformation("User {UserId} is playing dice!", userId);
+        logger.LogInformation("User balance is {Balance}", balance);
 
         return Ok(new PlayDiceResponse
         {

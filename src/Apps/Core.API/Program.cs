@@ -1,3 +1,4 @@
+using Common.Logging;
 using Core.Infrastructure;
 using Common.OpenApi.Extensions;
 using Core.API.Configuration;
@@ -5,10 +6,10 @@ using Core.Services;
 using Scalar.AspNetCore;
 using Core.Contracts;
 using Core.Services.Auth;
-using Serilog;
-using Serilog.Formatting.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddLogging("Core API");
 
 var apiOptions = new ApiOptions();
 builder.Configuration.Bind("Api", apiOptions);
@@ -18,33 +19,17 @@ if (apiOptions.EnableOpenApi)
     builder.Services.AddCommonOpenApi();
 }
 
-builder.Services.AddSerilog();
-
 // Add services to the container.
 builder.Services.AddControllers();
 
-builder.Services.AddCoreInfrastructure(builder.Configuration).AddCoreDomain().AddCoreMappers().AddSessionAuthentication();
+builder.Services.AddCoreInfrastructure(builder.Configuration).AddCoreDomain().AddCoreMappers()
+    .AddSessionAuthentication();
 
 builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    Log.Logger = new LoggerConfiguration()
-        .Enrich.FromLogContext()
-        .WriteTo.Console()
-        .CreateLogger();
-}
-else
-{
-    Log.Logger = new LoggerConfiguration()
-        .Enrich.FromLogContext()
-        .WriteTo.Console(new JsonFormatter())
-        .CreateLogger();
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
