@@ -7,7 +7,7 @@ namespace Common.Logging;
 
 public static class Logging
 {
-    public static void AddLogging(this WebApplicationBuilder builder, string appName)
+    public static WebApplicationBuilder AddLogging(this WebApplicationBuilder builder, string appName)
     {
         builder.Host.UseSerilog((_, loggerConfiguration) =>
         {
@@ -23,5 +23,7 @@ public static class Logging
                 loggerConfiguration.WriteTo.Console();
             }
         });
+
+        return builder;
     }
 }

@@ -22,9 +22,11 @@ if (apiOptions.EnableOpenApi)
 // Add services to the container.
 builder.Services.AddControllers();
 
-builder.Services.AddCoreInfrastructure(builder.Configuration).AddCoreDomain().AddCoreMappers()
-    .AddSessionAuthentication();
+// Add infrastructure and domains
+builder.Services.AddCoreInfrastructure(builder.Configuration).AddCoreDomain().AddCoreMappers();
 
+// Add authentication
+builder.Services.AddSessionAuthentication();
 builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -46,8 +48,7 @@ if (apiOptions.EnableOpenApi)
     });
 }
 
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseAuthentication().UseAuthorization();
 
 app.MapControllers();
 

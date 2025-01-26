@@ -25,6 +25,7 @@ obj/
 *.db
 *.db-shm
 *.db-wal
+!*.db/
 
 # Environment files
 *.env

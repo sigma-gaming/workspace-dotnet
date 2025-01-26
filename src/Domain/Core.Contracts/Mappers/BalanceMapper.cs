@@ -1,5 +1,6 @@
 using Core.Contracts.Data;
 using Core.Contracts.Entities;
+using Core.Contracts.Public;
 using Riok.Mapperly.Abstractions;
 
 namespace Core.Contracts.Mappers;
@@ -8,4 +9,6 @@ namespace Core.Contracts.Mappers;
 public partial class BalanceMapper
 {
     public partial Balance ToData(BalanceEntity balanceEntity);
+    public partial BalancePublic ToPublic(BalanceEntity balanceEntity);
+    public partial BalancePublic ToPublic(Balance balance);
 }
