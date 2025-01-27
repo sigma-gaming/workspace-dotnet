@@ -4,6 +4,7 @@ namespace Core.Contracts.Entities;
 
 public sealed record GameRecordEntity
 {
+    public Guid Id { get; set; }
     public Game Game { get; set; }
     public GameOutcome Outcome { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -14,7 +15,6 @@ public sealed record GameRecordEntity
     public string PreviewUserName { get; set; } = null!;
     public Guid UserId { get; set; }
     public Guid? TransactionId { get; set; }
-    public Guid Id { get; set; }
     public ICollection<BalanceEntity> BalanceMaxMultiplierGames { get; set; } = new List<BalanceEntity>();
     public ICollection<BalanceEntity> BalanceMaxWinGames { get; set; } = new List<BalanceEntity>();
     public TransactionEntity? Transaction { get; set; }

@@ -8,7 +8,7 @@ namespace Core.Contracts.Mappers;
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public partial class BalanceMapper
 {
-    public partial Balance ToData(BalanceEntity balanceEntity);
-    public partial BalancePublic ToPublic(BalanceEntity balanceEntity);
-    public partial BalancePublic ToPublic(Balance balance);
+    public partial Balance ToData(BalanceEntity entity);
+    public partial BalancePublic ToPublic(BalanceEntity entity);
+    public partial BalancePublic ToPublic(Balance data);
 }

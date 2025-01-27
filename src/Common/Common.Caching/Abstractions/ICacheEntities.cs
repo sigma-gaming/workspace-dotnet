@@ -1,31 +1,35 @@
 namespace Common.Caching.Abstractions;
 
-public interface INumberCacheEntity
+public interface IIntegerCacheEntity
 {
-    Task<double?> GetAsync();
-    Task SetAsync(double value);
-    Task IncrementByAsync(double value);
-    Task DecrementByAsync(double value);
+    Task<long?> GetAsync();
+    Task SetAsync(long value);
+    Task IncrementByAsync(long value);
+    Task DecrementByAsync(long value);
+    Task DeleteAsync();
 }
 
-public interface IKeyedNumberCacheEntity<TKey>
+public interface IKeyedIntegerCacheEntity<TKey>
 {
-    Task<double?> GetAsync(TKey key);
-    Task SetAsync(TKey key, double value);
-    Task IncrementByAsync(TKey key, double value);
-    Task DecrementByAsync(TKey key, double value);
+    Task<long?> GetAsync(TKey key);
+    Task SetAsync(TKey key, long value);
+    Task IncrementByAsync(TKey key, long value);
+    Task DecrementByAsync(TKey key, long value);
+    Task DeleteAsync(TKey key);
 }
 
 public interface IStringCacheEntity
 {
     Task<string?> GetAsync();
     Task SetAsync(string value);
+    Task DeleteAsync();
 }
 
 public interface IKeyedStringCacheEntity<TKey>
 {
     Task<string?> GetAsync(TKey key);
     Task SetAsync(TKey key, string value);
+    Task DeleteAsync(TKey key);
 }
 
 public interface IBooleanCacheEntity
@@ -33,6 +37,7 @@ public interface IBooleanCacheEntity
     Task<bool?> GetAsync();
     Task SetAsync(bool value);
     Task ToggleAsync();
+    Task DeleteAsync();
 }
 
 public interface IKeyedBooleanCacheEntity<TKey>
@@ -40,4 +45,5 @@ public interface IKeyedBooleanCacheEntity<TKey>
     Task<bool?> GetAsync(TKey key);
     Task SetAsync(TKey key, bool value);
     Task ToggleAsync(TKey key);
+    Task DeleteAsync(TKey key);
 } 

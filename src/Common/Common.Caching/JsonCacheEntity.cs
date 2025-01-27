@@ -25,6 +25,12 @@ public class JsonCacheEntity<T>(
         var json = JsonSerializer.Serialize(value);
         await db.StringSetAsync(key, json, ttl);
     }
+
+    public async Task DeleteAsync()
+    {
+        var db = redis.GetDatabase();
+        await db.KeyDeleteAsync(key);
+    }
 }
 
 public class KeyedJsonCacheEntity<TKey, TValue>(
@@ -47,6 +53,12 @@ public class KeyedJsonCacheEntity<TKey, TValue>(
         var db = redis.GetDatabase();
         var json = JsonSerializer.Serialize(value);
         await db.StringSetAsync(keyGenerator(key), json, ttl);
+    }
+
+    public async Task DeleteAsync(TKey key)
+    {
+        var db = redis.GetDatabase();
+        await db.KeyDeleteAsync(keyGenerator(key));
     }
 }
 
@@ -89,5 +101,59 @@ public class JsonListCacheEntity<T>(
     {
         var db = redis.GetDatabase();
         await db.KeyDeleteAsync(key);
+    }
+
+    public async Task DeleteAsync()
+    {
+        var db = redis.GetDatabase();
+        await db.KeyDeleteAsync(key);
+    }
+}
+
+public class KeyedJsonListCacheEntity<TKey, TValue>(
+    IConnectionMultiplexer redis,
+    Func<TKey, string> keyGenerator,
+    int maxItems = 100,
+    TimeSpan? ttl = null)
+    : IKeyedListCacheEntity<TKey, TValue>
+{
+    public async Task<List<TValue>> GetAllAsync(TKey key)
+    {
+        var db = redis.GetDatabase();
+        var values = await db.ListRangeAsync(keyGenerator(key));
+        return values
+            .Select(x => JsonSerializer.Deserialize<TValue>(x!))
+            .Where(x => x != null)
+            .ToList()!;
+    }
+
+    public async Task AddAsync(TKey key, TValue item)
+    {
+        var db = redis.GetDatabase();
+        var json = JsonSerializer.Serialize(item);
+
+        await db.ListLeftPushAsync(keyGenerator(key), json);
+        await db.ListTrimAsync(keyGenerator(key), 0, maxItems - 1);
+
+        if (ttl.HasValue)
+            await db.KeyExpireAsync(keyGenerator(key), ttl);
+    }
+
+    public async Task<int> GetCountAsync(TKey key)
+    {
+        var db = redis.GetDatabase();
+        return (int)await db.ListLengthAsync(keyGenerator(key));
+    }
+
+    public async Task ClearAsync(TKey key)
+    {
+        var db = redis.GetDatabase();
+        await db.KeyDeleteAsync(keyGenerator(key));
+    }
+
+    public async Task DeleteAsync(TKey key)
+    {
+        var db = redis.GetDatabase();
+        await db.KeyDeleteAsync(keyGenerator(key));
     }
 }

@@ -18,6 +18,9 @@ public class ReferrerTransactionConfiguration : IEntityTypeConfiguration<Referre
         entity.Property(e => e.ReferralAction)
             .HasColumnType("smallint")
             .HasColumnName("referral_action");
+        entity.Property(e => e.ReferralName).HasColumnName("referral_name");
+        entity.Property(e => e.ReferralImage).HasColumnName("referral_image");
+        entity.Property(e => e.ReferralUsername).HasColumnName("referral_username");
         entity.Property(e => e.Id)
             .HasDefaultValueSql("uuid_generate_v7()")
             .HasColumnName("id");
@@ -43,4 +46,4 @@ public class ReferrerTransactionConfiguration : IEntityTypeConfiguration<Referre
         entity.HasOne(d => d.Referrer).WithMany(p => p.ReferrerTransactionReferrers)
             .HasForeignKey(d => d.ReferrerId);
     }
-} 
+}

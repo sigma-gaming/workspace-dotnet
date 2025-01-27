@@ -8,10 +8,18 @@ public static class DependencyInjection
     public static IServiceCollection AddCoreMappers(
         this IServiceCollection services)
     {
-        services.AddSingleton<BalanceMapper>();
         services.AddSingleton<UserMapper>();
         services.AddSingleton<AccountMapper>();
         services.AddSingleton<SessionMapper>();
+        services.AddSingleton<BudgetMapper>();
+        services.AddSingleton<BalanceMapper>();
+        services.AddSingleton<TransactionMapper>();
+        services.AddSingleton<ReferralCampaignMapper>();
+        services.AddSingleton<ReferrerSettingsMapper>();
+        services.AddSingleton<ReferrerBalanceMapper>();
+        services.AddSingleton<ReferrerPayoutMapper>();
+        services.AddSingleton<ReferrerTransactionMapper>();
+        services.AddSingleton<ReferrerWithdrawalMapper>();
 
         return services;
     }

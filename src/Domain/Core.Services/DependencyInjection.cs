@@ -1,5 +1,6 @@
 using Core.Services.Auth;
 using Core.Services.Caching;
+using Core.Services.Finance;
 using Core.Services.PubSub;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,7 @@ public static class DependencyInjection
         services.AddSingleton<CorePubSubRegistry>();
 
         services.AddScoped<SessionService>();
+        services.AddScoped<BudgetService>();
 
         return services;
     }

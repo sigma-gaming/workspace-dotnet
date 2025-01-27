@@ -7,6 +7,7 @@ using Core.Contracts.Public;
 using Core.Contracts.Updates;
 using Core.Services.Auth;
 using Core.Services.Caching;
+using Core.Services.Finance;
 using Core.Services.PubSub;
 using Microsoft.AspNetCore.Authorization;
 
@@ -25,7 +26,8 @@ public class GamesController(
     CoreCacheRegistry cache,
     CorePubSubRegistry pubSub,
     UserMapper userMapper,
-    BalanceMapper balanceMapper) : ControllerBase
+    BalanceMapper balanceMapper,
+    BudgetService budgetService) : ControllerBase
 {
     [Authorize]
     [HttpGet("/games/play-dice")]
@@ -43,9 +45,12 @@ public class GamesController(
         }
 
         var balance = await cache.UserBalance.GetAsync(userId);
+        
+        var budget = await budgetService.GetBudgetAsync();
 
         logger.LogInformation("User {UserId} is playing dice!", userId);
         logger.LogInformation("User balance is {Balance}", balance);
+        logger.LogInformation("Budget is {Budget}", budget);
 
         if (balance != null)
         {

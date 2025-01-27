@@ -8,5 +8,5 @@ namespace Core.Contracts.Mappers;
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public partial class SessionMapper
 {
-    public partial Session ToData(SessionEntity sessionEntity);
+    public partial Session ToData(SessionEntity entity);
 }

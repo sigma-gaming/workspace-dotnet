@@ -8,7 +8,7 @@ namespace Core.Contracts.Mappers;
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public partial class UserMapper
 {
-    public partial User ToData(UserEntity userEntity);
-    public partial UserPublic ToPublic(UserEntity userEntity);
-    public partial UserPublic ToPublic(User user);
+    public partial User ToData(UserEntity entity);
+    public partial UserPublic ToPublic(UserEntity entity);
+    public partial UserPublic ToPublic(User data);
 }

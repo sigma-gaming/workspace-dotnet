@@ -4,7 +4,8 @@
     "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": false,
+      "launchBrowser": true,
+      "launchUrl": "https://api.sigma.local:5052/scalar/v1",
       "applicationUrl": "https://api.sigma.local:5052",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",

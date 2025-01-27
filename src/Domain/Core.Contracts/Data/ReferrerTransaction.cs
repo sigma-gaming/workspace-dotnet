@@ -12,4 +12,7 @@ public sealed record ReferrerTransaction
     public Guid? ReferralCampaignId { get; init; }
     public required Guid Id { get; init; }
     public required ReferralAction ReferralAction { get; init; }
+    public required string ReferralName { get; init; }
+    public string? ReferralImage { get; init; }
+    public string? ReferralUsername { get; init; }
 } 

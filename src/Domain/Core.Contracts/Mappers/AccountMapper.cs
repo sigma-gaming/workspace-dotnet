@@ -7,5 +7,5 @@ namespace Core.Contracts.Mappers;
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public partial class AccountMapper
 {
-    public partial Account ToData(AccountEntity accountEntity);
+    public partial Account ToData(AccountEntity entity);
 }
