@@ -5,20 +5,18 @@ using Core.Contracts.Mappers;
 using Core.Db.Context;
 using Core.Services.Caching;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Core.Services.Finance;
 
 public class BalanceService(
     CoreDbContext db,
     CoreCacheRegistry cache,
-    ILogger<BalanceService> logger,
     BalanceMapper balanceMapper,
     TransactionMapper transactionMapper)
 {
     public async Task<Balance> GetBalanceAsync(Guid userId, CancellationToken ct = default)
     {
-        if (cache.Ready())
+        if (cache.IsReady())
         {
             var cached = await cache.UserBalance.GetAsync(userId);
             if (cached != null) return cached;
@@ -30,7 +28,7 @@ public class BalanceService(
 
         var balance = balanceMapper.ToData(balanceEntity);
         
-        if (cache.Ready())
+        if (cache.IsReady())
             await cache.UserBalance.SetAsync(userId, balance);
 
         return balance;

@@ -45,7 +45,7 @@ public class GamesController(
         }
 
         var balance = await cache.UserBalance.GetAsync(userId);
-        
+
         var budget = await budgetService.GetBudgetAsync();
 
         logger.LogInformation("User {UserId} is playing dice!", userId);

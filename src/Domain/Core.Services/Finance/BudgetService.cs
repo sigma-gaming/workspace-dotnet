@@ -25,7 +25,7 @@ public class BudgetService(
 
     public async Task<Budget> GetBudgetAsync()
     {
-        if (!cache.Ready()) return await QueryBudgetAsync();
+        if (!cache.IsReady()) return await QueryBudgetAsync();
 
         var cached = await cache.Budget.GetAsync();
         if (cached != null) return cached;
@@ -38,7 +38,7 @@ public class BudgetService(
 
     public async Task<long> GetAvailableAsync()
     {
-        if (!cache.Ready()) return (await QueryBudgetAsync()).Available;
+        if (!cache.IsReady()) return (await QueryBudgetAsync()).Available;
 
         var cached = await cache.BudgetAvailable.GetAsync();
         if (cached != null) return cached.Value;

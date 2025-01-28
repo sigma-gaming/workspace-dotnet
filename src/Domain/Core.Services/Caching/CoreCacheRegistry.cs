@@ -1,19 +1,17 @@
 using Common.Caching;
-using Common.Caching.Abstractions;
 using Core.Cache.Configuration;
 using Core.Contracts.Compounds;
 using Core.Contracts.Data;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace Core.Services.Caching;
 
-public class CoreCacheRegistry(IConnectionMultiplexer redis, RedisCacheOptions options)
+public class CoreCacheRegistry(
+    IConnectionMultiplexer redis,
+    ILogger<CoreCacheRegistry> logger,
+    RedisCacheOptions options) : BaseCacheRegistry(redis, logger)
 {
-    public bool Ready()
-    {
-        return redis.IsConnected;
-    }
-
     public BooleanCacheEntity MaintenanceEnabled { get; } = new(redis, "global:maintenanceEnabled");
     public BooleanCacheEntity BackgroundJobsEnabled { get; } = new(redis, "global:backgroundJobsEnabled");
 
@@ -32,7 +30,7 @@ public class CoreCacheRegistry(IConnectionMultiplexer redis, RedisCacheOptions o
         sessionId => $"{options.Version}:session:{sessionId}",
         TimeSpan.FromHours(1));
 
-    public KeyedJsonCacheEntity<Guid, User> User { get; } = new(
+    public KeyedJsonCacheEntity<Guid, Contracts.Data.User> User { get; } = new(
         redis,
         userId => $"{options.Version}:user:{userId}",
         TimeSpan.FromHours(1));

@@ -49,7 +49,7 @@ public class AffiliateService(
             .ToArray());
     }
 
-    public async Task<ReferralCampaign?> GetCampaignAsync(string code)
+    public async Task<ReferralCampaign?> TryGetCampaignAsync(string code)
     {
         var campaign = await db.ReferralCampaigns
             .FirstOrDefaultAsync(c => c.Code == code);
@@ -59,35 +59,35 @@ public class AffiliateService(
 
     public async Task IncrementCampaignVisitsAsync(Guid campaignId)
     {
-        var campaign = await db.ReferralCampaigns.FindAsync(campaignId);
-        if (campaign != null)
+        var campaignEntity = await db.ReferralCampaigns.FindAsync(campaignId);
+        if (campaignEntity != null)
         {
-            campaign.TotalVisits++;
+            campaignEntity.TotalVisits++;
             await db.SaveChangesAsync();
         }
     }
 
     public async Task IncrementCampaignSignupsAsync(Guid campaignId)
     {
-        var campaign = await db.ReferralCampaigns.FindAsync(campaignId);
-        if (campaign != null)
+        var campaignEntity = await db.ReferralCampaigns.FindAsync(campaignId);
+        if (campaignEntity != null)
         {
-            campaign.TotalSignups++;
+            campaignEntity.TotalSignups++;
             await db.SaveChangesAsync();
         }
     }
 
     private async Task<ReferrerSettings?> QueryReferrerSettingsAsync(Guid referrerId)
     {
-        var settings = await db.ReferrerSettings
+        var settingsEntity = await db.ReferrerSettings
             .FirstOrDefaultAsync(s => s.ReferrerId == referrerId);
 
-        return settings != null ? settingsMapper.ToData(settings) : null;
+        return settingsEntity != null ? settingsMapper.ToData(settingsEntity) : null;
     }
 
     public async Task<ReferrerSettings?> GetReferrerSettingsAsync(Guid referrerId)
     {
-        if (!cache.Ready())
+        if (!cache.IsReady())
             return await QueryReferrerSettingsAsync(referrerId);
 
         var cached = await cache.ReferrerSettings.GetAsync(referrerId);
@@ -103,15 +103,15 @@ public class AffiliateService(
 
     private async Task<ReferrerBalance?> QueryReferrerBalanceAsync(Guid referrerId)
     {
-        var balance = await db.ReferrerBalances
+        var balanceEntity = await db.ReferrerBalances
             .FirstOrDefaultAsync(b => b.ReferrerId == referrerId);
 
-        return balance != null ? balanceMapper.ToData(balance) : null;
+        return balanceEntity != null ? balanceMapper.ToData(balanceEntity) : null;
     }
 
     public async Task<ReferrerBalance?> GetReferrerBalanceAsync(Guid referrerId)
     {
-        if (!cache.Ready())
+        if (!cache.IsReady())
             return await QueryReferrerBalanceAsync(referrerId);
 
         var cached = await cache.ReferrerBalance.GetAsync(referrerId);
@@ -127,8 +127,7 @@ public class AffiliateService(
 
     public async Task<ReferralCampaign> CreateReferralCampaignAsync(
         Guid referrerId,
-        string name,
-        string? description = null)
+        string name)
     {
         var campaign = new ReferralCampaignEntity
         {
@@ -138,10 +137,10 @@ public class AffiliateService(
             CreatedAt = DateTime.UtcNow
         };
 
-        var entry = await db.ReferralCampaigns.AddAsync(campaign);
+        var campaignEntry = await db.ReferralCampaigns.AddAsync(campaign);
         await db.SaveChangesAsync();
 
-        return campaignMapper.ToData(entry.Entity);
+        return campaignMapper.ToData(campaignEntry.Entity);
     }
 
     public async Task<ReferrerPayout> CreateReferrerPayoutAsync(Guid referrerId)
@@ -152,10 +151,10 @@ public class AffiliateService(
             NextPayoutAt = GenerateNextPayoutDate()
         };
 
-        var entry = await db.ReferrerPayouts.AddAsync(payout);
+        var payoutEntry = await db.ReferrerPayouts.AddAsync(payout);
         await db.SaveChangesAsync();
 
-        return payoutMapper.ToData(entry.Entity);
+        return payoutMapper.ToData(payoutEntry.Entity);
     }
 
     public async Task<ReferrerWithdrawal> CreateReferrerWithdrawalAsync(Guid referrerId, long amount)
@@ -166,25 +165,24 @@ public class AffiliateService(
             Amount = amount
         };
 
-        var entry = await db.ReferrerWithdrawals.AddAsync(withdrawal);
+        var withdrawalEntry = await db.ReferrerWithdrawals.AddAsync(withdrawal);
         await db.SaveChangesAsync();
 
-        return withdrawalMapper.ToData(entry.Entity);
+        return withdrawalMapper.ToData(withdrawalEntry.Entity);
     }
 
     public async Task<ReferrerBalance> UpdateReferrerBalanceAsync(Guid referrerId, long available)
     {
-        var balance = await db.ReferrerBalances
-                          .FirstOrDefaultAsync(b => b.ReferrerId == referrerId)
-                      ?? throw new Exception("ReferrerBalance not found");
+        var balanceEntity = await db.ReferrerBalances
+                                .FirstOrDefaultAsync(b => b.ReferrerId == referrerId)
+                            ?? throw new Exception("ReferrerBalance not found");
 
-        balance.Available = available;
+        balanceEntity.Available = available;
         await db.SaveChangesAsync();
 
-        var result = balanceMapper.ToData(balance);
+        var result = balanceMapper.ToData(balanceEntity);
 
-        if (cache.Ready())
-            await cache.ReferrerBalance.DeleteAsync(referrerId);
+        await cache.ExecuteIfConnectedAsync(async () => await cache.ReferrerBalance.SetAsync(referrerId, result));
 
         return result;
     }
@@ -204,9 +202,9 @@ public class AffiliateService(
         if (settings == null)
             return;
 
-        var finalAmount = (amount - amount * (decimal)TotalFee) * (settings.RevShare / 100m);
+        var finalAmount = (amount - amount * TotalFee) * (settings.RevShare / 100m);
 
-        var transaction = new ReferrerTransactionEntity
+        var transactionEntity = new ReferrerTransactionEntity
         {
             ReferrerId = referrerId.Value,
             ReferralAction = referralAction,
@@ -218,7 +216,7 @@ public class AffiliateService(
             Amount = (long)finalAmount
         };
 
-        await db.ReferrerTransactions.AddAsync(transaction);
+        await db.ReferrerTransactions.AddAsync(transactionEntity);
         await db.SaveChangesAsync();
     }
 
@@ -270,13 +268,13 @@ public class AffiliateService(
 
                 try
                 {
-                    var balance = await db.ReferrerBalances
+                    var balanceEntity = await db.ReferrerBalances
                         .TagWith("ForUpdate")
                         .FirstOrDefaultAsync(b => b.ReferrerId == payout.ReferrerId);
 
-                    if (balance != null)
+                    if (balanceEntity != null)
                     {
-                        balance.Available += payout.TotalAmount;
+                        balanceEntity.Available += payout.TotalAmount;
 
                         // Mark transactions as processed
                         var transactions = await db.ReferrerTransactions
@@ -303,11 +301,11 @@ public class AffiliateService(
                         await db.SaveChangesAsync();
                         await transaction.CommitAsync();
 
-                        if (cache.Ready())
+                        await cache.ExecuteIfConnectedAsync(async () =>
                         {
                             await cache.ReferrerBalance.DeleteAsync(payout.ReferrerId);
                             await cache.LastReferrerTransactions.DeleteAsync(payout.ReferrerId);
-                        }
+                        });
                     }
                 }
                 catch (Exception)
