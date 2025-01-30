@@ -1,0 +1,87 @@
+using Core.Contracts.Entities;
+using Core.Contracts.Enums;
+using Core.Db.Context;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+namespace Core.Services.Settings;
+
+public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFactory, ILogger<DomainService> logger)
+    : BackgroundService
+{
+    private readonly List<DomainEntity> cached = new();
+    private readonly TimeSpan refreshInterval = TimeSpan.FromMinutes(5);
+    private readonly TimeSpan retryDelay = TimeSpan.FromSeconds(5);
+
+    private async Task<List<DomainEntity>> QueryDomainsAsync()
+    {
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+
+        return await db.Domains
+            .OrderByDescending(d => d.CreatedAt)
+            .ToListAsync();
+    }
+
+    private async Task RefreshDomainsAsync()
+    {
+        try
+        {
+            var domains = await QueryDomainsAsync();
+            cached.Clear();
+            cached.AddRange(domains);
+            logger.LogInformation("Refreshed domains");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to refresh domains");
+        }
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                await RefreshDomainsAsync();
+                await Task.Delay(refreshInterval, stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to refresh domains, retrying in {Delay} seconds...",
+                    retryDelay.TotalSeconds);
+                await Task.Delay(retryDelay, stoppingToken);
+            }
+        }
+    }
+
+    public IReadOnlyList<DomainEntity> GetDomains(params DomainApp[]? apps)
+    {
+        if (apps == null || apps.Length == 0)
+            return cached;
+
+        return cached.Where(d => apps.Contains(d.App)).ToList();
+    }
+
+    public DomainEntity? GetLatestDomain(DomainApp app)
+    {
+        return cached.FirstOrDefault(d => d.App == app);
+    }
+
+    public IReadOnlyList<DomainEntity> GetDomainsByApp(DomainApp app)
+    {
+        return cached.Where(d => d.App == app).ToList();
+    }
+
+    public bool OriginMatches(string? origin, params DomainApp[]? apps)
+    {
+        if (string.IsNullOrEmpty(origin))
+            return false;
+
+        var domains = GetDomains(apps);
+        var host = origin.Replace("https://", "", StringComparison.OrdinalIgnoreCase);
+
+        return domains.Any(d => string.Equals(host, d.Host, StringComparison.OrdinalIgnoreCase));
+    }
+}

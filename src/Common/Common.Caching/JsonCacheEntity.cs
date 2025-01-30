@@ -10,6 +10,12 @@ public class JsonCacheEntity<T>(
     TimeSpan? ttl = null)
     : IJsonCacheEntity<T>
 {
+    public async Task<bool> ExistsAsync()
+    {
+        var db = redis.GetDatabase();
+        return await db.KeyExistsAsync(key);
+    }
+
     public async Task<T?> GetAsync()
     {
         var db = redis.GetDatabase();
@@ -39,6 +45,12 @@ public class KeyedJsonCacheEntity<TKey, TValue>(
     TimeSpan? ttl = null)
     : IKeyedJsonCacheEntity<TKey, TValue>
 {
+    public async Task<bool> ExistsAsync(TKey key)
+    {
+        var db = redis.GetDatabase();
+        return await db.KeyExistsAsync(keyGenerator(key));
+    }
+
     public async Task<TValue?> GetAsync(TKey key)
     {
         var db = redis.GetDatabase();
@@ -69,6 +81,12 @@ public class JsonListCacheEntity<T>(
     TimeSpan? ttl = null)
     : IListCacheEntity<T>
 {
+    public async Task<bool> ExistsAsync()
+    {
+        var db = redis.GetDatabase();
+        return await db.KeyExistsAsync(key);
+    }
+
     public async Task<List<T>> GetAllAsync()
     {
         var db = redis.GetDatabase();
@@ -79,13 +97,32 @@ public class JsonListCacheEntity<T>(
             .ToList()!;
     }
 
-    public async Task AddAsync(T item)
+    public async Task SetAllAsync(List<T> items)
+    {
+        var db = redis.GetDatabase();
+        var json = JsonSerializer.Serialize(items);
+        await db.StringSetAsync(key, json, ttl);
+    }
+
+    public async Task LeftPushAsync(T item)
     {
         var db = redis.GetDatabase();
         var json = JsonSerializer.Serialize(item);
 
         await db.ListLeftPushAsync(key, json);
         await db.ListTrimAsync(key, 0, maxItems - 1);
+
+        if (ttl.HasValue)
+            await db.KeyExpireAsync(key, ttl);
+    }
+
+    public async Task RightPushAsync(T item)
+    {
+        var db = redis.GetDatabase();
+        var json = JsonSerializer.Serialize(item);
+
+        await db.ListRightPushAsync(key, json);
+        await db.ListTrimAsync(key, -maxItems, -1);
 
         if (ttl.HasValue)
             await db.KeyExpireAsync(key, ttl);
@@ -117,6 +154,12 @@ public class KeyedJsonListCacheEntity<TKey, TValue>(
     TimeSpan? ttl = null)
     : IKeyedListCacheEntity<TKey, TValue>
 {
+    public async Task<bool> ExistsAsync(TKey key)
+    {
+        var db = redis.GetDatabase();
+        return await db.KeyExistsAsync(keyGenerator(key));
+    }
+
     public async Task<List<TValue>> GetAllAsync(TKey key)
     {
         var db = redis.GetDatabase();
@@ -127,13 +170,32 @@ public class KeyedJsonListCacheEntity<TKey, TValue>(
             .ToList()!;
     }
 
-    public async Task AddAsync(TKey key, TValue item)
+    public async Task SetAllAsync(TKey key, List<TValue> items)
+    {
+        var db = redis.GetDatabase();
+        var json = JsonSerializer.Serialize(items);
+        await db.StringSetAsync(keyGenerator(key), json, ttl);
+    }
+
+    public async Task LeftPushAsync(TKey key, TValue item)
     {
         var db = redis.GetDatabase();
         var json = JsonSerializer.Serialize(item);
 
         await db.ListLeftPushAsync(keyGenerator(key), json);
         await db.ListTrimAsync(keyGenerator(key), 0, maxItems - 1);
+
+        if (ttl.HasValue)
+            await db.KeyExpireAsync(keyGenerator(key), ttl);
+    }
+
+    public async Task RightPushAsync(TKey key, TValue item)
+    {
+        var db = redis.GetDatabase();
+        var json = JsonSerializer.Serialize(item);
+
+        await db.ListRightPushAsync(keyGenerator(key), json);
+        await db.ListTrimAsync(keyGenerator(key), -maxItems, -1);
 
         if (ttl.HasValue)
             await db.KeyExpireAsync(keyGenerator(key), ttl);

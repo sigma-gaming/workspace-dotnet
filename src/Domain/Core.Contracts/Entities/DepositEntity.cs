@@ -1,4 +1,5 @@
 ﻿using Core.Contracts.Enums;
+using Core.Contracts.Jsonb;
 
 namespace Core.Contracts.Entities;
 
@@ -9,7 +10,7 @@ public sealed record DepositEntity
     public DateTime UpdatedAt { get; set; }
     public long GemAmount { get; set; }
     public decimal CurrencyAmount { get; set; }
-    public string Payload { get; set; } = null!;
+    public DepositPayload Payload { get; set; } = null!;
     public Guid UserId { get; set; }
     public Guid? TransactionId { get; set; }
     public string ProviderTransactionId { get; set; } = null!;

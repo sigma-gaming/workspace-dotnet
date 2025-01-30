@@ -1,4 +1,5 @@
 using Core.Contracts.Entities;
+using Common.Db.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,7 +24,8 @@ public class GlobalTaskConfiguration : IEntityTypeConfiguration<GlobalTaskEntity
         entity.Property(e => e.Payout).HasColumnName("payout");
         entity.Property(e => e.Requirements)
             .HasColumnType("jsonb")
-            .HasColumnName("requirements");
+            .HasColumnName("requirements")
+            .HasJsonbConversion();
         entity.Property(e => e.WageringMultiplier).HasColumnName("wagering_multiplier");
     }
-} 
+}

@@ -3,6 +3,7 @@ using Core.Contracts.Entities;
 using Core.Contracts.Enums;
 using Core.Contracts.Mappers;
 using Core.Db.Context;
+using Common.Db.Extensions;
 using Core.Services.Caching;
 using Core.Services.Finance;
 using Core.Services.User;
@@ -107,7 +108,7 @@ public class AuthService(
             .FirstOrDefaultAsync(a =>
                 a.Provider == payload.Provider &&
                 a.ProviderUserId == payload.ProviderUserId);
-        
+
         var accountData = new AccountEntity()
         {
             Provider = payload.Provider,
@@ -150,7 +151,7 @@ public class AuthService(
             await db.SaveChangesAsync();
 
             await cache.ExecuteIfConnectedAsync(async () =>
-                await cache.DetailedProfile.DeleteAsync(payload.UserId.Value));
+                await cache.UserDetails.DeleteAsync(payload.UserId.Value));
 
             return AuthResult.Connected();
         }
@@ -179,9 +180,7 @@ public class AuthService(
             }
         }
 
-        await using var transaction = await db.Database.BeginTransactionAsync();
-
-        try
+        var (createdUserEntity, createdAccountEntity) = await db.ExecuteInTransactionAsync(async () =>
         {
             var createdUserEntity = new UserEntity()
             {
@@ -218,19 +217,14 @@ public class AuthService(
                 await affiliateService.IncrementCampaignSignupsAsync(referralCampaignId.Value);
 
             await db.SaveChangesAsync();
-            await db.Database.CommitTransactionAsync();
+            return (createdUserEntity, createdAccount.Entity);
+        });
 
-            var createdUser = userMapper.ToData(createdUserEntity);
+        var createdUser = userMapper.ToData(createdUserEntity);
 
-            await cache.ExecuteIfConnectedAsync(
-                async () => await cache.User.SetAsync(createdUserEntity.Id, createdUser));
+        await cache.ExecuteIfConnectedAsync(
+            async () => await cache.User.SetAsync(createdUserEntity.Id, createdUser));
 
-            return AuthResult.SignedUp(createdUser, accountMapper.ToData(createdAccount.Entity));
-        }
-        catch (Exception)
-        {
-            await db.Database.RollbackTransactionAsync();
-            throw;
-        }
+        return AuthResult.SignedUp(createdUser, accountMapper.ToData(createdAccountEntity));
     }
 }

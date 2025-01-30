@@ -1345,13 +1345,11 @@ namespace Core.Migrations.Migrations
                 {
                     b.HasOne("Core.Contracts.Entities.GameRecordEntity", "MaxMultiplierGame")
                         .WithMany("BalanceMaxMultiplierGames")
-                        .HasForeignKey("MaxMultiplierGameId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("MaxMultiplierGameId");
 
                     b.HasOne("Core.Contracts.Entities.GameRecordEntity", "MaxWinGame")
                         .WithMany("BalanceMaxWinGames")
-                        .HasForeignKey("MaxWinGameId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("MaxWinGameId");
 
                     b.HasOne("Core.Contracts.Entities.UserEntity", "User")
                         .WithOne("Balance")

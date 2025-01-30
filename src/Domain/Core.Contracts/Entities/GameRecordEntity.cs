@@ -1,14 +1,15 @@
 ﻿using Core.Contracts.Enums;
+using Core.Contracts.Jsonb;
 
 namespace Core.Contracts.Entities;
 
 public sealed record GameRecordEntity
 {
     public Guid Id { get; set; }
+    public DateTime CreatedAt { get; set; }
     public Game Game { get; set; }
     public GameOutcome Outcome { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string Snapshot { get; set; } = null!;
+    public GameSnapshot Snapshot { get; set; } = null!;
     public long Bet { get; set; }
     public int Multiplier { get; set; }
     public long Payout { get; set; }

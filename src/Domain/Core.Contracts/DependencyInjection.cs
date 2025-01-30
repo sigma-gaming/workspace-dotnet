@@ -10,10 +10,12 @@ public static class DependencyInjection
     {
         services.AddSingleton<UserMapper>();
         services.AddSingleton<AccountMapper>();
+        services.AddSingleton<ProfileMapper>();
         services.AddSingleton<SessionMapper>();
         services.AddSingleton<BudgetMapper>();
         services.AddSingleton<BalanceMapper>();
         services.AddSingleton<TransactionMapper>();
+        services.AddSingleton<GameRecordMapper>();
         services.AddSingleton<ReferralCampaignMapper>();
         services.AddSingleton<ReferrerSettingsMapper>();
         services.AddSingleton<ReferrerBalanceMapper>();

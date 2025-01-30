@@ -1,4 +1,5 @@
 using Core.Contracts.Entities;
+using Common.Db.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -32,7 +33,8 @@ public class GameRecordConfiguration : IEntityTypeConfiguration<GameRecordEntity
         entity.Property(e => e.PreviewUserName).HasColumnName("preview_user_name");
         entity.Property(e => e.Snapshot)
             .HasColumnType("jsonb")
-            .HasColumnName("snapshot");
+            .HasColumnName("snapshot")
+            .HasJsonbConversion();
         entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
         entity.Property(e => e.UserId).HasColumnName("user_id");
 
@@ -43,4 +45,4 @@ public class GameRecordConfiguration : IEntityTypeConfiguration<GameRecordEntity
         entity.HasOne(d => d.User).WithMany(p => p.GameRecords)
             .HasForeignKey(d => d.UserId);
     }
-} 
+}

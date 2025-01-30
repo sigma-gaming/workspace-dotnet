@@ -1,9 +1,9 @@
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace Core.Db.Interceptors;
+namespace Common.Db.Interceptors;
 
-public class ForUpdateInterceptor: DbCommandInterceptor
+public class ForUpdateInterceptor : DbCommandInterceptor
 {
     public override InterceptionResult<DbDataReader> ReaderExecuting(
         DbCommand command,

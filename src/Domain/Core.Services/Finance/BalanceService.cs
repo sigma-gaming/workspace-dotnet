@@ -11,8 +11,7 @@ namespace Core.Services.Finance;
 public class BalanceService(
     CoreDbContext db,
     CoreCacheRegistry cache,
-    BalanceMapper balanceMapper,
-    TransactionMapper transactionMapper)
+    BalanceMapper balanceMapper)
 {
     public async Task<Balance> GetBalanceAsync(Guid userId, CancellationToken ct = default)
     {
@@ -21,27 +20,27 @@ public class BalanceService(
             var cached = await cache.UserBalance.GetAsync(userId);
             if (cached != null) return cached;
         }
-        
+
         var balanceEntity = await db.Balances
-            .FirstOrDefaultAsync(b => b.UserId == userId, ct)
-            ?? throw new Exception("Balance not found");
+                                .FirstOrDefaultAsync(b => b.UserId == userId, ct)
+                            ?? throw new Exception("Balance not found");
 
         var balance = balanceMapper.ToData(balanceEntity);
-        
+
         if (cache.IsReady())
             await cache.UserBalance.SetAsync(userId, balance);
 
         return balance;
     }
 
-    public async Task<Transaction> CreateTransactionAsync(
+    public async Task<TransactionEntity> CreateTransactionAsync(
         TransactionEntity transaction,
         CancellationToken ct = default)
     {
         var entry = await db.Transactions.AddAsync(transaction, ct);
         await db.SaveChangesAsync(ct);
 
-        return transactionMapper.ToData(entry.Entity);
+        return entry.Entity;
     }
 
     public async Task<Balance> UpdateBalanceAsync(

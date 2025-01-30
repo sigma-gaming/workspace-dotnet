@@ -1,3 +1,4 @@
+using Common.Db.Interceptors;
 using Core.Db.Configuration;
 using Core.Db.Context;
 using Microsoft.EntityFrameworkCore;
@@ -17,8 +18,6 @@ public static class DependencyInjection
         var dbOptions = new CoreDbOptions();
         configuration.Bind("CoreDb", dbOptions);
 
-        services.AddSingleton(dbOptions);
-
         var connectionString = new NpgsqlConnectionStringBuilder
         {
             Host = dbOptions.Host,
@@ -28,12 +27,16 @@ public static class DependencyInjection
             Password = dbOptions.Password
         }.ToString();
 
-        services.AddDbContext<CoreDbContext>(options =>
+        Action<DbContextOptionsBuilder> action = options =>
         {
-            options.UseNpgsql(connectionString);
+            options.UseNpgsql(connectionString, npgsqOptions => { npgsqOptions.EnableRetryOnFailure(); });
+            options.AddInterceptors(new ForUpdateInterceptor());
             optionsAction?.Invoke(options);
-        });
+        };
+
+        services.AddDbContext<CoreDbContext>(action, optionsLifetime: ServiceLifetime.Singleton);
+        services.AddPooledDbContextFactory<CoreDbContext>(action);
 
         return services;
     }
-} 
+}

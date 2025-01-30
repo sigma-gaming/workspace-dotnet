@@ -23,7 +23,11 @@ if (apiOptions.EnableOpenApi)
 builder.Services.AddControllers();
 
 // Add infrastructure and domains
-builder.Services.AddCoreInfrastructure(builder.Configuration).AddCoreDomain().AddCoreMappers();
+builder.Services
+    .AddHttpClient()
+    .AddCoreInfrastructure(builder.Configuration)
+    .AddCoreDomain()
+    .AddCoreMappers();
 
 // Add authentication
 builder.Services.AddSessionAuthentication();

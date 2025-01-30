@@ -35,9 +35,9 @@ public class CoreCacheRegistry(
         userId => $"{options.Version}:user:{userId}",
         TimeSpan.FromHours(1));
 
-    public KeyedJsonCacheEntity<Guid, ProfileDetailed> DetailedProfile { get; } = new(
+    public KeyedJsonCacheEntity<Guid, UserDetails> UserDetails { get; } = new(
         redis,
-        userId => $"{options.Version}:detailedProfile:{userId}",
+        userId => $"{options.Version}:userDetails:{userId}",
         TimeSpan.FromHours(1));
 
     public KeyedStringCacheEntity<Guid> SessionCodeToSessionId { get; } = new(

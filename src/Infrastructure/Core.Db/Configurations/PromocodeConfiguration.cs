@@ -1,4 +1,5 @@
 using Core.Contracts.Entities;
+using Common.Db.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,7 +21,8 @@ public class PromocodeConfiguration : IEntityTypeConfiguration<PromocodeEntity>
             .HasColumnName("id");
         entity.Property(e => e.Bonus)
             .HasColumnType("jsonb")
-            .HasColumnName("bonus");
+            .HasColumnName("bonus")
+            .HasJsonbConversion();
         entity.Property(e => e.BonusType)
             .HasColumnType("smallint")
             .HasColumnName("bonus_type");
@@ -45,4 +47,4 @@ public class PromocodeConfiguration : IEntityTypeConfiguration<PromocodeEntity>
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
-} 
+}

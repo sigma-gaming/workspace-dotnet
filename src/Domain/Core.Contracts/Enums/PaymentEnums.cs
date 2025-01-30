@@ -17,23 +17,23 @@ public enum PaymentStatus
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum Currency
 {
-    RUB,
-    KZT,
-    KGS,
-    UZS,
-    UAH,
-    USD,
-    EUR,
-    TRX,
-    USDT_TRC20,
-    USDT_ERC20,
-    BTC,
-    LTC,
-    TON,
-    NOT,
-    ETH,
-    BNB,
-    DOGE
+    Rub,
+    Kzt,
+    Kgs,
+    Uzs,
+    Uah,
+    Usd,
+    Eur,
+    Trx,
+    UsdtTrc20,
+    UsdtErc20,
+    Btc,
+    Ltc,
+    Ton,
+    Not,
+    Eth,
+    Bnb,
+    Doge
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -46,7 +46,7 @@ public enum DepositType
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum DepositMethod
 {
-    SBP,
+    Sbp,
     CreditCard,
     Piastrix,
     Toncoin
@@ -55,7 +55,7 @@ public enum DepositMethod
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum WithdrawalMethod
 {
-    SBP,
+    Sbp,
     CreditCard,
     Piastrix
 }

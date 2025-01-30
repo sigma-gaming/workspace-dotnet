@@ -43,12 +43,10 @@ public class BalanceConfiguration : IEntityTypeConfiguration<BalanceEntity>
             .HasColumnName("wagering_required");
 
         entity.HasOne(d => d.MaxMultiplierGame).WithMany(p => p.BalanceMaxMultiplierGames)
-            .HasForeignKey(d => d.MaxMultiplierGameId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(d => d.MaxMultiplierGameId);
 
         entity.HasOne(d => d.MaxWinGame).WithMany(p => p.BalanceMaxWinGames)
-            .HasForeignKey(d => d.MaxWinGameId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(d => d.MaxWinGameId);
 
         entity.HasOne(d => d.User).WithOne(p => p.Balance)
             .HasForeignKey<BalanceEntity>(d => d.UserId);

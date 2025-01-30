@@ -8,6 +8,12 @@ public class IntegerCacheEntity(
     string key,
     TimeSpan? ttl = null) : IIntegerCacheEntity
 {
+    public async Task<bool> ExistsAsync()
+    {
+        var db = redis.GetDatabase();
+        return await db.KeyExistsAsync(key);
+    }
+
     public async Task<long?> GetAsync()
     {
         var db = redis.GetDatabase();
@@ -49,6 +55,12 @@ public class KeyedIntegerCacheEntity<TKey>(
     Func<TKey, string> keyGenerator,
     TimeSpan? ttl = null) : IKeyedIntegerCacheEntity<TKey>
 {
+    public async Task<bool> ExistsAsync(TKey key)
+    {
+        var db = redis.GetDatabase();
+        return await db.KeyExistsAsync(keyGenerator(key));
+    }
+
     public async Task<long?> GetAsync(TKey key)
     {
         var db = redis.GetDatabase();
@@ -90,6 +102,12 @@ public class StringCacheEntity(
     string key,
     TimeSpan? ttl = null) : IStringCacheEntity
 {
+    public async Task<bool> ExistsAsync()
+    {
+        var db = redis.GetDatabase();
+        return await db.KeyExistsAsync(key);
+    }
+
     public async Task<string?> GetAsync()
     {
         var db = redis.GetDatabase();
@@ -115,6 +133,12 @@ public class KeyedStringCacheEntity<TKey>(
     Func<TKey, string> keyGenerator,
     TimeSpan? ttl = null) : IKeyedStringCacheEntity<TKey>
 {
+    public async Task<bool> ExistsAsync(TKey key)
+    {
+        var db = redis.GetDatabase();
+        return await db.KeyExistsAsync(keyGenerator(key));
+    }
+
     public async Task<string?> GetAsync(TKey key)
     {
         var db = redis.GetDatabase();
@@ -140,6 +164,12 @@ public class BooleanCacheEntity(
     string key,
     TimeSpan? ttl = null) : IBooleanCacheEntity
 {
+    public async Task<bool> ExistsAsync()
+    {
+        var db = redis.GetDatabase();
+        return await db.KeyExistsAsync(key);
+    }
+
     public async Task<bool?> GetAsync()
     {
         var db = redis.GetDatabase();
@@ -172,6 +202,12 @@ public class KeyedBooleanCacheEntity<TKey>(
     Func<TKey, string> keyGenerator,
     TimeSpan? ttl = null) : IKeyedBooleanCacheEntity<TKey>
 {
+    public async Task<bool> ExistsAsync(TKey key)
+    {
+        var db = redis.GetDatabase();
+        return await db.KeyExistsAsync(keyGenerator(key));
+    }
+
     public async Task<bool?> GetAsync(TKey key)
     {
         var db = redis.GetDatabase();

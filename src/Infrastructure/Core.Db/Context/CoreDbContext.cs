@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Common.Db.Interceptors;
 using Core.Contracts.Entities;
-using Core.Db.Interceptors;
 
 namespace Core.Db.Context;
 
@@ -67,11 +67,6 @@ public class CoreDbContext : DbContext
     public virtual DbSet<UserStatsEntity> UserStats { get; set; }
 
     public virtual DbSet<WithdrawalEntity> Withdrawals { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.AddInterceptors(new ForUpdateInterceptor());
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

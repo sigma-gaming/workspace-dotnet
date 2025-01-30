@@ -1,4 +1,5 @@
 using Core.Contracts.Entities;
+using Common.Db.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -27,7 +28,8 @@ public class DepositConfiguration : IEntityTypeConfiguration<DepositEntity>
             .HasColumnName("method");
         entity.Property(e => e.Payload)
             .HasColumnType("jsonb")
-            .HasColumnName("payload");
+            .HasColumnName("payload")
+            .HasJsonbConversion();
         entity.Property(e => e.ProviderAmount).HasColumnName("provider_amount");
         entity.Property(e => e.ProviderTransactionId).HasColumnName("provider_transaction_id");
         entity.Property(e => e.Status)
@@ -55,4 +57,4 @@ public class DepositConfiguration : IEntityTypeConfiguration<DepositEntity>
         entity.HasOne(d => d.User).WithMany(p => p.Deposits)
             .HasForeignKey(d => d.UserId);
     }
-} 
+}

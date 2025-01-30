@@ -1,4 +1,5 @@
 using Core.Contracts.Enums;
+using Core.Contracts.Jsonb;
 
 namespace Core.Contracts.Data;
 
@@ -8,7 +9,7 @@ public sealed record Deposit
     public required DateTime UpdatedAt { get; init; }
     public required long GemAmount { get; init; }
     public required decimal CurrencyAmount { get; init; }
-    public required string Payload { get; init; }
+    public required DepositPayload Payload { get; init; }
     public required Guid UserId { get; init; }
     public Guid? TransactionId { get; init; }
     public required Guid Id { get; init; }

@@ -1,0 +1,38 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace Core.Services.Finance.Api;
+
+public enum BinanceSymbol
+{
+    [JsonStringEnumMemberName("BTCUSDT")] BtcUsdt,
+    [JsonStringEnumMemberName("ETHUSDT")] EthUsdt,
+    [JsonStringEnumMemberName("LTCUSDT")] LtcUsdt,
+    [JsonStringEnumMemberName("TRXUSDT")] TrxUsdt,
+    [JsonStringEnumMemberName("TONUSDT")] TonUsdt,
+    [JsonStringEnumMemberName("NOTUSDT")] NotUsdt,
+    [JsonStringEnumMemberName("BNBUSDT")] BnbUsdt,
+    [JsonStringEnumMemberName("DOGEUSDT")] DogeUsdt
+}
+
+public sealed record BinanceTickerPrice
+{
+    [JsonPropertyName("symbol")] public required BinanceSymbol Symbol { get; init; }
+    [JsonPropertyName("price")] public required string Price { get; init; }
+}
+
+public sealed class BinanceApi(HttpClient httpClient)
+{
+    private const string BaseUrl = "https://data-api.binance.vision/api/v3";
+
+    public async Task<List<BinanceTickerPrice>> GetTickerPrice(BinanceSymbol[] symbols)
+    {
+        var symbolsParam = string.Join(",", symbols);
+        var response = await httpClient.GetAsync($"{BaseUrl}/ticker/price?symbols=[{symbolsParam}]");
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<List<BinanceTickerPrice>>(content);
+        return result ?? throw new InvalidOperationException("Failed to deserialize Binance response");
+    }
+}

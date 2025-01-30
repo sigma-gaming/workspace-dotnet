@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Core.Db.Extensions;
+namespace Common.Db.Extensions;
 
 public static class ForUpdateExtensions
 {

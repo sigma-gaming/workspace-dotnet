@@ -1,4 +1,5 @@
 ﻿using Core.Contracts.Enums;
+using Core.Contracts.Jsonb;
 
 namespace Core.Contracts.Entities;
 
@@ -12,7 +13,7 @@ public sealed record PromocodeEntity
     public int Usages { get; set; } = 0;
     public int MaxUsages { get; set; }
     public bool IsActive { get; set; } = true;
-    public string Bonus { get; set; } = null!;
+    public PromocodeBonus Bonus { get; set; } = null!;
     public Guid? UserId { get; set; }
     public string? Campaign { get; set; }
     public Guid? CreatedBy { get; set; }

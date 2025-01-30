@@ -3,7 +3,7 @@ using Core.Contracts.Public;
 
 namespace Core.Contracts.Compounds;
 
-public sealed record ProfileDetailed
+public sealed record UserDetails
 {
     public required UserPublic User { get; init; }
     public required Profile Profile { get; init; }
