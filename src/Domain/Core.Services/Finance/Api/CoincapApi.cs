@@ -31,12 +31,12 @@ public sealed class CoincapApi(HttpClient httpClient)
 {
     private const string BaseUrl = "https://api.coincap.io/v2";
 
-    public async Task<List<CoincapRate>> GetRates()
+    public async Task<List<CoincapRate>> GetRates(CancellationToken ct = default)
     {
-        var response = await httpClient.GetAsync($"{BaseUrl}/rates");
+        var response = await httpClient.GetAsync($"{BaseUrl}/rates", ct);
         response.EnsureSuccessStatusCode();
 
-        var content = await response.Content.ReadAsStringAsync();
+        var content = await response.Content.ReadAsStringAsync(ct);
         var result = JsonSerializer.Deserialize<CoincapRatesResponse>(content);
         return result?.Data ?? throw new InvalidOperationException("Failed to deserialize Coincap response");
     }

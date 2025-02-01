@@ -105,6 +105,7 @@ public class AuthService(
     public async Task<AuthResult> AuthenticateAsync(AuthenticatePayload payload)
     {
         var account = await db.Accounts
+            .AsNoTracking()
             .FirstOrDefaultAsync(a =>
                 a.Provider == payload.Provider &&
                 a.ProviderUserId == payload.ProviderUserId);
@@ -124,6 +125,7 @@ public class AuthService(
         if (payload.UserId.HasValue)
         {
             var connectedAccount = await db.Accounts
+                .AsNoTracking()
                 .FirstOrDefaultAsync(a =>
                     a.UserId == payload.UserId &&
                     a.Provider == payload.Provider);

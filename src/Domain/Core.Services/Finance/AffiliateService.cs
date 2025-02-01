@@ -14,6 +14,7 @@ public class AffiliateService(
     CoreDbContext db,
     CoreCacheRegistry cache,
     ILogger<AffiliateService> logger,
+    BalanceService balanceService,
     ReferralCampaignMapper campaignMapper,
     ReferrerSettingsMapper settingsMapper,
     ReferrerBalanceMapper balanceMapper,
@@ -50,10 +51,11 @@ public class AffiliateService(
             .ToArray());
     }
 
-    public async Task<ReferralCampaign?> TryGetCampaignAsync(string code)
+    public async Task<ReferralCampaign?> TryGetCampaignAsync(string code, CancellationToken ct = default)
     {
         var campaign = await db.ReferralCampaigns
-            .FirstOrDefaultAsync(c => c.Code == code);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Code == code, ct);
 
         return campaign != null ? campaignMapper.ToData(campaign) : null;
     }
@@ -78,10 +80,11 @@ public class AffiliateService(
         }
     }
 
-    private async Task<ReferrerSettings?> QueryReferrerSettingsAsync(Guid referrerId)
+    private async Task<ReferrerSettings?> QueryReferrerSettingsAsync(Guid referrerId, CancellationToken ct = default)
     {
         var settingsEntity = await db.ReferrerSettings
-            .FirstOrDefaultAsync(s => s.ReferrerId == referrerId);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => s.ReferrerId == referrerId, ct);
 
         return settingsEntity != null ? settingsMapper.ToData(settingsEntity) : null;
     }
@@ -102,10 +105,11 @@ public class AffiliateService(
         return settings;
     }
 
-    private async Task<ReferrerBalance?> QueryReferrerBalanceAsync(Guid referrerId)
+    private async Task<ReferrerBalance?> QueryReferrerBalanceAsync(Guid referrerId, CancellationToken ct = default)
     {
         var balanceEntity = await db.ReferrerBalances
-            .FirstOrDefaultAsync(b => b.ReferrerId == referrerId);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.ReferrerId == referrerId, ct);
 
         return balanceEntity != null ? balanceMapper.ToData(balanceEntity) : null;
     }
@@ -174,14 +178,15 @@ public class AffiliateService(
 
     public async Task<ReferrerBalance> UpdateReferrerBalanceAsync(Guid referrerId, long available)
     {
-        var balanceEntity = await db.ReferrerBalances
-                                .FirstOrDefaultAsync(b => b.ReferrerId == referrerId)
-                            ?? throw new Exception("ReferrerBalance not found");
+        await db.ReferrerBalances.Where(b => b.ReferrerId == referrerId).ExecuteUpdateAsync(setters =>
+            setters.SetProperty(b => b.Available, available));
 
-        balanceEntity.Available = available;
-        await db.SaveChangesAsync();
+        var updatedEntity = await db.ReferrerBalances.FindAsync(referrerId);
 
-        var result = balanceMapper.ToData(balanceEntity);
+        if (updatedEntity == null)
+            throw new Exception("ReferrerBalance not found");
+
+        var result = balanceMapper.ToData(updatedEntity);
 
         await cache.ExecuteIfConnectedAsync(async () => await cache.ReferrerBalance.SetAsync(referrerId, result));
 
@@ -221,7 +226,7 @@ public class AffiliateService(
         await db.SaveChangesAsync();
     }
 
-    public async Task ProcessReferrerPayoutsAsync()
+    public async Task ProcessReferrerPayoutsAsync(CancellationToken ct = default)
     {
         var now = DateTime.UtcNow;
         var nextPayoutAt = GenerateNextPayoutDate();
@@ -229,7 +234,8 @@ public class AffiliateService(
         // Get last transaction ID to prevent false-positive isProcessed updates
         var lastTransaction = await db.ReferrerTransactions
             .OrderByDescending(t => t.Id)
-            .FirstOrDefaultAsync();
+            .AsNoTracking()
+            .FirstOrDefaultAsync(ct);
 
         if (lastTransaction == null)
         {
@@ -246,7 +252,7 @@ public class AffiliateService(
             {
                 ReferrerId = g.Key,
                 TotalAmount = g.Sum(x => x.Amount)
-            }).ToListAsync();
+            }).ToListAsync(ct);
 
         if (pendingPayouts.Count == 0)
         {
@@ -261,38 +267,33 @@ public class AffiliateService(
 
             await db.ExecuteInTransactionAsync(async () =>
             {
-                var balanceEntity = await db.ReferrerBalances
-                    .TagWith("ForUpdate")
-                    .FirstOrDefaultAsync(b => b.ReferrerId == payout.ReferrerId);
+                var balanceEntity = await balanceService.GetBalanceForUpdateAsync(payout.ReferrerId, ct);
 
-                if (balanceEntity != null)
+                balanceEntity.Available += payout.TotalAmount;
+
+                // Mark transactions as processed
+                var transactions = await db.ReferrerTransactions
+                    .Where(t => t.Id <= lastTransaction.Id &&
+                                t.ReferrerId == payout.ReferrerId &&
+                                !t.IsProcessed)
+                    .ToListAsync(ct);
+
+                foreach (var t in transactions)
                 {
-                    balanceEntity.Available += payout.TotalAmount;
-
-                    // Mark transactions as processed
-                    var transactions = await db.ReferrerTransactions
-                        .Where(t => t.Id <= lastTransaction.Id &&
-                                    t.ReferrerId == payout.ReferrerId &&
-                                    !t.IsProcessed)
-                        .ToListAsync();
-
-                    foreach (var t in transactions)
-                    {
-                        t.IsProcessed = true;
-                    }
-
-                    // Update payout dates
-                    var payoutEntity = await db.ReferrerPayouts
-                        .FirstOrDefaultAsync(p => p.ReferrerId == payout.ReferrerId);
-
-                    if (payoutEntity != null)
-                    {
-                        payoutEntity.NextPayoutAt = nextPayoutAt;
-                        payoutEntity.LastPayoutAt = now;
-                    }
-
-                    await db.SaveChangesAsync();
+                    t.IsProcessed = true;
                 }
+
+                // Update payout dates
+                var payoutEntity = await db.ReferrerPayouts
+                    .FirstOrDefaultAsync(p => p.ReferrerId == payout.ReferrerId);
+
+                if (payoutEntity != null)
+                {
+                    payoutEntity.NextPayoutAt = nextPayoutAt;
+                    payoutEntity.LastPayoutAt = now;
+                }
+
+                await db.SaveChangesAsync();
             });
 
             await cache.ExecuteIfConnectedAsync(async () =>

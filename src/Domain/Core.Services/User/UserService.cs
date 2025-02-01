@@ -13,10 +13,11 @@ public class UserService(
     CoreCacheRegistry cache,
     UserMapper userMapper)
 {
-    private async Task<UserEntity?> QueryUserAsync(Guid userId)
+    private async Task<UserEntity?> QueryUserAsync(Guid userId, CancellationToken ct = default)
     {
         return await db.Users
-            .FirstOrDefaultAsync(u => u.Id == userId);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId, ct);
     }
 
     public async Task<Contracts.Data.User?> TryGetUserAsync(Guid userId)
@@ -44,6 +45,7 @@ public class UserService(
     public async Task<Contracts.Data.User> GetUserAsync(Guid userId)
     {
         var user = await TryGetUserAsync(userId);
+
         if (user == null)
             throw new Exception("User not found");
 

@@ -24,17 +24,28 @@ public static class DependencyInjection
             Port = dbOptions.Port,
             Database = dbOptions.Database,
             Username = dbOptions.Username,
-            Password = dbOptions.Password
+            Password = dbOptions.Password,
+            Pooling = true,
+            MinPoolSize = 10,
+            MaxPoolSize = dbOptions.MaxConnections,
+            NoResetOnClose = true,
+            Enlist = false,
+            SslMode = SslMode.Disable,
+            KeepAlive = 10,
         }.ToString();
 
         Action<DbContextOptionsBuilder> action = options =>
         {
-            options.UseNpgsql(connectionString, npgsqOptions => { npgsqOptions.EnableRetryOnFailure(); });
+            options.UseNpgsql(connectionString, npgsqOptions =>
+            {
+                npgsqOptions.EnableRetryOnFailure();
+                npgsqOptions.SetPostgresVersion(17, 0);
+            });
             options.AddInterceptors(new ForUpdateInterceptor());
             optionsAction?.Invoke(options);
         };
 
-        services.AddDbContext<CoreDbContext>(action, optionsLifetime: ServiceLifetime.Singleton);
+        services.AddDbContextPool<CoreDbContext>(action);
         services.AddPooledDbContextFactory<CoreDbContext>(action);
 
         return services;

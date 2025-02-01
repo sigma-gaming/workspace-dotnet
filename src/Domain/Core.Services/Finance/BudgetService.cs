@@ -13,9 +13,9 @@ public class BudgetService(
     CoreDbContext db,
     BudgetMapper budgetMapper)
 {
-    private async Task<Budget> QueryBudgetAsync()
+    private async Task<Budget> QueryBudgetAsync(CancellationToken ct = default)
     {
-        var budgetEntity = await db.Budget.FirstOrDefaultAsync();
+        var budgetEntity = await db.Budget.AsNoTracking().FirstOrDefaultAsync(ct);
 
         if (budgetEntity == null)
             throw new Exception("Budget is not configured");

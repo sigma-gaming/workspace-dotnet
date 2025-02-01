@@ -25,9 +25,10 @@ public static class DependencyInjection
             Password = cacheOptions.Password,
         };
 
-        services.AddSingleton<IConnectionMultiplexer>(_ =>
-            ConnectionMultiplexer.Connect(options));
-
+        var connection = ConnectionMultiplexer.Connect(options);
+        services.AddSingleton<IConnectionMultiplexer>(connection);
+        connection.GetDatabase().PingAsync();
+        
         return services;
     }
 }

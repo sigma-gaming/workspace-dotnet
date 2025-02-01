@@ -25,13 +25,13 @@ public sealed class BinanceApi(HttpClient httpClient)
 {
     private const string BaseUrl = "https://data-api.binance.vision/api/v3";
 
-    public async Task<List<BinanceTickerPrice>> GetTickerPrice(BinanceSymbol[] symbols)
+    public async Task<List<BinanceTickerPrice>> GetTickerPrice(BinanceSymbol[] symbols, CancellationToken ct = default)
     {
         var symbolsParam = string.Join(",", symbols);
-        var response = await httpClient.GetAsync($"{BaseUrl}/ticker/price?symbols=[{symbolsParam}]");
+        var response = await httpClient.GetAsync($"{BaseUrl}/ticker/price?symbols=[{symbolsParam}]", ct);
         response.EnsureSuccessStatusCode();
 
-        var content = await response.Content.ReadAsStringAsync();
+        var content = await response.Content.ReadAsStringAsync(ct);
         var result = JsonSerializer.Deserialize<List<BinanceTickerPrice>>(content);
         return result ?? throw new InvalidOperationException("Failed to deserialize Binance response");
     }

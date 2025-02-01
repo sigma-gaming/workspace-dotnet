@@ -13,21 +13,23 @@ public class ProfileService(
     ProfileMapper profileMapper,
     AccountMapper accountMapper)
 {
-    private async Task<UserDetails> QueryUserDetailsAsync(Guid userId)
+    private async Task<UserDetails> QueryUserDetailsAsync(Guid userId, CancellationToken ct = default)
     {
         var result = await (
-            from user in db.Users
-            join p in db.Profiles on user.Id equals p.UserId into userProfiles
-            from profile in userProfiles.DefaultIfEmpty()
-            join a in db.Accounts on user.Id equals a.UserId into userAccounts
-            where user.Id == userId
-            select new
-            {
-                User = user,
-                Profile = profile,
-                Accounts = userAccounts.ToList()
-            }
-        ).FirstOrDefaultAsync();
+                from user in db.Users
+                join p in db.Profiles on user.Id equals p.UserId into userProfiles
+                from profile in userProfiles.DefaultIfEmpty()
+                join a in db.Accounts on user.Id equals a.UserId into userAccounts
+                where user.Id == userId
+                select new
+                {
+                    User = user,
+                    Profile = profile,
+                    Accounts = userAccounts.ToList()
+                }
+            )
+            .AsNoTracking()
+            .FirstOrDefaultAsync(ct);
 
         if (result == null)
             throw new InvalidOperationException("User not found");

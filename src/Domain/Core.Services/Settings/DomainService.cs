@@ -14,13 +14,14 @@ public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFact
     private readonly TimeSpan refreshInterval = TimeSpan.FromMinutes(5);
     private readonly TimeSpan retryDelay = TimeSpan.FromSeconds(5);
 
-    private async Task<List<DomainEntity>> QueryDomainsAsync()
+    private async Task<List<DomainEntity>> QueryDomainsAsync(CancellationToken ct = default)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
+        await using var db = await dbContextFactory.CreateDbContextAsync(ct);
 
         return await db.Domains
             .OrderByDescending(d => d.CreatedAt)
-            .ToListAsync();
+            .AsNoTracking()
+            .ToListAsync(ct);
     }
 
     private async Task RefreshDomainsAsync()
@@ -46,6 +47,10 @@ public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFact
             {
                 await RefreshDomainsAsync();
                 await Task.Delay(refreshInterval, stoppingToken);
+            }
+            catch (OperationCanceledException)
+            {
+                logger.LogInformation("Domain refresh cancelled");
             }
             catch (Exception ex)
             {

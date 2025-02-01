@@ -1073,10 +1073,6 @@ namespace Core.Migrations.Migrations
                         .HasColumnName("roles")
                         .HasDefaultValueSql("'{0}'::smallint[]");
 
-                    b.Property<Guid?>("SecurityId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("security_id");
-
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")

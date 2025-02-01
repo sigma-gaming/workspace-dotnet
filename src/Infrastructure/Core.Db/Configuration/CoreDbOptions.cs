@@ -7,4 +7,5 @@ public class CoreDbOptions
     public string Database { get; set; } = null!;
     public string Username { get; set; } = null!;
     public string Password { get; set; } = null!;
-} 
+    public int MaxConnections { get; set; } = 100;
+}

@@ -13,9 +13,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddCoreDb(configuration,
-            (options) => { options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking); });
-
+        services.AddCoreDb(configuration);
         services.AddCoreCache(configuration);
         services.AddCorePubSub(configuration);
 

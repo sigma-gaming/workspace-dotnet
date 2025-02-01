@@ -21,6 +21,7 @@ public class SessionService(
         }
 
         var sessionEntity = await db.Sessions
+            .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == sessionId);
 
         if (sessionEntity == null)

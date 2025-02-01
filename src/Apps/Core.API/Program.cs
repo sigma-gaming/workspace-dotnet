@@ -5,9 +5,17 @@ using Core.API.Configuration;
 using Core.Services;
 using Scalar.AspNetCore;
 using Core.Contracts;
-using Core.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.Http2.MaxStreamsPerConnection = 1000;
+    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
+    options.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(30);
+    options.Limits.MinRequestBodyDataRate = null;
+    options.AddServerHeader = false;
+});
 
 builder.AddLogging("Core API");
 
@@ -30,8 +38,8 @@ builder.Services
     .AddCoreMappers();
 
 // Add authentication
-builder.Services.AddSessionAuthentication();
-builder.Services.AddAuthorization();
+// builder.Services.AddSessionAuthentication();
+// builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -52,8 +60,7 @@ if (apiOptions.EnableOpenApi)
     });
 }
 
-app.UseAuthentication().UseAuthorization();
+// app.UseAuthentication().UseAuthorization();
 
 app.MapControllers();
-
 await app.RunAsync();

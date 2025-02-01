@@ -10,7 +10,7 @@ public class GameHistoryService(
     CoreDbContext db,
     CoreCacheRegistry cache)
 {
-    public async Task<GameRecord[]> GetLastWinHistoryAsync()
+    public async Task<GameRecord[]> GetLastWinHistoryAsync(CancellationToken ct = default)
     {
         if (cache.IsReady() && await cache.LastWinHistory.ExistsAsync())
         {
@@ -18,33 +18,34 @@ public class GameHistoryService(
             return cached.ToArray();
         }
 
-        var records = await db.GameRecords
-            .Where(r => r.Outcome == GameOutcome.Win)
-            .OrderByDescending(r => r.Id)
+        var records = await (
+                from r in db.GameRecords
+                where r.Outcome == GameOutcome.Win
+                orderby r.Id descending
+                select new GameRecord
+                {
+                    Id = r.Id,
+                    Game = r.Game,
+                    Outcome = r.Outcome,
+                    CreatedAt = r.CreatedAt,
+                    Snapshot = r.Snapshot,
+                    Bet = r.Bet,
+                    Multiplier = r.Multiplier,
+                    Payout = r.Payout,
+                    PreviewUserName = r.PreviewUserName,
+                    UserId = r.UserId,
+                    TransactionId = r.TransactionId
+                })
             .Take(10)
-            .Select(r => new GameRecord
-            {
-                Id = r.Id,
-                Game = r.Game,
-                Outcome = r.Outcome,
-                CreatedAt = r.CreatedAt,
-                Snapshot = r.Snapshot,
-                Bet = r.Bet,
-                Multiplier = r.Multiplier,
-                Payout = r.Payout,
-                PreviewUserName = r.PreviewUserName,
-                UserId = r.UserId,
-                TransactionId = r.TransactionId
-            })
-            .ToArrayAsync();
+            .AsNoTracking()
+            .ToArrayAsync(ct);
 
-        if (cache.IsReady())
-            await cache.LastWinHistory.SetAllAsync(records.ToList());
+        await cache.ExecuteIfConnectedAsync(async () => { await cache.LastWinHistory.SetAllAsync(records.ToList()); });
 
         return records;
     }
 
-    public async Task<GameRecord[]> GetBigWinHistoryAsync()
+    public async Task<GameRecord[]> GetBigWinHistoryAsync(CancellationToken ct = default)
     {
         if (cache.IsReady() && await cache.BigWinHistory.ExistsAsync())
         {
@@ -71,15 +72,15 @@ public class GameHistoryService(
                     TransactionId = r.TransactionId
                 })
             .Take(10)
-            .ToArrayAsync();
+            .AsNoTracking()
+            .ToArrayAsync(ct);
 
-        if (cache.IsReady())
-            await cache.BigWinHistory.SetAllAsync(records.ToList());
+        await cache.ExecuteIfConnectedAsync(async () => { await cache.BigWinHistory.SetAllAsync(records.ToList()); });
 
         return records;
     }
 
-    public async Task<GameRecord[]> GetUserGameHistoryAsync(Guid userId)
+    public async Task<GameRecord[]> GetUserGameHistoryAsync(Guid userId, CancellationToken ct = default)
     {
         if (cache.IsReady() && await cache.UserGameHistory.ExistsAsync(userId))
         {
@@ -87,28 +88,32 @@ public class GameHistoryService(
             return cached.ToArray();
         }
 
-        var records = await db.GameRecords
-            .Where(r => r.UserId == userId)
-            .OrderByDescending(r => r.Id)
+        var records = await (
+                from r in db.GameRecords
+                where r.UserId == userId
+                orderby r.Id descending
+                select new GameRecord
+                {
+                    Id = r.Id,
+                    Game = r.Game,
+                    Outcome = r.Outcome,
+                    CreatedAt = r.CreatedAt,
+                    Snapshot = r.Snapshot,
+                    Bet = r.Bet,
+                    Multiplier = r.Multiplier,
+                    Payout = r.Payout,
+                    PreviewUserName = r.PreviewUserName,
+                    UserId = r.UserId,
+                    TransactionId = r.TransactionId
+                })
             .Take(10)
-            .Select(r => new GameRecord
-            {
-                Id = r.Id,
-                Game = r.Game,
-                Outcome = r.Outcome,
-                CreatedAt = r.CreatedAt,
-                Snapshot = r.Snapshot,
-                Bet = r.Bet,
-                Multiplier = r.Multiplier,
-                Payout = r.Payout,
-                PreviewUserName = r.PreviewUserName,
-                UserId = r.UserId,
-                TransactionId = r.TransactionId
-            })
-            .ToArrayAsync();
+            .AsNoTracking()
+            .ToArrayAsync(ct);
 
-        if (cache.IsReady())
+        await cache.ExecuteIfConnectedAsync(async () =>
+        {
             await cache.UserGameHistory.SetAllAsync(userId, records.ToList());
+        });
 
         return records;
     }

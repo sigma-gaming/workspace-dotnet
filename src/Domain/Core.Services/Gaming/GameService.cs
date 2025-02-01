@@ -5,6 +5,7 @@ using Core.Contracts.Enums;
 using Core.Contracts.Jsonb;
 using Core.Db.Context;
 using Common.Db.Extensions;
+using Core.Contracts.Mappers;
 using Core.Services.Caching;
 using Core.Services.Finance;
 using Core.Services.User;
@@ -37,7 +38,8 @@ public class GameService(
     BudgetService budgetService,
     BalanceService balanceService,
     ProfileService profileService,
-    GameHistoryService gameHistoryService)
+    GameHistoryService gameHistoryService,
+    GameRecordMapper gameRecordMapper)
 {
     private static readonly Dictionary<GameOutcome, TransactionType> OutcomeToTypeMap = new()
     {
@@ -45,9 +47,11 @@ public class GameService(
         [GameOutcome.Loss] = TransactionType.Loss
     };
 
-    public async Task<GameRecordEntity?> GetGameRecordAsync(Guid gameRecordId)
+    public async Task<GameRecordEntity?> GetGameRecordAsync(Guid gameRecordId, CancellationToken ct = default)
     {
-        return await db.GameRecords.FirstOrDefaultAsync(r => r.Id == gameRecordId);
+        return await db.GameRecords
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == gameRecordId, ct);
     }
 
     public decimal CalculateWageringMultiplier(GameSnapshot snapshot)
@@ -96,8 +100,8 @@ public class GameService(
 
         var (gameRecord, updatedBalance) = await db.ExecuteInTransactionAsync(async () =>
         {
-            var transactionId = Guid.NewGuid();
-            var gameRecordId = Guid.NewGuid();
+            var transactionId = Guid.CreateVersion7();
+            var gameRecordId = Guid.CreateVersion7();
 
             var transaction = await balanceService.CreateTransactionAsync(new TransactionEntity
             {
@@ -112,7 +116,7 @@ public class GameService(
 
             var multiplier = (int)Math.Floor(Math.Max(0, (decimal)payload.Payout / payload.Bet * 100));
 
-            var gameRecord = new GameRecordEntity
+            var gameRecordEntity = new GameRecordEntity
             {
                 Id = gameRecordId,
                 Game = payload.Game,
@@ -127,7 +131,7 @@ public class GameService(
                 CreatedAt = DateTime.UtcNow
             };
 
-            db.GameRecords.Add(gameRecord);
+            db.GameRecords.Add(gameRecordEntity);
             await db.SaveChangesAsync();
 
             var wageringChange = CalculateWageringChange(payload.Bet, payload.Snapshot);
@@ -135,31 +139,19 @@ public class GameService(
             var updatedBalance = await balanceService.UpdateBalanceAsync(
                 payload.Balance,
                 transaction,
-                gameRecord,
+                gameRecordEntity,
                 wageringChange);
 
-            return (gameRecord, updatedBalance);
+            return (gameRecord: gameRecordEntity, updatedBalance);
         });
 
-        if (cache.IsReady())
+        await cache.ExecuteIfConnectedAsync(async () =>
         {
             await cache.UserBalance.SetAsync(payload.UserId, updatedBalance);
             await budgetService.ChangeAvailableAsync(-payload.Payout);
-            await gameHistoryService.AddGameRecordAsync(new GameRecord
-            {
-                Id = gameRecord.Id,
-                Game = gameRecord.Game,
-                Outcome = gameRecord.Outcome,
-                CreatedAt = gameRecord.CreatedAt,
-                Snapshot = gameRecord.Snapshot,
-                Bet = gameRecord.Bet,
-                Multiplier = gameRecord.Multiplier,
-                Payout = gameRecord.Payout,
-                PreviewUserName = gameRecord.PreviewUserName,
-                UserId = gameRecord.UserId,
-                TransactionId = gameRecord.TransactionId
-            });
-        }
+        });
+
+        _ = gameHistoryService.AddGameRecordAsync(gameRecordMapper.ToData(gameRecord));
 
         return (gameRecord, updatedBalance);
     }

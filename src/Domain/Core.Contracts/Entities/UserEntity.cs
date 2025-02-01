@@ -8,7 +8,6 @@ public sealed record UserEntity
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public int? ProfileId { get; set; }
-    public Guid? SecurityId { get; set; }
     public Guid? ReferrerId { get; set; }
     public Guid? ReferralCampaignId { get; set; }
     public bool Virtual { get; set; } = false;

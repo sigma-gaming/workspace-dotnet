@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Events;
 using Serilog.Formatting.Compact;
 
 namespace Common.Logging;
@@ -16,11 +17,16 @@ public static class Logging
 
             if (builder.Environment.IsProduction())
             {
-                loggerConfiguration.WriteTo.Console(new CompactJsonFormatter());
+                loggerConfiguration
+                    .MinimumLevel.Information()
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                    .WriteTo.Async(c => c.Console(new CompactJsonFormatter()));
             }
             else
             {
-                loggerConfiguration.WriteTo.Console();
+                loggerConfiguration
+                    .MinimumLevel.Debug()
+                    .WriteTo.Async(c => c.Console());
             }
         });
 

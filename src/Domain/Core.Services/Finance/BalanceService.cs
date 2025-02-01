@@ -1,3 +1,4 @@
+using Common.Db.Extensions;
 using Core.Contracts.Data;
 using Core.Contracts.Entities;
 using Core.Contracts.Enums;
@@ -22,15 +23,29 @@ public class BalanceService(
         }
 
         var balanceEntity = await db.Balances
-                                .FirstOrDefaultAsync(b => b.UserId == userId, ct)
-                            ?? throw new Exception("Balance not found");
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.UserId == userId, ct);
+
+        if (balanceEntity == null)
+            throw new Exception("Balance not found");
 
         var balance = balanceMapper.ToData(balanceEntity);
 
-        if (cache.IsReady())
-            await cache.UserBalance.SetAsync(userId, balance);
+        await cache.ExecuteIfConnectedAsync(async () => { await cache.UserBalance.SetAsync(userId, balance); });
 
         return balance;
+    }
+
+    public async Task<BalanceEntity> GetBalanceForUpdateAsync(Guid userId, CancellationToken ct = default)
+    {
+        var balanceEntity = await db.Balances
+            .ForUpdate()
+            .FirstOrDefaultAsync(b => b.UserId == userId, ct);
+
+        if (balanceEntity == null)
+            throw new Exception("Balance not found");
+
+        return balanceEntity;
     }
 
     public async Task<TransactionEntity> CreateTransactionAsync(
@@ -47,8 +62,7 @@ public class BalanceService(
         BalanceEntity balance,
         TransactionEntity transaction,
         GameRecordEntity? gameRecord = null,
-        long wageringChange = 0,
-        CancellationToken ct = default)
+        long wageringChange = 0)
     {
         if (!transaction.UserId.HasValue)
             throw new ArgumentException("UserId is required");
@@ -91,7 +105,7 @@ public class BalanceService(
         }
 
         db.Balances.Update(balance);
-        await db.SaveChangesAsync(ct);
+        await db.SaveChangesAsync();
 
         return balanceMapper.ToData(balance);
     }

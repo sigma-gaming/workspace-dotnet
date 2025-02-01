@@ -26,7 +26,6 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .HasColumnType("smallint[]")
             .HasColumnName("roles")
             .HasDefaultValueSql("'{0}'::smallint[]");
-        entity.Property(e => e.SecurityId).HasColumnName("security_id");
         entity.Property(e => e.UpdatedAt)
             .HasDefaultValueSql("now()")
             .HasColumnName("updated_at");
