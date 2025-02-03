@@ -109,7 +109,7 @@ public class CoreCacheRegistry(
         $"{options.Version}:global:globalTasks",
         TimeSpan.FromHours(1));
 
-    public KeyedJsonCacheEntity<string, GlobalTaskStatus> GlobalTaskStatus { get; } = new(
+    public KeyedJsonCacheEntity<string, GlobalTaskStatusInfo> GlobalTaskStatus { get; } = new(
         redis,
         keyAndUserId => $"{options.Version}:globalTaskStatus:{keyAndUserId}",
         TimeSpan.FromHours(1));

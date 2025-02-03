@@ -16,6 +16,7 @@ public class TestController(
     public async Task<ActionResult<UserPublic>> Test()
     {
         var user = await db.Users.AsNoTracking().FirstOrDefaultAsync();
+
         return Ok(mapper.ToPublic(user!));
     }
 }

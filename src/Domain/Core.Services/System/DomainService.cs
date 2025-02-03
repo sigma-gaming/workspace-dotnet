@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Core.Services.Settings;
+namespace Core.Services.System;
 
 public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFactory, ILogger<DomainService> logger)
     : BackgroundService

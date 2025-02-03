@@ -22,6 +22,7 @@ public static class DependencyInjection
         services.AddSingleton<ReferrerPayoutMapper>();
         services.AddSingleton<ReferrerTransactionMapper>();
         services.AddSingleton<ReferrerWithdrawalMapper>();
+        services.AddSingleton<GlobalTaskMapper>();
 
         return services;
     }

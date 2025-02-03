@@ -14,18 +14,17 @@ public static class Logging
         {
             loggerConfiguration.Enrich.FromLogContext();
             loggerConfiguration.Enrich.WithProperty("App", appName);
+            loggerConfiguration.MinimumLevel.Information();
 
             if (builder.Environment.IsProduction())
             {
                 loggerConfiguration
-                    .MinimumLevel.Information()
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .WriteTo.Async(c => c.Console(new CompactJsonFormatter()));
             }
             else
             {
                 loggerConfiguration
-                    .MinimumLevel.Debug()
                     .WriteTo.Async(c => c.Console());
             }
         });

@@ -5,6 +5,7 @@ using Core.API.Configuration;
 using Core.Services;
 using Scalar.AspNetCore;
 using Core.Contracts;
+using Core.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,8 +39,8 @@ builder.Services
     .AddCoreMappers();
 
 // Add authentication
-// builder.Services.AddSessionAuthentication();
-// builder.Services.AddAuthorization();
+builder.Services.AddSessionAuthentication();
+builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -60,7 +61,7 @@ if (apiOptions.EnableOpenApi)
     });
 }
 
-// app.UseAuthentication().UseAuthorization();
+app.UseAuthentication().UseAuthorization();
 
 app.MapControllers();
 await app.RunAsync();

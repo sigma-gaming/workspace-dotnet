@@ -39,7 +39,8 @@ public class GameService(
     BalanceService balanceService,
     ProfileService profileService,
     GameHistoryService gameHistoryService,
-    GameRecordMapper gameRecordMapper)
+    GameRecordMapper gameRecordMapper,
+    BalanceMapper balanceMapper)
 {
     private static readonly Dictionary<GameOutcome, TransactionType> OutcomeToTypeMap = new()
     {
@@ -142,7 +143,7 @@ public class GameService(
                 gameRecordEntity,
                 wageringChange);
 
-            return (gameRecord: gameRecordEntity, updatedBalance);
+            return (gameRecord: gameRecordEntity, balanceMapper.ToData(updatedBalance));
         });
 
         await cache.ExecuteIfConnectedAsync(async () =>

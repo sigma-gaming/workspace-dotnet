@@ -4,8 +4,8 @@ namespace Core.Contracts.Data;
 
 public sealed record Notification
 {
-    public required NotificationKind Kind { get; init; }
     public required Guid Id { get; init; }
+    public required NotificationKind Kind { get; init; }
     public required DateTime CreatedAt { get; init; }
     public required DateTime ExpiresAt { get; init; }
     public required string Title { get; init; }

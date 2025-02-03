@@ -58,7 +58,7 @@ public class BalanceService(
         return entry.Entity;
     }
 
-    public async Task<Balance> UpdateBalanceAsync(
+    public async Task<BalanceEntity> UpdateBalanceAsync(
         BalanceEntity balance,
         TransactionEntity transaction,
         GameRecordEntity? gameRecord = null,
@@ -107,6 +107,6 @@ public class BalanceService(
         db.Balances.Update(balance);
         await db.SaveChangesAsync();
 
-        return balanceMapper.ToData(balance);
+        return balance;
     }
 }

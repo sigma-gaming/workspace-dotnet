@@ -490,6 +490,10 @@ namespace Core.Migrations.Migrations
 
             modelBuilder.Entity("Core.Contracts.Entities.GlobalTaskEntity", b =>
                 {
+                    b.Property<short>("Key")
+                        .HasColumnType("smallint")
+                        .HasColumnName("key");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -501,10 +505,6 @@ namespace Core.Migrations.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
                         .HasColumnName("is_active");
-
-                    b.Property<short>("Key")
-                        .HasColumnType("smallint")
-                        .HasColumnName("key");
 
                     b.Property<long>("Payout")
                         .HasColumnType("bigint")
@@ -519,15 +519,13 @@ namespace Core.Migrations.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("wagering_multiplier");
 
+                    b.HasKey("Key");
+
                     b.ToTable("global_task", (string)null);
                 });
 
             modelBuilder.Entity("Core.Contracts.Entities.GlobalTaskStatusEntity", b =>
                 {
-                    b.Property<short>("Status")
-                        .HasColumnType("smallint")
-                        .HasColumnName("status");
-
                     b.Property<short>("TaskKey")
                         .HasColumnType("smallint")
                         .HasColumnName("task_key");
@@ -535,6 +533,12 @@ namespace Core.Migrations.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
+
+                    b.Property<short>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.HasKey("TaskKey", "UserId");
 
                     b.HasIndex("UserId");
 
@@ -981,6 +985,11 @@ namespace Core.Migrations.Migrations
                     b.Property<Guid?>("ReferrerId")
                         .HasColumnType("uuid")
                         .HasColumnName("referrer_id");
+
+                    b.PrimitiveCollection<short[]>("Roles")
+                        .IsRequired()
+                        .HasColumnType("smallint[]")
+                        .HasColumnName("roles");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")

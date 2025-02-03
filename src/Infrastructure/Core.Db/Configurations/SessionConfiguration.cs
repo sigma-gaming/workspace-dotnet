@@ -22,6 +22,10 @@ public class SessionConfiguration : IEntityTypeConfiguration<SessionEntity>
         entity.Property(e => e.ReferralCampaignId).HasColumnName("referral_campaign_id");
         entity.Property(e => e.ReferrerId).HasColumnName("referrer_id");
         entity.Property(e => e.UserId).HasColumnName("user_id");
+        entity.Property(e => e.Roles).HasColumnName("roles");
+        entity.Property(e => e.Roles)
+            .HasColumnType("smallint[]")
+            .HasColumnName("roles");
 
         entity.HasOne(d => d.ReferralCampaign).WithMany(p => p.Sessions)
             .HasForeignKey(d => d.ReferralCampaignId)

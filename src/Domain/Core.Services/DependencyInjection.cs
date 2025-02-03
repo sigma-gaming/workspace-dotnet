@@ -4,7 +4,7 @@ using Core.Services.Finance;
 using Core.Services.Finance.Api;
 using Core.Services.Gaming;
 using Core.Services.PubSub;
-using Core.Services.Settings;
+using Core.Services.System;
 using Core.Services.User;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,6 +31,7 @@ public static class DependencyInjection
         services.AddScoped<CurrencyRatesService>();
         services.AddScoped<GameService>();
         services.AddScoped<GameHistoryService>();
+        services.AddScoped<FraudService>();
 
         services.AddSingleton<DomainService>();
         services.AddHostedService(sp => sp.GetRequiredService<DomainService>());

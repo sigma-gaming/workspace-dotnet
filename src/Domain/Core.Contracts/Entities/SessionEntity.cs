@@ -7,6 +7,7 @@ public sealed record SessionEntity
     public Guid Id { get; set; }
     public DateTime ExpiresAt { get; set; }
     public Guid UserId { get; set; }
+    public UserRole[] Roles { get; set; } = [];
     public Guid? ReferrerId { get; set; }
     public Guid? ReferralCampaignId { get; set; }
     public AccountProvider Provider { get; set; }

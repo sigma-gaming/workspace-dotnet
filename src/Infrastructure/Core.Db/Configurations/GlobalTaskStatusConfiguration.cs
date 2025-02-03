@@ -8,7 +8,7 @@ public class GlobalTaskStatusConfiguration : IEntityTypeConfiguration<GlobalTask
 {
     public void Configure(EntityTypeBuilder<GlobalTaskStatusEntity> entity)
     {
-        entity.HasNoKey();
+        entity.HasKey(e => new { e.TaskKey, e.UserId });
         entity.ToTable("global_task_status");
         
         entity.Property(e => e.TaskKey)

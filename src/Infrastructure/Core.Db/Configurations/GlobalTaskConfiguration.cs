@@ -9,7 +9,7 @@ public class GlobalTaskConfiguration : IEntityTypeConfiguration<GlobalTaskEntity
 {
     public void Configure(EntityTypeBuilder<GlobalTaskEntity> entity)
     {
-        entity.HasNoKey();
+        entity.HasKey(e => e.Key);
         entity.ToTable("global_task");
 
         entity.Property(e => e.CreatedAt)
