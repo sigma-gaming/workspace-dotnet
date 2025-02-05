@@ -1,4 +1,5 @@
 using Common.Db.Interceptors;
+using Core.Builder;
 using Core.Db.Configuration;
 using Core.Db.Context;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +11,8 @@ namespace Core.Db;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddCoreDb(
-        this IServiceCollection services,
+    public static CoreBuilder AddCoreDb(
+        this CoreBuilder builder,
         IConfiguration configuration,
         Action<DbContextOptionsBuilder>? optionsAction = null)
     {
@@ -45,9 +46,9 @@ public static class DependencyInjection
             optionsAction?.Invoke(options);
         };
 
-        services.AddDbContextPool<CoreDbContext>(action);
-        services.AddPooledDbContextFactory<CoreDbContext>(action);
+        builder.Services.AddDbContextPool<CoreDbContext>(action);
+        builder.Services.AddPooledDbContextFactory<CoreDbContext>(action);
 
-        return services;
+        return builder;
     }
 }

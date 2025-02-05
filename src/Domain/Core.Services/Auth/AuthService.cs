@@ -5,7 +5,7 @@ using Core.Contracts.Mappers;
 using Core.Db.Context;
 using Common.Db.Extensions;
 using Core.Services.Caching;
-using Core.Services.Finance;
+using Core.Services.Promotions;
 using Core.Services.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

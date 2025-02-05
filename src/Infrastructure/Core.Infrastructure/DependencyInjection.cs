@@ -1,7 +1,7 @@
+using Core.Builder;
 using Core.Db;
 using Core.Cache;
 using Core.PubSub;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
@@ -9,14 +9,14 @@ namespace Core.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddCoreInfrastructure(
-        this IServiceCollection services,
+    public static CoreBuilder AddInfrastructure(
+        this CoreBuilder builder,
         IConfiguration configuration)
     {
-        services.AddCoreDb(configuration);
-        services.AddCoreCache(configuration);
-        services.AddCorePubSub(configuration);
+        builder.AddCoreDb(configuration);
+        builder.AddCoreCache(configuration);
+        builder.AddCorePubSub(configuration);
 
-        return services;
+        return builder;
     }
 }

@@ -1,10 +1,8 @@
-using Core.Contracts.Data;
 using Core.Contracts.Entities;
 using Core.Contracts.Mappers;
 using Core.Db.Context;
 using Core.Services.Caching;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Core.Services.User;
 

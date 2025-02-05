@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using Common.Db.Interceptors;
 using Core.Contracts.Entities;
 
 namespace Core.Db.Context;

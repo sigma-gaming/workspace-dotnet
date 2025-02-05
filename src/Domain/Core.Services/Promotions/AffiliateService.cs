@@ -5,10 +5,11 @@ using Core.Contracts.Mappers;
 using Core.Db.Context;
 using Common.Db.Extensions;
 using Core.Services.Caching;
+using Core.Services.Finance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Core.Services.Finance;
+namespace Core.Services.Promotions;
 
 public class AffiliateService(
     CoreDbContext db,

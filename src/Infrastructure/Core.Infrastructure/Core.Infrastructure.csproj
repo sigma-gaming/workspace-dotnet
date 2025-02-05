@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Infrastructure\Core.Builder\Core.Builder.csproj" />
         <ProjectReference Include="..\Core.Cache\Core.Cache.csproj"/>
         <ProjectReference Include="..\Core.Db\Core.Db.csproj"/>
         <ProjectReference Include="..\Core.PubSub\Core.PubSub.csproj"/>

@@ -1,3 +1,4 @@
+using Core.Builder;
 using Core.Contracts.Mappers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -5,25 +6,28 @@ namespace Core.Contracts;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddCoreMappers(
-        this IServiceCollection services)
+    public static CoreBuilder AddMappers(
+        this CoreBuilder builder)
     {
-        services.AddSingleton<UserMapper>();
-        services.AddSingleton<AccountMapper>();
-        services.AddSingleton<ProfileMapper>();
-        services.AddSingleton<SessionMapper>();
-        services.AddSingleton<BudgetMapper>();
-        services.AddSingleton<BalanceMapper>();
-        services.AddSingleton<TransactionMapper>();
-        services.AddSingleton<GameRecordMapper>();
-        services.AddSingleton<ReferralCampaignMapper>();
-        services.AddSingleton<ReferrerSettingsMapper>();
-        services.AddSingleton<ReferrerBalanceMapper>();
-        services.AddSingleton<ReferrerPayoutMapper>();
-        services.AddSingleton<ReferrerTransactionMapper>();
-        services.AddSingleton<ReferrerWithdrawalMapper>();
-        services.AddSingleton<GlobalTaskMapper>();
+        builder.Services.AddSingleton<UserMapper>();
+        builder.Services.AddSingleton<UserStatsMapper>();
+        builder.Services.AddSingleton<AccountMapper>();
+        builder.Services.AddSingleton<ProfileMapper>();
+        builder.Services.AddSingleton<SessionMapper>();
+        builder.Services.AddSingleton<BudgetMapper>();
+        builder.Services.AddSingleton<BalanceMapper>();
+        builder.Services.AddSingleton<TransactionMapper>();
+        builder.Services.AddSingleton<GameRecordMapper>();
+        builder.Services.AddSingleton<ReferralCampaignMapper>();
+        builder.Services.AddSingleton<ReferrerSettingsMapper>();
+        builder.Services.AddSingleton<ReferrerBalanceMapper>();
+        builder.Services.AddSingleton<ReferrerPayoutMapper>();
+        builder.Services.AddSingleton<ReferrerTransactionMapper>();
+        builder.Services.AddSingleton<ReferrerWithdrawalMapper>();
+        builder.Services.AddSingleton<GlobalTaskMapper>();
+        builder.Services.AddSingleton<PromocodeMapper>();
+        builder.Services.AddSingleton<NotificationMapper>();
 
-        return services;
+        return builder;
     }
 }

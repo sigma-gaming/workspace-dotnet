@@ -1,3 +1,4 @@
+using Core.Builder;
 using Core.Db;
 using Core.Db.Context;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddCoreDb(hostContext.Configuration, options =>
+        services.Core().AddCoreDb(hostContext.Configuration, options =>
             options.UseNpgsql(x => x.MigrationsAssembly("Core.Migrations")));
     })
     .Build();

@@ -15,9 +15,8 @@ public class SessionAuthenticationHandler(
     SessionService sessionService,
     IOptionsMonitor<SessionAuthenticationOptions> options,
     ILoggerFactory logger,
-    UrlEncoder encoder,
-    ISystemClock clock)
-    : AuthenticationHandler<SessionAuthenticationOptions>(options, logger, encoder, clock)
+    UrlEncoder encoder)
+    : AuthenticationHandler<SessionAuthenticationOptions>(options, logger, encoder)
 {
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {

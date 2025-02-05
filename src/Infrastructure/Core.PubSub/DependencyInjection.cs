@@ -1,5 +1,6 @@
 using Common.PubSub;
 using Common.PubSub.Abstractions;
+using Core.Builder;
 using Core.PubSub.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,14 +10,14 @@ namespace Core.PubSub;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddCorePubSub(
-        this IServiceCollection services,
+    public static CoreBuilder AddCorePubSub(
+        this CoreBuilder builder,
         IConfiguration configuration)
     {
         var cacheOptions = new RedisPubSubOptions();
         configuration.Bind("CorePubSub", cacheOptions);
 
-        services.AddSingleton(cacheOptions);
+        builder.Services.AddSingleton(cacheOptions);
 
         var options = new ConfigurationOptions
         {
@@ -27,10 +28,10 @@ public static class DependencyInjection
             Password = cacheOptions.Password,
         };
 
-        services.AddSingleton<IConnectionMultiplexer>(_ =>
+        builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
             ConnectionMultiplexer.Connect(options));
-        services.AddSingleton<IPubSubService, RedisPubSubService>();
+        builder.Services.AddSingleton<IPubSubService, RedisPubSubService>();
 
-        return services;
+        return builder;
     }
 }

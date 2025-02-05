@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TaskStatus = Core.Contracts.Enums.TaskStatus;
 
-namespace Core.Services.Tasks;
+namespace Core.Services.Promotions;
 
 public enum GlobalTaskCompleteOutcome
 {

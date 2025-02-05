@@ -1,4 +1,3 @@
-using Core.Contracts.Entities;
 using Core.Db.Context;
 using Core.Services.Caching;
 using Microsoft.EntityFrameworkCore;

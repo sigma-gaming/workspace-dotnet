@@ -2,6 +2,7 @@ using Common.Logging;
 using Core.Infrastructure;
 using Common.OpenApi.Extensions;
 using Core.API.Configuration;
+using Core.Builder;
 using Core.Services;
 using Scalar.AspNetCore;
 using Core.Contracts;
@@ -28,15 +29,14 @@ if (apiOptions.EnableOpenApi)
     builder.Services.AddCommonOpenApi();
 }
 
-// Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
 
 // Add infrastructure and domains
-builder.Services
-    .AddHttpClient()
-    .AddCoreInfrastructure(builder.Configuration)
-    .AddCoreDomain()
-    .AddCoreMappers();
+builder.Services.Core()
+    .AddInfrastructure(builder.Configuration)
+    .AddMappers()
+    .AddCommonServices();
 
 // Add authentication
 builder.Services.AddSessionAuthentication();

@@ -1,3 +1,4 @@
+using Core.Builder;
 using Core.Cache.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,14 +8,14 @@ namespace Core.Cache;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddCoreCache(
-        this IServiceCollection services,
+    public static CoreBuilder AddCoreCache(
+        this CoreBuilder builder,
         IConfiguration configuration)
     {
         var cacheOptions = new RedisCacheOptions();
         configuration.Bind("CoreCache", cacheOptions);
 
-        services.AddSingleton(cacheOptions);
+        builder.Services.AddSingleton(cacheOptions);
 
         var options = new ConfigurationOptions
         {
@@ -23,12 +24,13 @@ public static class DependencyInjection
                 { cacheOptions.Host, cacheOptions.Port }
             },
             Password = cacheOptions.Password,
+            AbortOnConnectFail = false
         };
 
         var connection = ConnectionMultiplexer.Connect(options);
-        services.AddSingleton<IConnectionMultiplexer>(connection);
+        builder.Services.AddSingleton<IConnectionMultiplexer>(connection);
         connection.GetDatabase().PingAsync();
-        
-        return services;
+
+        return builder;
     }
 }

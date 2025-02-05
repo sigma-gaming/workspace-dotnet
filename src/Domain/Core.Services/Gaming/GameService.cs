@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Core.Contracts.Data;
 using Core.Contracts.Entities;
 using Core.Contracts.Enums;

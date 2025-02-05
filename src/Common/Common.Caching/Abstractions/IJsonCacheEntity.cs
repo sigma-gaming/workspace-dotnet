@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace Common.Caching.Abstractions;
 
 public interface IJsonCacheEntity<T>
