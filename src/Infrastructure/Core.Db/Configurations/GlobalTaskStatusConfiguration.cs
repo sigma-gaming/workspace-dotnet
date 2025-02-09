@@ -10,7 +10,7 @@ public class GlobalTaskStatusConfiguration : IEntityTypeConfiguration<GlobalTask
     {
         entity.HasKey(e => new { e.TaskKey, e.UserId });
         entity.ToTable("global_task_status");
-        
+
         entity.Property(e => e.TaskKey)
             .HasColumnType("smallint")
             .HasColumnName("task_key");
@@ -22,4 +22,4 @@ public class GlobalTaskStatusConfiguration : IEntityTypeConfiguration<GlobalTask
         entity.HasOne(d => d.User).WithMany()
             .HasForeignKey(d => d.UserId);
     }
-} 
+}

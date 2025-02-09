@@ -11,25 +11,29 @@ public static class TransactionExtensions
         var existingTransaction = context.Database.CurrentTransaction;
 
         //  Reuse existing transaction
-        if (existingTransaction != null)
-        {
-            return await operation();
-        }
+        if (existingTransaction != null) return await operation();
 
         // Open a new transaction
-        await using var transaction = await context.Database.BeginTransactionAsync();
+        var strategy = context.Database.CreateExecutionStrategy();
 
-        try
+        var result = await strategy.ExecuteAsync(async () =>
         {
-            var result = await operation();
-            await transaction.CommitAsync();
-            return result;
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+            await using var transaction = await context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var result = await operation();
+                await transaction.CommitAsync();
+                return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
+
+        return result;
     }
 
     public static async Task ExecuteInTransactionAsync(

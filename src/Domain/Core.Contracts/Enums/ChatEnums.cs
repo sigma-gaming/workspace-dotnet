@@ -6,11 +6,11 @@ namespace Core.Contracts.Enums;
 public enum ChatMessageType
 {
     UserMessage,
-    SystemMessage
+    SystemMessage,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ChatMessageAttachmentType
 {
-    Game
+    Game,
 }

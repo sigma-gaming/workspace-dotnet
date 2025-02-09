@@ -29,8 +29,6 @@ public class ForUpdateInterceptor : DbCommandInterceptor
     private static void ManipulateCommand(DbCommand command)
     {
         if (command.CommandText.StartsWith("-- ForUpdate", StringComparison.Ordinal))
-        {
             command.CommandText += " FOR UPDATE";
-        }
     }
 }

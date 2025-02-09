@@ -1,8 +1,7 @@
 using Core.Builder;
-using Core.Db;
 using Core.Cache;
+using Core.Db;
 using Core.PubSub;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
 namespace Core.Infrastructure;

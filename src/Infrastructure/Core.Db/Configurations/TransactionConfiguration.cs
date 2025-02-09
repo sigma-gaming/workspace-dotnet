@@ -35,4 +35,4 @@ public class TransactionConfiguration : IEntityTypeConfiguration<TransactionEnti
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.SetNull);
     }
-} 
+}

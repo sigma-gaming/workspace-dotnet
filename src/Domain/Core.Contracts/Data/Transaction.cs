@@ -11,4 +11,4 @@ public sealed record Transaction
     public required Guid Id { get; init; }
     public required TransactionType Type { get; init; }
     public Game? Game { get; init; }
-} 
+}

@@ -13,4 +13,4 @@ public sealed record Balance
     public required int MaxMultiplier { get; init; }
     public Guid? MaxWinGameId { get; init; }
     public Guid? MaxMultiplierGameId { get; init; }
-} 
+}

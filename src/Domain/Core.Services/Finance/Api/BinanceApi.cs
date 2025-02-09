@@ -12,7 +12,7 @@ public enum BinanceSymbol
     [JsonStringEnumMemberName("TONUSDT")] TonUsdt,
     [JsonStringEnumMemberName("NOTUSDT")] NotUsdt,
     [JsonStringEnumMemberName("BNBUSDT")] BnbUsdt,
-    [JsonStringEnumMemberName("DOGEUSDT")] DogeUsdt
+    [JsonStringEnumMemberName("DOGEUSDT")] DogeUsdt,
 }
 
 public sealed record BinanceTickerPrice

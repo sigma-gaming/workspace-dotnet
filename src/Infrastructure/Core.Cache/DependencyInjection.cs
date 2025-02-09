@@ -21,10 +21,10 @@ public static class DependencyInjection
         {
             EndPoints =
             {
-                { cacheOptions.Host, cacheOptions.Port }
+                { cacheOptions.Host, cacheOptions.Port },
             },
             Password = cacheOptions.Password,
-            AbortOnConnectFail = false
+            AbortOnConnectFail = false,
         };
 
         var connection = ConnectionMultiplexer.Connect(options);

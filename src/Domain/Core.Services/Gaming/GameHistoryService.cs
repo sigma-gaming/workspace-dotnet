@@ -1,8 +1,8 @@
 using Core.Contracts.Data;
 using Core.Contracts.Enums;
+using Core.Db.Context;
 using Core.Services.Caching;
 using Microsoft.EntityFrameworkCore;
-using Core.Db.Context;
 
 namespace Core.Services.Gaming;
 
@@ -34,7 +34,7 @@ public class GameHistoryService(
                     Payout = r.Payout,
                     PreviewUserName = r.PreviewUserName,
                     UserId = r.UserId,
-                    TransactionId = r.TransactionId
+                    TransactionId = r.TransactionId,
                 })
             .Take(10)
             .AsNoTracking()
@@ -69,7 +69,7 @@ public class GameHistoryService(
                     Payout = r.Payout,
                     PreviewUserName = r.PreviewUserName,
                     UserId = r.UserId,
-                    TransactionId = r.TransactionId
+                    TransactionId = r.TransactionId,
                 })
             .Take(10)
             .AsNoTracking()
@@ -104,7 +104,7 @@ public class GameHistoryService(
                     Payout = r.Payout,
                     PreviewUserName = r.PreviewUserName,
                     UserId = r.UserId,
-                    TransactionId = r.TransactionId
+                    TransactionId = r.TransactionId,
                 })
             .Take(10)
             .AsNoTracking()

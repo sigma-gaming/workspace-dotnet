@@ -4,9 +4,9 @@ using Core.Contracts.Enums;
 namespace Core.Contracts.Jsonb;
 
 [JsonDerivedType(typeof(DepositPayloadRedirect),
-    typeDiscriminator: (int)DepositType.Redirect)]
+    (int)DepositType.Redirect)]
 [JsonDerivedType(typeof(DepositPayloadWhiteLabel),
-    typeDiscriminator: (int)DepositType.WhiteLabel)]
+    (int)DepositType.WhiteLabel)]
 public abstract record DepositPayload
 {
     public abstract DepositType Type { get; }

@@ -12,8 +12,8 @@ var host = Host.CreateDefaultBuilder(args)
         var env = hostingContext.HostingEnvironment;
 
         config.SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false)
-            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+            .AddJsonFile("appsettings.json", false)
+            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
             .AddEnvironmentVariables();
     })
     .ConfigureServices((hostContext, services) =>

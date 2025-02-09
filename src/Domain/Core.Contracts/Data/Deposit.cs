@@ -20,4 +20,4 @@ public sealed record Deposit
     public required DepositMethod Method { get; init; }
     public required PaymentProvider Provider { get; init; }
     public required DepositType Type { get; init; }
-} 
+}

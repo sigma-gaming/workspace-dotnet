@@ -12,4 +12,4 @@ public sealed record User
     public Guid? ReferralCampaignId { get; init; }
     public required bool Virtual { get; init; }
     public required UserRole[] Roles { get; init; }
-} 
+}

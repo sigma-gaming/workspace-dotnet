@@ -8,5 +8,5 @@ public enum NotificationKind
     Success,
     Info,
     Warning,
-    Failure
+    Failure,
 }

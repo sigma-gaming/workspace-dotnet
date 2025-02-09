@@ -23,7 +23,7 @@ public static class DependencyInjection
         {
             EndPoints =
             {
-                { cacheOptions.Host, cacheOptions.Port }
+                { cacheOptions.Host, cacheOptions.Port },
             },
             Password = cacheOptions.Password,
         };

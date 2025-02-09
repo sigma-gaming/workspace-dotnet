@@ -9,4 +9,4 @@ public sealed record ReferralCampaign
     public required int TotalSignups { get; init; }
     public Guid? ReferrerId { get; init; }
     public required Guid Id { get; init; }
-} 
+}

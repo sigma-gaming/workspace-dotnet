@@ -7,14 +7,14 @@ public enum GlobalTaskKey
 {
     VkGroupSubscribe,
     VkPinnedRepost,
-    TelegramGroupSubscribe
+    TelegramGroupSubscribe,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum TaskType
 {
     Global,
-    Personal
+    Personal,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -22,5 +22,5 @@ public enum TaskStatus
 {
     Pending,
     Completed,
-    Claimed
+    Claimed,
 }

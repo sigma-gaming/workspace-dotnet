@@ -1,9 +1,9 @@
+using Common.Db.Extensions;
 using Core.Contracts.Data;
 using Core.Contracts.Entities;
 using Core.Contracts.Enums;
 using Core.Contracts.Mappers;
 using Core.Db.Context;
-using Common.Db.Extensions;
 using Core.Services.Caching;
 using Core.Services.Promotions;
 using Core.Services.User;
@@ -18,7 +18,7 @@ public enum AuthOutcome
     SignedUp,
     Connected,
     ConnectedToAnotherUser,
-    AnotherAccountConnected
+    AnotherAccountConnected,
 }
 
 public record AuthenticatePayload
@@ -40,39 +40,49 @@ public record AuthResult
     public Contracts.Data.User? User { get; init; }
     public Account? Account { get; init; }
 
-    public static AuthResult SignedIn(Contracts.Data.User user, Account account) =>
-        new()
+    public static AuthResult SignedIn(Contracts.Data.User user, Account account)
+    {
+        return new AuthResult
         {
             Outcome = AuthOutcome.SignedIn,
             User = user,
-            Account = account
+            Account = account,
         };
+    }
 
-    public static AuthResult SignedUp(Contracts.Data.User user, Account account) =>
-        new()
+    public static AuthResult SignedUp(Contracts.Data.User user, Account account)
+    {
+        return new AuthResult
         {
             Outcome = AuthOutcome.SignedUp,
             User = user,
-            Account = account
+            Account = account,
         };
+    }
 
-    public static AuthResult Connected() =>
-        new()
+    public static AuthResult Connected()
+    {
+        return new AuthResult
         {
-            Outcome = AuthOutcome.Connected
+            Outcome = AuthOutcome.Connected,
         };
+    }
 
-    public static AuthResult ConnectedToAnotherUser() =>
-        new()
+    public static AuthResult ConnectedToAnotherUser()
+    {
+        return new AuthResult
         {
-            Outcome = AuthOutcome.ConnectedToAnotherUser
+            Outcome = AuthOutcome.ConnectedToAnotherUser,
         };
+    }
 
-    public static AuthResult AnotherAccountConnected() =>
-        new()
+    public static AuthResult AnotherAccountConnected()
+    {
+        return new AuthResult
         {
-            Outcome = AuthOutcome.AnotherAccountConnected
+            Outcome = AuthOutcome.AnotherAccountConnected,
         };
+    }
 }
 
 public class AuthService(
@@ -85,8 +95,10 @@ public class AuthService(
     ILogger<AuthService> logger,
     HttpClient httpClient)
 {
-    private static string GetUserFullName(string firstName, string? lastName) =>
-        string.IsNullOrEmpty(lastName) ? firstName : $"{firstName} {lastName}";
+    private static string GetUserFullName(string firstName, string? lastName)
+    {
+        return string.IsNullOrEmpty(lastName) ? firstName : $"{firstName} {lastName}";
+    }
 
     private async Task<string?> ValidateImageUrlAsync(string imageUrl)
     {
@@ -110,7 +122,7 @@ public class AuthService(
                 a.Provider == payload.Provider &&
                 a.ProviderUserId == payload.ProviderUserId);
 
-        var accountData = new AccountEntity()
+        var accountData = new AccountEntity
         {
             Provider = payload.Provider,
             ProviderUserId = payload.ProviderUserId,
@@ -119,7 +131,7 @@ public class AuthService(
             ProviderUserLastName = payload.ProviderUserLastName,
             ProviderUserImage = payload.ProviderUserImage != null
                 ? await ValidateImageUrlAsync(payload.ProviderUserImage)
-                : null
+                : null,
         };
 
         if (payload.UserId.HasValue)
@@ -184,22 +196,22 @@ public class AuthService(
 
         var (createdUserEntity, createdAccountEntity) = await db.ExecuteInTransactionAsync(async () =>
         {
-            var createdUserEntity = new UserEntity()
+            var createdUserEntity = new UserEntity
             {
                 ReferrerId = referrerId,
                 ReferralCampaignId = referralCampaignId,
-                Virtual = payload.Virtual ?? false
+                Virtual = payload.Virtual ?? false,
             };
 
             await db.Users.AddAsync(createdUserEntity);
             await db.SaveChangesAsync();
 
-            var profile = new ProfileEntity()
+            var profile = new ProfileEntity
             {
                 UserId = createdUserEntity.Id,
                 UsedProvider = payload.Provider,
                 Name = GetUserFullName(payload.ProviderUserFirstName, payload.ProviderUserLastName),
-                Image = accountData.ProviderUserImage
+                Image = accountData.ProviderUserImage,
             };
 
             await db.Profiles.AddAsync(profile);

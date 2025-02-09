@@ -7,4 +7,4 @@ public sealed record Config
     public required DateTime UpdatedAt { get; init; }
     public required bool MaintenanceEnabled { get; init; }
     public required bool BackgroundJobsEnabled { get; init; }
-} 
+}

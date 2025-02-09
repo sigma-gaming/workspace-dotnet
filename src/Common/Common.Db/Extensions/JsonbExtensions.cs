@@ -5,7 +5,7 @@ namespace Common.Db.Extensions;
 
 public static class JsonbSerializerOptions
 {
-    public static JsonSerializerOptions Options { get; } = new JsonSerializerOptions
+    public static JsonSerializerOptions Options { get; } = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         AllowOutOfOrderMetadataProperties = true,

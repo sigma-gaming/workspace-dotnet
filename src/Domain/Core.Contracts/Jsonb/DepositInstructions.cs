@@ -4,7 +4,7 @@ using Core.Contracts.Enums;
 namespace Core.Contracts.Jsonb;
 
 [JsonDerivedType(typeof(DepositInstructionsSbp),
-    typeDiscriminator: (int)DepositMethod.Sbp)]
+    (int)DepositMethod.Sbp)]
 public abstract record DepositInstructions
 {
     public abstract DepositMethod Method { get; }

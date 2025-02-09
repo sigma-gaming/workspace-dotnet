@@ -38,4 +38,4 @@ public class SessionConfiguration : IEntityTypeConfiguration<SessionEntity>
         entity.HasOne(d => d.User).WithMany(p => p.SessionUsers)
             .HasForeignKey(d => d.UserId);
     }
-} 
+}

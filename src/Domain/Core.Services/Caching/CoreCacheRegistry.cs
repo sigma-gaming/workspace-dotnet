@@ -116,7 +116,7 @@ public class CoreCacheRegistry(
 
     public JsonCacheEntity<CurrencyExchangeRates> CurrencyExchangeRates { get; } = new(
         redis,
-        $"global:currencyRates",
+        "global:currencyRates",
         TimeSpan.FromMinutes(15));
 
     public StringCacheEntity LastMetricsTransactionId { get; } = new(

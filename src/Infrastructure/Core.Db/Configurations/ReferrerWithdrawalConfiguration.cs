@@ -25,4 +25,4 @@ public class ReferrerWithdrawalConfiguration : IEntityTypeConfiguration<Referrer
             .HasForeignKey(d => d.ReferrerId)
             .OnDelete(DeleteBehavior.Cascade);
     }
-} 
+}

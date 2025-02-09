@@ -16,4 +16,4 @@ public sealed record GameRecord
     public required string PreviewUserName { get; init; }
     public required Guid UserId { get; init; }
     public Guid? TransactionId { get; init; }
-} 
+}

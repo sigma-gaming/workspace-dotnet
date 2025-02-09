@@ -7,5 +7,5 @@ public enum DomainApp
 {
     CoreApp,
     CoreApi,
-    ControlApp
+    ControlApp,
 }

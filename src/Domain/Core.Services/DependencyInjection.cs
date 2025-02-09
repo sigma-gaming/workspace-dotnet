@@ -5,6 +5,7 @@ using Core.Services.Caching;
 using Core.Services.Finance;
 using Core.Services.Finance.Api;
 using Core.Services.Gaming;
+using Core.Services.Gaming.Runners;
 using Core.Services.Notifications;
 using Core.Services.Promotions;
 using Core.Services.PubSub;
@@ -44,6 +45,8 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<GameService>();
         builder.Services.AddScoped<GameHistoryService>();
+        builder.Services.AddScoped<DiceGame>();
+        builder.Services.AddScoped<PincodeGame>();
 
         builder.Services.AddScoped<AffiliateService>();
         builder.Services.AddScoped<GlobalTaskService>();

@@ -17,16 +17,12 @@ public static class Logging
             loggerConfiguration.MinimumLevel.Information();
 
             if (builder.Environment.IsProduction())
-            {
                 loggerConfiguration
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .WriteTo.Async(c => c.Console(new CompactJsonFormatter()));
-            }
             else
-            {
                 loggerConfiguration
                     .WriteTo.Async(c => c.Console());
-            }
         });
 
         return builder;

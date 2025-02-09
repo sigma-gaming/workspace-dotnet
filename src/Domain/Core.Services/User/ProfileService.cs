@@ -25,7 +25,7 @@ public class ProfileService(
                 {
                     User = user,
                     Profile = profile,
-                    Accounts = userAccounts.ToList()
+                    Accounts = userAccounts.ToList(),
                 }
             )
             .AsNoTracking()
@@ -41,7 +41,7 @@ public class ProfileService(
         {
             User = userMapper.ToPublic(result.User),
             Profile = profileMapper.ToData(result.Profile),
-            Accounts = result.Accounts.Select(accountMapper.ToData).ToArray()
+            Accounts = result.Accounts.Select(accountMapper.ToData).ToArray(),
         };
     }
 

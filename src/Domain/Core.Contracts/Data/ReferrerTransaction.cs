@@ -15,4 +15,4 @@ public sealed record ReferrerTransaction
     public required string ReferralName { get; init; }
     public string? ReferralImage { get; init; }
     public string? ReferralUsername { get; init; }
-} 
+}

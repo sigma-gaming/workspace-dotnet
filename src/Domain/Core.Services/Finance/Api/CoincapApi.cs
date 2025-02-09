@@ -12,7 +12,7 @@ public enum CoincapSymbol
     [JsonStringEnumMemberName("UAH")] Uah,
     [JsonStringEnumMemberName("USD")] Usd,
     [JsonStringEnumMemberName("EUR")] Eur,
-    [JsonStringEnumMemberName("USDT")] Usdt
+    [JsonStringEnumMemberName("USDT")] Usdt,
 }
 
 public sealed record CoincapRate

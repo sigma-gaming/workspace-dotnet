@@ -10,6 +10,9 @@ public sealed record ReferralCampaignEntity
     public int TotalSignups { get; set; } = 0;
     public Guid? ReferrerId { get; set; }
     public UserEntity? Referrer { get; set; }
-    public ICollection<ReferrerTransactionEntity> ReferrerTransactions { get; set; } = new List<ReferrerTransactionEntity>();
+
+    public ICollection<ReferrerTransactionEntity> ReferrerTransactions { get; set; } =
+        new List<ReferrerTransactionEntity>();
+
     public ICollection<SessionEntity> Sessions { get; set; } = new List<SessionEntity>();
 }

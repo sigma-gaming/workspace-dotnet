@@ -7,5 +7,5 @@ public enum ReferralAction
 {
     Deposit,
     Loss,
-    Withdrawal
+    Withdrawal,
 }

@@ -51,4 +51,4 @@ public class BalanceConfiguration : IEntityTypeConfiguration<BalanceEntity>
         entity.HasOne(d => d.User).WithOne(p => p.Balance)
             .HasForeignKey<BalanceEntity>(d => d.UserId);
     }
-} 
+}

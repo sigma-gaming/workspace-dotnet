@@ -1,5 +1,5 @@
-using Core.Contracts.Entities;
 using Common.Db.Extensions;
+using Core.Contracts.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

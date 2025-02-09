@@ -21,7 +21,7 @@ public class CurrencyRatesService(
         [BinanceSymbol.TonUsdt] = Currency.Ton,
         [BinanceSymbol.NotUsdt] = Currency.Not,
         [BinanceSymbol.BnbUsdt] = Currency.Bnb,
-        [BinanceSymbol.DogeUsdt] = Currency.Doge
+        [BinanceSymbol.DogeUsdt] = Currency.Doge,
     };
 
     private async Task<CurrencyExchangeRates> GetLatestRatesAsync()
@@ -69,15 +69,9 @@ public class CurrencyRatesService(
                 }
 
                 if (rates[Currency.UsdtTrc20].HasValue)
-                {
                     foreach (var ticker in cryptoRates)
-                    {
                         if (SymbolCurrencyMap.TryGetValue(ticker.Symbol, out var currency))
-                        {
                             rates[currency] = double.Parse(ticker.Price) * rates[Currency.UsdtTrc20]!.Value;
-                        }
-                    }
-                }
             }
         }
         catch (Exception ex)
@@ -107,9 +101,7 @@ public class CurrencyRatesService(
 
         if (!rates.TryGetValue(from, out var fromRate) || !fromRate.HasValue ||
             !rates.TryGetValue(to, out var toRate) || !toRate.HasValue)
-        {
             throw new InvalidOperationException("Specified currency rates not available");
-        }
 
         return amount * fromRate.Value / toRate.Value;
     }

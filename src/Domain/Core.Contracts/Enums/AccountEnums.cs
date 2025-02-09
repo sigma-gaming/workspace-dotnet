@@ -6,7 +6,7 @@ namespace Core.Contracts.Enums;
 public enum AccountProvider
 {
     VK,
-    Telegram
+    Telegram,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -15,7 +15,7 @@ public enum UserRole
     User,
     Admin,
     Moderator,
-    Support
+    Support,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -25,5 +25,5 @@ public enum FraudRisk
     Low,
     Medium,
     High,
-    Unknown
+    Unknown,
 }

@@ -11,7 +11,7 @@ public enum PaymentStatus
     Failed,
     Rejected,
     Cancelled,
-    Expired
+    Expired,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -33,14 +33,14 @@ public enum Currency
     Not,
     Eth,
     Bnb,
-    Doge
+    Doge,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum DepositType
 {
     Redirect,
-    WhiteLabel
+    WhiteLabel,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -49,7 +49,7 @@ public enum DepositMethod
     Sbp,
     CreditCard,
     Piastrix,
-    Toncoin
+    Toncoin,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -57,12 +57,12 @@ public enum WithdrawalMethod
 {
     Sbp,
     CreditCard,
-    Piastrix
+    Piastrix,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum PaymentProvider
 {
     Bovapay,
-    Test
+    Test,
 }

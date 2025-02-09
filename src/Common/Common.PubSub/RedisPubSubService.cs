@@ -7,15 +7,17 @@ namespace Common.PubSub;
 public class RedisPubSubService(IConnectionMultiplexer redis) : IPubSubService
 {
     private readonly ISubscriber _subscriber = redis.GetSubscriber();
-    
+
     public ITypedPubSub<T> Create<T>(string channelName) where T : class
-        => new RedisTypedPubSub<T>(_subscriber, channelName);
+    {
+        return new RedisTypedPubSub<T>(_subscriber, channelName);
+    }
 }
 
 file class RedisTypedPubSub<T>(ISubscriber subscriber, string channelName) : ITypedPubSub<T> where T : class
 {
     private readonly RedisChannel _channel = new(channelName, RedisChannel.PatternMode.Literal);
-    
+
     public async Task PublishAsync(T message, CancellationToken cancellationToken = default)
     {
         var json = JsonSerializer.Serialize(message);
@@ -51,5 +53,8 @@ file class RedisTypedPubSub<T>(ISubscriber subscriber, string channelName) : ITy
 
 file class RedisSubscription(ChannelMessageQueue queue) : IDisposable
 {
-    public void Dispose() => queue.Unsubscribe();
-} 
+    public void Dispose()
+    {
+        queue.Unsubscribe();
+    }
+}

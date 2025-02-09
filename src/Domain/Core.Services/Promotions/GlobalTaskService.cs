@@ -1,5 +1,6 @@
 using Common.Db.Extensions;
 using Core.Contracts.Compounds;
+using Core.Contracts.Data;
 using Core.Contracts.Entities;
 using Core.Contracts.Enums;
 using Core.Contracts.Mappers;
@@ -18,7 +19,7 @@ public enum GlobalTaskCompleteOutcome
     NotCompleted,
     Completed,
     NotActive,
-    Failed
+    Failed,
 }
 
 public enum GlobalTaskClaimRewardOutcome
@@ -26,7 +27,7 @@ public enum GlobalTaskClaimRewardOutcome
     AlreadyClaimed,
     NotCompleted,
     Claimed,
-    Failed
+    Failed,
 }
 
 public sealed record GlobalTaskCompleteOutput(
@@ -52,7 +53,7 @@ public class GlobalTaskService(
     GlobalTaskMapper taskMapper,
     BalanceMapper balanceMapper)
 {
-    private async Task<Contracts.Data.GlobalTask[]> QueryTasksAsync()
+    private async Task<GlobalTask[]> QueryTasksAsync()
     {
         return await db.GlobalTasks
             .Select(t => taskMapper.ToData(t))
@@ -60,7 +61,7 @@ public class GlobalTaskService(
             .ToArrayAsync();
     }
 
-    public async Task<Contracts.Data.GlobalTask[]> GetTasksAsync()
+    public async Task<GlobalTask[]> GetTasksAsync()
     {
         if (!cache.IsReady()) return await QueryTasksAsync();
 
@@ -72,7 +73,7 @@ public class GlobalTaskService(
         return tasks;
     }
 
-    public async Task<Contracts.Data.GlobalTask?> GetTaskAsync(GlobalTaskKey taskKey)
+    public async Task<GlobalTask?> GetTaskAsync(GlobalTaskKey taskKey)
     {
         var tasks = await GetTasksAsync();
         return tasks.FirstOrDefault(t => t.Key == taskKey);
@@ -113,28 +114,24 @@ public class GlobalTaskService(
         var info = await GetStatusAsync(taskKey, userId);
 
         if (info.IsInserted)
-        {
             await db.GlobalTaskStatuses
                 .AsNoTracking()
                 .Where(s => s.TaskKey == taskKey && s.UserId == userId)
                 .ExecuteUpdateAsync(setters =>
                     setters.SetProperty(s => s.Status, status));
-        }
         else
-        {
             await db.GlobalTaskStatuses.AddAsync(new GlobalTaskStatusEntity
             {
                 TaskKey = taskKey,
                 UserId = userId,
-                Status = status
+                Status = status,
             });
-        }
     }
 
     public async Task<GlobalTaskCompleteOutput> CompleteTaskAsync(
         Guid userId,
         GlobalTaskKey taskKey,
-        Func<Guid, Contracts.Data.GlobalTask, Task<GlobalTaskCheckResult>> checker)
+        Func<Guid, GlobalTask, Task<GlobalTaskCheckResult>> checker)
     {
         try
         {
@@ -213,7 +210,7 @@ public class GlobalTaskService(
                 {
                     UserId = userId,
                     Type = TransactionType.Bonus,
-                    Amount = task.Payout
+                    Amount = task.Payout,
                 });
 
                 var updatedBalance = await balanceService.UpdateBalanceAsync(

@@ -49,4 +49,4 @@ public class WithdrawalConfiguration : IEntityTypeConfiguration<WithdrawalEntity
         entity.HasOne(d => d.User).WithMany(p => p.Withdrawals)
             .HasForeignKey(d => d.UserId);
     }
-} 
+}

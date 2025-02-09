@@ -1,11 +1,12 @@
+using Core.Contracts.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Core.Db.Configurations;
 
-public class DomainConfiguration : IEntityTypeConfiguration<Contracts.Entities.DomainEntity>
+public class DomainConfiguration : IEntityTypeConfiguration<DomainEntity>
 {
-    public void Configure(EntityTypeBuilder<Contracts.Entities.DomainEntity> entity)
+    public void Configure(EntityTypeBuilder<DomainEntity> entity)
     {
         entity.HasKey(e => e.Host);
 
@@ -19,4 +20,4 @@ public class DomainConfiguration : IEntityTypeConfiguration<Contracts.Entities.D
             .HasDefaultValueSql("now()")
             .HasColumnName("created_at");
     }
-} 
+}

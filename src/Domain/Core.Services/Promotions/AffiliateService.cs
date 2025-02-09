@@ -1,9 +1,9 @@
+using Common.Db.Extensions;
 using Core.Contracts.Data;
 using Core.Contracts.Entities;
 using Core.Contracts.Enums;
 using Core.Contracts.Mappers;
 using Core.Db.Context;
-using Common.Db.Extensions;
 using Core.Services.Caching;
 using Core.Services.Finance;
 using Microsoft.EntityFrameworkCore;
@@ -32,10 +32,7 @@ public class AffiliateService(
     {
         var current = DateTime.UtcNow.AddDays(1); // Skip today
 
-        while (current.Day != 1 && current.Day != 15)
-        {
-            current = current.AddDays(1);
-        }
+        while (current.Day != 1 && current.Day != 15) current = current.AddDays(1);
 
         // Distribute payout time randomly between 2 and 6 hours
         var random = new Random();
@@ -140,7 +137,7 @@ public class AffiliateService(
             ReferrerId = referrerId,
             Name = name,
             Code = GenerateCode(),
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
         };
 
         var campaignEntry = await db.ReferralCampaigns.AddAsync(campaign);
@@ -154,7 +151,7 @@ public class AffiliateService(
         var payout = new ReferrerPayoutEntity
         {
             ReferrerId = referrerId,
-            NextPayoutAt = GenerateNextPayoutDate()
+            NextPayoutAt = GenerateNextPayoutDate(),
         };
 
         var payoutEntry = await db.ReferrerPayouts.AddAsync(payout);
@@ -168,7 +165,7 @@ public class AffiliateService(
         var withdrawal = new ReferrerWithdrawalEntity
         {
             ReferrerId = referrerId,
-            Amount = amount
+            Amount = amount,
         };
 
         var withdrawalEntry = await db.ReferrerWithdrawals.AddAsync(withdrawal);
@@ -220,7 +217,7 @@ public class AffiliateService(
             ReferralName = referralProfile.Name,
             ReferralImage = referralProfile.Image,
             ReferralUsername = referralProfile.Username,
-            Amount = (long)finalAmount
+            Amount = (long)finalAmount,
         };
 
         await db.ReferrerTransactions.AddAsync(transactionEntity);
@@ -252,7 +249,7 @@ public class AffiliateService(
             select new
             {
                 ReferrerId = g.Key,
-                TotalAmount = g.Sum(x => x.Amount)
+                TotalAmount = g.Sum(x => x.Amount),
             }).ToListAsync(ct);
 
         if (pendingPayouts.Count == 0)
@@ -279,10 +276,7 @@ public class AffiliateService(
                                 !t.IsProcessed)
                     .ToListAsync(ct);
 
-                foreach (var t in transactions)
-                {
-                    t.IsProcessed = true;
-                }
+                foreach (var t in transactions) t.IsProcessed = true;
 
                 // Update payout dates
                 var payoutEntity = await db.ReferrerPayouts

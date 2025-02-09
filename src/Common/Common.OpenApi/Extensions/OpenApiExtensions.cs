@@ -2,9 +2,9 @@
 // using Microsoft.AspNetCore.OpenApi;
 
 using Microsoft.AspNetCore.Builder;
-using Scalar.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Common.OpenApi.Extensions;
@@ -51,7 +51,7 @@ public static class OpenApiExtensions
     {
         app.MapSwagger();
         app.UseSwagger(options => { options.RouteTemplate = "/openapi/{documentName}.json"; });
-        app.MapScalarApiReference((options) => { configureOptions?.Invoke(options); });
+        app.MapScalarApiReference(options => { configureOptions?.Invoke(options); });
 
         return app;
     }

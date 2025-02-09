@@ -34,4 +34,4 @@ public class ReferralCampaignConfiguration : IEntityTypeConfiguration<ReferralCa
             .HasForeignKey(d => d.ReferrerId)
             .OnDelete(DeleteBehavior.Cascade);
     }
-} 
+}

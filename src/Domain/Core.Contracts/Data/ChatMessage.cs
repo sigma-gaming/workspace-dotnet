@@ -17,4 +17,4 @@ public sealed record ChatMessage
     public required Guid Id { get; init; }
     public required ChatMessageType Type { get; init; }
     public required UserRole[] SenderRoles { get; init; }
-} 
+}

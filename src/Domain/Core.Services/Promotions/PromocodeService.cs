@@ -106,7 +106,7 @@ public class PromocodeService(
                 if (promocode == null)
                     return new PromocodeActivationFailedResult
                     {
-                        Outcome = PromocodeActivationOutcome.NotFound
+                        Outcome = PromocodeActivationOutcome.NotFound,
                     };
 
                 var balance = await db.Balances
@@ -120,44 +120,44 @@ public class PromocodeService(
                     return new PromocodeActivationWrongUsageResult
                     {
                         Outcome = PromocodeActivationOutcome.WrongUsage,
-                        BonusType = promocode.BonusType
+                        BonusType = promocode.BonusType,
                     };
 
                 if (promocode.Bonus.Type != PromocodeBonusType.Payout)
                     return new PromocodeActivationWrongUsageResult
                     {
                         Outcome = PromocodeActivationOutcome.WrongUsage,
-                        BonusType = promocode.Bonus.Type
+                        BonusType = promocode.Bonus.Type,
                     };
 
                 if (promocode.UserId.HasValue && promocode.UserId != userId)
                     return new PromocodeActivationFailedResult
                     {
-                        Outcome = PromocodeActivationOutcome.NotFound
+                        Outcome = PromocodeActivationOutcome.NotFound,
                     };
 
                 if (await IsUsedAsync(promocode.Id, userId))
                     return new PromocodeActivationFailedResult
                     {
-                        Outcome = PromocodeActivationOutcome.AlreadyUsed
+                        Outcome = PromocodeActivationOutcome.AlreadyUsed,
                     };
 
                 if (!promocode.IsActive)
                     return new PromocodeActivationFailedResult
                     {
-                        Outcome = PromocodeActivationOutcome.Inactive
+                        Outcome = PromocodeActivationOutcome.Inactive,
                     };
 
                 if (promocode.ExpiresAt.HasValue && DateTime.UtcNow >= promocode.ExpiresAt)
                     return new PromocodeActivationFailedResult
                     {
-                        Outcome = PromocodeActivationOutcome.Expired
+                        Outcome = PromocodeActivationOutcome.Expired,
                     };
 
                 if (promocode.Usages >= promocode.MaxUsages)
                     return new PromocodeActivationFailedResult
                     {
-                        Outcome = PromocodeActivationOutcome.UsageExceeded
+                        Outcome = PromocodeActivationOutcome.UsageExceeded,
                     };
 
                 var risk = await fraudService.ActualizeRiskAsync(userId);
@@ -165,7 +165,7 @@ public class PromocodeService(
                 if (risk is FraudRisk.High or FraudRisk.Medium)
                     return new PromocodeActivationFailedResult
                     {
-                        Outcome = PromocodeActivationOutcome.Blocked
+                        Outcome = PromocodeActivationOutcome.Blocked,
                     };
 
                 var payout = ((PromocodeBonusPayout)promocode.Bonus).Payout;
@@ -179,7 +179,7 @@ public class PromocodeService(
                     Status = PromocodeUsageStatus.Applied,
                     UserId = userId,
                     PromocodeId = promocode.Id,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 });
 
                 var transaction = new TransactionEntity
@@ -188,7 +188,7 @@ public class PromocodeService(
                     UserId = userId,
                     Type = TransactionType.Bonus,
                     Amount = payout,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 };
 
                 await db.Transactions.AddAsync(transaction);
@@ -205,7 +205,7 @@ public class PromocodeService(
                     Payout = payout,
                     UpdatedBalance = balance,
                     UpdatedPromocode = promocode,
-                    WageringRequired = wageringRequired
+                    WageringRequired = wageringRequired,
                 };
             });
 

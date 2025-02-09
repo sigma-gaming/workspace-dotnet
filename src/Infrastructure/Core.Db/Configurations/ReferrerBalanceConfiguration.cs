@@ -22,4 +22,4 @@ public class ReferrerBalanceConfiguration : IEntityTypeConfiguration<ReferrerBal
         entity.HasOne(d => d.Referrer).WithOne(p => p.ReferrerBalance)
             .HasForeignKey<ReferrerBalanceEntity>(d => d.ReferrerId);
     }
-} 
+}

@@ -1,10 +1,9 @@
-using Core.Contracts.Data;
+using Common.Db.Extensions;
 using Core.Contracts.Entities;
 using Core.Contracts.Enums;
 using Core.Contracts.Jsonb;
-using Core.Db.Context;
-using Common.Db.Extensions;
 using Core.Contracts.Mappers;
+using Core.Db.Context;
 using Core.Services.Caching;
 using Core.Services.Finance;
 using Core.Services.User;
@@ -23,12 +22,12 @@ public sealed record SaveGamePayload
     public required BalanceEntity Balance { get; init; }
 }
 
-public sealed record GameRunnerResult<TGame> where TGame : struct
+public sealed record GameRunnerResult
 {
-    public required TGame Game { get; init; }
+    public required Game Game { get; init; }
     public required long Payout { get; init; }
     public required GameOutcome Outcome { get; init; }
-    public required string Snapshot { get; init; }
+    public required GameSnapshot Snapshot { get; init; }
 }
 
 public class GameService(
@@ -44,7 +43,7 @@ public class GameService(
     private static readonly Dictionary<GameOutcome, TransactionType> OutcomeToTypeMap = new()
     {
         [GameOutcome.Win] = TransactionType.Win,
-        [GameOutcome.Loss] = TransactionType.Loss
+        [GameOutcome.Loss] = TransactionType.Loss,
     };
 
     public async Task<GameRecordEntity?> GetGameRecordAsync(Guid gameRecordId, CancellationToken ct = default)
@@ -73,9 +72,9 @@ public class GameService(
         return (long)Math.Ceiling(-bet * multiplier);
     }
 
-    public async Task<GameRunnerResult<TGame>> RunGameAsync<TGame>(
-        Func<Task<GameRunnerResult<TGame>>> runner,
-        long minPayout = 0) where TGame : struct
+    public async Task<GameRunnerResult> RunGameAsync(
+        Func<GameRunnerResult> runner,
+        long minPayout = 0)
     {
         var availableBudget = await budgetService.GetAvailableAsync();
 
@@ -84,14 +83,15 @@ public class GameService(
 
         while (true)
         {
-            var result = await runner();
+            var result = runner();
 
             if (result.Payout <= availableBudget)
                 return result;
         }
     }
 
-    public async Task<(GameRecordEntity GameRecord, Balance UpdatedBalance)> SaveGameAsync(SaveGamePayload payload)
+    public async Task<(GameRecordEntity GameRecord, BalanceEntity UpdatedBalance)> SaveGameAsync(
+        SaveGamePayload payload)
     {
         var profile = await profileService.GetUserDetailsAsync(payload.UserId);
 
@@ -111,7 +111,7 @@ public class GameService(
                 Game = payload.Game,
                 Amount = payload.Payout,
                 GameRecordId = gameRecordId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             });
 
             var multiplier = (int)Math.Floor(Math.Max(0, (decimal)payload.Payout / payload.Bet * 100));
@@ -128,7 +128,7 @@ public class GameService(
                 UserId = payload.UserId,
                 PreviewUserName = profile.Profile.Username ?? profile.Profile.Name,
                 TransactionId = transactionId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
 
             db.GameRecords.Add(gameRecordEntity);
@@ -142,12 +142,12 @@ public class GameService(
                 gameRecordEntity,
                 wageringChange);
 
-            return (gameRecord: gameRecordEntity, balanceMapper.ToData(updatedBalance));
+            return (gameRecord: gameRecordEntity, updatedBalance);
         });
 
         await cache.ExecuteIfConnectedAsync(async () =>
         {
-            await cache.UserBalance.SetAsync(payload.UserId, updatedBalance);
+            await cache.UserBalance.SetAsync(payload.UserId, balanceMapper.ToData(updatedBalance));
             await budgetService.ChangeAvailableAsync(-payload.Payout);
         });
 

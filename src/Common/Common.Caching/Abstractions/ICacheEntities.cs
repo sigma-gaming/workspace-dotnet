@@ -52,4 +52,4 @@ public interface IKeyedBooleanCacheEntity<TKey>
     Task SetAsync(TKey key, bool value);
     Task ToggleAsync(TKey key);
     Task DeleteAsync(TKey key);
-} 
+}

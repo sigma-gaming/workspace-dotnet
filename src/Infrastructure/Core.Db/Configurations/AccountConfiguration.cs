@@ -39,4 +39,4 @@ public class AccountConfiguration : IEntityTypeConfiguration<AccountEntity>
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
-} 
+}

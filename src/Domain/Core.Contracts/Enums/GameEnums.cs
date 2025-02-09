@@ -6,19 +6,19 @@ namespace Core.Contracts.Enums;
 public enum Game
 {
     Dice,
-    Pincode
+    Pincode,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum GameOutcome
 {
     Win,
-    Loss
+    Loss,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum PincodeMode
 {
     Easy,
-    Hardcore
+    Hardcore,
 }

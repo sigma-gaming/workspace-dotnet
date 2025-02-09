@@ -25,4 +25,4 @@ public class UserStatsConfiguration : IEntityTypeConfiguration<UserStatsEntity>
         entity.HasOne(d => d.User).WithOne(p => p.UserStats)
             .HasForeignKey<UserStatsEntity>(d => d.UserId);
     }
-} 
+}

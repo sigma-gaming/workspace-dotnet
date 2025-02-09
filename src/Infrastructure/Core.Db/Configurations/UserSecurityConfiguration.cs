@@ -72,4 +72,4 @@ public class UserSecurityConfiguration : IEntityTypeConfiguration<UserSecurityEn
         entity.HasOne(d => d.User).WithOne(p => p.UserSecurity)
             .HasForeignKey<UserSecurityEntity>(d => d.UserId);
     }
-} 
+}

@@ -25,4 +25,4 @@ public class ReferrerPayoutConfiguration : IEntityTypeConfiguration<ReferrerPayo
         entity.HasOne(d => d.Referrer).WithOne(p => p.ReferrerPayout)
             .HasForeignKey<ReferrerPayoutEntity>(d => d.ReferrerId);
     }
-} 
+}

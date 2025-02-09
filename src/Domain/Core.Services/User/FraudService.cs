@@ -10,13 +10,6 @@ public class FraudService(
     CoreDbContext db,
     ILogger<FraudService> logger)
 {
-    private record ScoreConfig(
-        string FieldName,
-        string ScoreName,
-        Func<UserSecurityEntity, string?> FieldSelector,
-        Func<UserSecurityEntity, int> ScoreSelector,
-        int Multiplier);
-
     private static readonly ScoreConfig[] ScoreConfigs =
     [
         new(nameof(UserSecurityEntity.LastIp), nameof(UserSecurityEntity.IpScore), s => s.LastIp,
@@ -52,7 +45,7 @@ public class FraudService(
             >= 75 => FraudRisk.High,
             >= 45 => FraudRisk.Medium,
             >= 30 => FraudRisk.Low,
-            _ => FraudRisk.Clear
+            _ => FraudRisk.Clear,
         };
     }
 
@@ -134,4 +127,11 @@ public class FraudService(
             return FraudRisk.Unknown;
         }
     }
+
+    private record ScoreConfig(
+        string FieldName,
+        string ScoreName,
+        Func<UserSecurityEntity, string?> FieldSelector,
+        Func<UserSecurityEntity, int> ScoreSelector,
+        int Multiplier);
 }

@@ -9,4 +9,4 @@ public sealed record PromocodeUsage
     public required Guid UserId { get; init; }
     public DateTime? ExpiresAt { get; init; }
     public required PromocodeUsageStatus Status { get; init; }
-} 
+}

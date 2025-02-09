@@ -22,21 +22,15 @@ public class SessionAuthenticationHandler(
     {
         var sessionId = ExtractSessionIdFromRequest();
 
-        if (sessionId == null)
-        {
-            return AuthenticateResult.NoResult();
-        }
+        if (sessionId == null) return AuthenticateResult.NoResult();
 
         var session = await sessionService.GetSessionAsync(sessionId.Value);
 
-        if (session == null)
-        {
-            return AuthenticateResult.Fail("Session is invalid or expired");
-        }
+        if (session == null) return AuthenticateResult.Fail("Session is invalid or expired");
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, session.UserId.ToString())
+            new(ClaimTypes.NameIdentifier, session.UserId.ToString()),
         };
 
         foreach (var role in session.Roles)
@@ -57,14 +51,10 @@ public class SessionAuthenticationHandler(
         var authHeader = Request.Headers["Authorization"].ToString();
 
         if (!string.IsNullOrWhiteSpace(authHeader))
-        {
             if (AuthenticationHeaderValue.TryParse(authHeader, out var headerVal))
-            {
                 return Guid.TryParse(headerVal.Parameter, out var headerSessionId)
                     ? headerSessionId
                     : null;
-            }
-        }
 
         return Request.Cookies.ContainsKey("session_id")
             ? Guid.TryParse(Request.Cookies["session_id"], out var cookieSessionId) ? cookieSessionId : null

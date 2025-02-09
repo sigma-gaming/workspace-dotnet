@@ -28,4 +28,4 @@ public class PromocodeUsageConfiguration : IEntityTypeConfiguration<PromocodeUsa
         entity.HasOne(d => d.User).WithMany(p => p.PromocodeUsages)
             .HasForeignKey(d => d.UserId);
     }
-} 
+}

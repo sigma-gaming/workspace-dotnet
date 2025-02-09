@@ -13,4 +13,4 @@ public sealed record Profile
     public string? Image { get; init; }
     public required int Id { get; init; }
     public required AccountProvider UsedProvider { get; init; }
-} 
+}

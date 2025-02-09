@@ -7,4 +7,4 @@ public sealed record Budget
     public required DateTime UpdatedAt { get; init; }
     public required DateTime LastSyncAt { get; init; }
     public required long Available { get; init; }
-} 
+}

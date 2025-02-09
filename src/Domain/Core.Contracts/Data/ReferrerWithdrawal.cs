@@ -6,4 +6,4 @@ public sealed record ReferrerWithdrawal
     public required long Amount { get; init; }
     public Guid? ReferrerId { get; init; }
     public required Guid Id { get; init; }
-} 
+}

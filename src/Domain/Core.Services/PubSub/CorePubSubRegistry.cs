@@ -18,7 +18,7 @@ public class CorePubSubRegistry(IPubSubService pubSubService)
 
     public ITypedPubSub<UserUpdate<BalancePublic>> BalanceUpdated { get; } =
         pubSubService.Create<UserUpdate<BalancePublic>>("balance-updated");
-    
+
     public ITypedPubSub<UserUpdate<GlobalTaskStatus>> GlobalTaskStatusUpdated { get; } =
         pubSubService.Create<UserUpdate<GlobalTaskStatus>>("global-task-status-updated");
 }

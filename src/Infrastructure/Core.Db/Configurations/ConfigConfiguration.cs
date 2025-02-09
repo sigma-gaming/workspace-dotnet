@@ -27,4 +27,4 @@ public class ConfigConfiguration : IEntityTypeConfiguration<ConfigEntity>
             .HasDefaultValueSql("now()")
             .HasColumnName("updated_at");
     }
-} 
+}

@@ -42,7 +42,6 @@ public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFact
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
-        {
             try
             {
                 await RefreshDomainsAsync();
@@ -58,7 +57,6 @@ public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFact
                     retryDelay.TotalSeconds);
                 await Task.Delay(retryDelay, stoppingToken);
             }
-        }
     }
 
     public IReadOnlyList<DomainEntity> GetDomains(params DomainApp[]? apps)

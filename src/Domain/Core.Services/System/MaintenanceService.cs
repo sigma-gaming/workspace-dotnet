@@ -39,7 +39,6 @@ public class MaintenanceService(
     public async Task<bool> IsMaintenanceEnabledAsync()
     {
         for (var i = 0; i < 3; i++)
-        {
             try
             {
                 return await CheckMaintenanceEnabledAsync();
@@ -51,7 +50,6 @@ public class MaintenanceService(
                 logger.LogInformation("Retrying in 1 second...");
                 await Task.Delay(1000);
             }
-        }
 
         return true;
     }

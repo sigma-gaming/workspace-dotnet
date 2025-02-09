@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Core.Contracts.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Db.Context;
 
@@ -27,7 +27,7 @@ public class CoreDbContext : DbContext
 
     public virtual DbSet<DepositEntity> Deposits { get; set; }
 
-    public virtual DbSet<Contracts.Entities.DomainEntity> Domains { get; set; }
+    public virtual DbSet<DomainEntity> Domains { get; set; }
 
     public virtual DbSet<GameRecordEntity> GameRecords { get; set; }
 
@@ -76,7 +76,7 @@ public class CoreDbContext : DbContext
                 MaintenanceEnabled = false,
                 BackgroundJobsEnabled = true,
                 CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             });
 
         modelBuilder.Entity<BudgetEntity>().HasData(
@@ -86,7 +86,7 @@ public class CoreDbContext : DbContext
                 Available = 100000_00,
                 LastSyncAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                 CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             });
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

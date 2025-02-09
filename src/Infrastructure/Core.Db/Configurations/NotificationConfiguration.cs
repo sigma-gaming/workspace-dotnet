@@ -33,4 +33,4 @@ public class NotificationConfiguration : IEntityTypeConfiguration<NotificationEn
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
-} 
+}

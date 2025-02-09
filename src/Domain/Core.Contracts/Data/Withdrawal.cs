@@ -17,4 +17,4 @@ public sealed record Withdrawal
     public required Currency Currency { get; init; }
     public required WithdrawalMethod Method { get; init; }
     public required PaymentProvider Provider { get; init; }
-} 
+}

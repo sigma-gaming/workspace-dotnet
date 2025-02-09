@@ -23,7 +23,7 @@ public class NotificationService(
             .OrderBy(n => n.CreatedAt)
             .AsNoTracking()
             .ToArrayAsync();
-        
+
         return notifications.Select(mapper.ToData).ToArray();
     }
 

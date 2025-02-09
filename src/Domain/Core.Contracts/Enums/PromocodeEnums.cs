@@ -7,14 +7,14 @@ public enum PromocodeBonusType
 {
     DepositMultiplier,
     DepositFixed,
-    Payout
+    Payout,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum PromocodeUsageStatus
 {
     Applied,
-    Pending
+    Pending,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -29,5 +29,5 @@ public enum PromocodeActivationOutcome
     UsageExceeded,
     AlreadyUsed,
     WrongUsage,
-    Failed
+    Failed,
 }

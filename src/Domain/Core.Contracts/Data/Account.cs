@@ -14,4 +14,4 @@ public sealed record Account
     public string? ProviderUserImage { get; init; }
     public required Guid UserId { get; init; }
     public required AccountProvider Provider { get; init; }
-} 
+}

@@ -14,4 +14,4 @@ public sealed record Notification
     public required int AutoCloseMs { get; init; }
     public required bool WithCloseButton { get; init; }
     public Guid? UserId { get; init; }
-} 
+}

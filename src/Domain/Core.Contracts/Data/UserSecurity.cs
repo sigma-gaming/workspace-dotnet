@@ -28,4 +28,4 @@ public sealed record UserSecurity
     public required int AddressBnbScore { get; init; }
     public required int AddressXmrScore { get; init; }
     public required int AddressSolScore { get; init; }
-} 
+}
