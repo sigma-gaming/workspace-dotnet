@@ -18,7 +18,7 @@ public class UserStatsService(CoreDbContext db, UserStatsMapper mapper)
     public async Task<UserStats> GetStatsAsync(Guid userId)
     {
         var stats = await QueryStatsAsync(userId);
-        if (stats == null) throw new Exception("User stats not found");
+        if (stats is null) throw new Exception("User stats not found");
         return mapper.ToData(stats);
     }
 }

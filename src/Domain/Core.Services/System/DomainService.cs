@@ -61,7 +61,7 @@ public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFact
 
     public IReadOnlyList<DomainEntity> GetDomains(params DomainApp[]? apps)
     {
-        if (apps == null || apps.Length == 0)
+        if (apps is null || apps.Length == 0)
             return cached;
 
         return cached.Where(d => apps.Contains(d.App)).ToList();

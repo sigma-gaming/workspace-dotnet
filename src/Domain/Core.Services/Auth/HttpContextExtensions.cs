@@ -11,7 +11,7 @@ public static class HttpContextExtensions
             return null;
 
         var claim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-        if (claim == null)
+        if (claim is null)
             return null;
 
         return Guid.TryParse(claim.Value, out var userId) ? userId : null;
@@ -21,7 +21,7 @@ public static class HttpContextExtensions
     {
         var userId = httpContext.TryGetUserId();
 
-        if (userId == null)
+        if (userId is null)
             throw new InvalidOperationException("User is not authenticated or the claim is missing or invalid");
 
         return userId.Value;

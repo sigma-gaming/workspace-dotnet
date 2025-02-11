@@ -64,7 +64,7 @@ public class FraudService(
             var security = await db.UserSecurities
                 .FirstOrDefaultAsync(u => u.UserId == userId);
 
-            if (security == null)
+            if (security is null)
             {
                 logger.LogWarning("Failed to get UserSecurity entity for user {UserId}", userId);
                 return FraudRisk.Clear;

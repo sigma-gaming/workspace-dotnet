@@ -17,7 +17,7 @@ public class BudgetService(
     {
         var budgetEntity = await db.Budget.AsNoTracking().FirstOrDefaultAsync(ct);
 
-        if (budgetEntity == null)
+        if (budgetEntity is null)
             throw new Exception("Budget is not configured");
 
         return budgetMapper.ToData(budgetEntity);
@@ -28,7 +28,7 @@ public class BudgetService(
         if (!cache.IsReady()) return await QueryBudgetAsync();
 
         var cached = await cache.Budget.GetAsync();
-        if (cached != null) return cached;
+        if (cached is not null) return cached;
 
         var budget = await QueryBudgetAsync();
         await cache.Budget.SetAsync(budget);
@@ -41,7 +41,7 @@ public class BudgetService(
         if (!cache.IsReady()) return (await QueryBudgetAsync()).Available;
 
         var cached = await cache.BudgetAvailable.GetAsync();
-        if (cached != null) return cached.Value;
+        if (cached is not null) return cached.Value;
 
         var budget = await GetBudgetAsync();
         await cache.BudgetAvailable.SetAsync(budget.Available);

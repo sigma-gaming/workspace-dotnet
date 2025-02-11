@@ -91,7 +91,7 @@ public class GamesController(
             return TypedResults.ValidationProblem(
                 new Dictionary<string, string[]>
                 {
-                    ["bet"] = ["Недостаточно гемов"],
+                    [nameof(PlayDicePayload.Bet)] = ["Недостаточно гемов"],
                 });
         }
     }
@@ -131,7 +131,7 @@ public class GamesController(
             return TypedResults.ValidationProblem(
                 new Dictionary<string, string[]>
                 {
-                    ["bet"] = ["Недостаточно гемов"],
+                    [nameof(PlayPincodePayload.Bet)] = ["Недостаточно гемов"],
                 });
         }
     }

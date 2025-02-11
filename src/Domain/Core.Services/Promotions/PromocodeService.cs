@@ -68,14 +68,14 @@ public class PromocodeService(
         if (cache.IsReady())
         {
             var cached = await cache.Promocode.GetAsync(code);
-            if (cached != null) return cached;
+            if (cached is not null) return cached;
         }
 
         var promocodeEntity = await db.Promocodes
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Code == code);
 
-        if (promocodeEntity == null) return null;
+        if (promocodeEntity is null) return null;
 
         var promocode = promocodeMapper.ToData(promocodeEntity);
 
@@ -103,7 +103,7 @@ public class PromocodeService(
                     .ForUpdate()
                     .FirstOrDefaultAsync(p => p.Code == code);
 
-                if (promocode == null)
+                if (promocode is null)
                     return new PromocodeActivationFailedResult
                     {
                         Outcome = PromocodeActivationOutcome.NotFound,
@@ -113,7 +113,7 @@ public class PromocodeService(
                     .ForUpdate()
                     .FirstOrDefaultAsync(b => b.UserId == userId);
 
-                if (balance == null)
+                if (balance is null)
                     throw new Exception("Balance not found (should not happen)");
 
                 if (promocode.BonusType != PromocodeBonusType.Payout)

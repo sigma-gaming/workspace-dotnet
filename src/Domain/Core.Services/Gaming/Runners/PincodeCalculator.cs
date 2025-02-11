@@ -144,7 +144,7 @@ public static class PincodeCalculator
     private static void SetCombination(PincodeMode mode, int code, string combination)
     {
         var currentCombination = GetPincodeCombination(mode, code);
-        if (currentCombination == null)
+        if (currentCombination is null)
         {
             Config[mode].CombinationMap[code] = combination;
             return;
@@ -224,7 +224,7 @@ public static class PincodeCalculator
     public static int GetPincodeMultiplier(PincodeMode mode, int code)
     {
         var combination = GetPincodeCombination(mode, code);
-        if (combination == null) return 0;
+        if (combination is null) return 0;
         return Config[mode].MultiplierMap.GetValueOrDefault(combination);
     }
 

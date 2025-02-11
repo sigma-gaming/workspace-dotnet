@@ -96,7 +96,7 @@ public class CurrencyRatesService(
     public async Task<double> ConvertAsync(double amount, Currency from, Currency to)
     {
         var rates = await GetRatesAsync();
-        if (rates == null)
+        if (rates is null)
             throw new InvalidOperationException("Currency rates not available");
 
         if (!rates.TryGetValue(from, out var fromRate) || !fromRate.HasValue ||
@@ -109,7 +109,7 @@ public class CurrencyRatesService(
     public async Task<double> ConvertGemsAsync(double amount, Currency to)
     {
         var rates = await GetRatesAsync();
-        if (rates == null)
+        if (rates is null)
             throw new InvalidOperationException("Currency rates not available");
 
         if (!rates.TryGetValue(to, out var toRate) || !toRate.HasValue)

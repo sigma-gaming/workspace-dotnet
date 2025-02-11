@@ -95,7 +95,7 @@ public class GameService(
     {
         var profile = await profileService.GetUserDetailsAsync(payload.UserId);
 
-        if (profile == null)
+        if (profile is null)
             throw new InvalidOperationException("User profile not found");
 
         var (gameRecord, updatedBalance) = await db.ExecuteInTransactionAsync(async () =>

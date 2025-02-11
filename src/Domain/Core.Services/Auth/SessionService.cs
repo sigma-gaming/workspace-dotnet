@@ -15,13 +15,14 @@ public class SessionService(
     {
         var cachedSession = await cache.Session.GetAsync(sessionId);
 
-        if (cachedSession != null) return cachedSession.ExpiresAt > DateTime.UtcNow ? cachedSession : null;
+        if (cachedSession is not null)
+            return cachedSession.ExpiresAt > DateTime.UtcNow ? cachedSession : null;
 
         var sessionEntity = await db.Sessions
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == sessionId);
 
-        if (sessionEntity == null)
+        if (sessionEntity is null)
             return null;
 
         var session = sessionMapper.ToData(sessionEntity);

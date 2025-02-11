@@ -55,13 +55,13 @@ public class AffiliateService(
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Code == code, ct);
 
-        return campaign != null ? campaignMapper.ToData(campaign) : null;
+        return campaign is not null ? campaignMapper.ToData(campaign) : null;
     }
 
     public async Task IncrementCampaignVisitsAsync(Guid campaignId)
     {
         var campaignEntity = await db.ReferralCampaigns.FindAsync(campaignId);
-        if (campaignEntity != null)
+        if (campaignEntity is not null)
         {
             campaignEntity.TotalVisits++;
             await db.SaveChangesAsync();
@@ -71,7 +71,7 @@ public class AffiliateService(
     public async Task IncrementCampaignSignupsAsync(Guid campaignId)
     {
         var campaignEntity = await db.ReferralCampaigns.FindAsync(campaignId);
-        if (campaignEntity != null)
+        if (campaignEntity is not null)
         {
             campaignEntity.TotalSignups++;
             await db.SaveChangesAsync();
@@ -84,7 +84,7 @@ public class AffiliateService(
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.ReferrerId == referrerId, ct);
 
-        return settingsEntity != null ? settingsMapper.ToData(settingsEntity) : null;
+        return settingsEntity is not null ? settingsMapper.ToData(settingsEntity) : null;
     }
 
     public async Task<ReferrerSettings?> GetReferrerSettingsAsync(Guid referrerId)
@@ -93,11 +93,11 @@ public class AffiliateService(
             return await QueryReferrerSettingsAsync(referrerId);
 
         var cached = await cache.ReferrerSettings.GetAsync(referrerId);
-        if (cached != null)
+        if (cached is not null)
             return cached;
 
         var settings = await QueryReferrerSettingsAsync(referrerId);
-        if (settings != null)
+        if (settings is not null)
             await cache.ReferrerSettings.SetAsync(referrerId, settings);
 
         return settings;
@@ -109,7 +109,7 @@ public class AffiliateService(
             .AsNoTracking()
             .FirstOrDefaultAsync(b => b.ReferrerId == referrerId, ct);
 
-        return balanceEntity != null ? balanceMapper.ToData(balanceEntity) : null;
+        return balanceEntity is not null ? balanceMapper.ToData(balanceEntity) : null;
     }
 
     public async Task<ReferrerBalance?> GetReferrerBalanceAsync(Guid referrerId)
@@ -118,11 +118,11 @@ public class AffiliateService(
             return await QueryReferrerBalanceAsync(referrerId);
 
         var cached = await cache.ReferrerBalance.GetAsync(referrerId);
-        if (cached != null)
+        if (cached is not null)
             return cached;
 
         var balance = await QueryReferrerBalanceAsync(referrerId);
-        if (balance != null)
+        if (balance is not null)
             await cache.ReferrerBalance.SetAsync(referrerId, balance);
 
         return balance;
@@ -181,7 +181,7 @@ public class AffiliateService(
 
         var updatedEntity = await db.ReferrerBalances.FindAsync(referrerId);
 
-        if (updatedEntity == null)
+        if (updatedEntity is null)
             throw new Exception("ReferrerBalance not found");
 
         var result = balanceMapper.ToData(updatedEntity);
@@ -203,7 +203,7 @@ public class AffiliateService(
             return;
 
         var settings = await GetReferrerSettingsAsync(referrerId.Value);
-        if (settings == null)
+        if (settings is null)
             return;
 
         var finalAmount = (amount - amount * TotalFee) * (settings.RevShare / 100m);
@@ -235,7 +235,7 @@ public class AffiliateService(
             .AsNoTracking()
             .FirstOrDefaultAsync(ct);
 
-        if (lastTransaction == null)
+        if (lastTransaction is null)
         {
             logger.LogInformation("No transactions to process");
             return;
@@ -282,7 +282,7 @@ public class AffiliateService(
                 var payoutEntity = await db.ReferrerPayouts
                     .FirstOrDefaultAsync(p => p.ReferrerId == payout.ReferrerId);
 
-                if (payoutEntity != null)
+                if (payoutEntity is not null)
                 {
                     payoutEntity.NextPayoutAt = nextPayoutAt;
                     payoutEntity.LastPayoutAt = now;

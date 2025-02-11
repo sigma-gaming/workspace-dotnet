@@ -13,6 +13,104 @@ public class ProfileService(
     ProfileMapper profileMapper,
     AccountMapper accountMapper)
 {
+    public static readonly string[] ReservedUsernames =
+    [
+        "sigma",
+        "sigmadm",
+        "sigmaadm",
+        "sigmadmin",
+        "sigmaadmin",
+        "sigmagames",
+        "sigmagaming",
+        "sigma_admin",
+        "sigma_support",
+        "sigma_moderator",
+        "sigma_developer",
+        "sigma_dev",
+        "sigma_owner",
+        "sigma_bot",
+        "sigma_service",
+        "sigma_team",
+        "sigma_staff",
+        "sigma_helpdesk",
+        "sigma_system",
+        "sigmadev",
+        "admin",
+        "administrator",
+        "moderator",
+        "support",
+        "helpdesk",
+        "system",
+        "root",
+        "superuser",
+        "manager",
+        "operator",
+        "team",
+        "staff",
+        "service",
+        "developer",
+        "dev",
+        "owner",
+        "bot",
+        "api",
+        "test",
+        "master",
+        "security",
+        "info",
+        "contact",
+        "no-reply",
+        "notifications",
+        "noreply",
+        "official",
+        "webmaster",
+        "help",
+        "agent",
+        "customer_service",
+        "assistant",
+        "user_support",
+        "community",
+        "guide",
+        "consultant",
+        "agent",
+        "moderation",
+        "moderators",
+        "project",
+        "control",
+        "account",
+        "client_service",
+        "sysadmin",
+        "team_leader",
+        "group_admin",
+        "contact_support",
+        "customer_care",
+        "management",
+        "host",
+        "monitor",
+        "api_service",
+        "backend",
+        "frontend",
+        "engineer",
+        "developer_support",
+        "server",
+        "dashboard",
+        "console",
+        "admin_panel",
+        "config",
+        "analytics",
+        "update",
+        "access",
+        "report",
+        "auth",
+        "authorization",
+        "authentication",
+    ];
+
+    public static string GetUserFullName(string? firstName, string? lastName)
+    {
+        return string.Join(" ", new[] { firstName, lastName }
+            .Where(name => !string.IsNullOrWhiteSpace(name)));
+    }
+
     private async Task<UserDetails> QueryUserDetailsAsync(Guid userId, CancellationToken ct = default)
     {
         var result = await (
@@ -31,10 +129,10 @@ public class ProfileService(
             .AsNoTracking()
             .FirstOrDefaultAsync(ct);
 
-        if (result == null)
+        if (result is null)
             throw new InvalidOperationException("User not found");
 
-        if (result.Profile == null)
+        if (result.Profile is null)
             throw new InvalidOperationException("Profile not found");
 
         return new UserDetails
@@ -51,7 +149,7 @@ public class ProfileService(
             return await QueryUserDetailsAsync(userId);
 
         var cached = await cache.UserDetails.GetAsync(userId);
-        if (cached != null)
+        if (cached is not null)
             return cached;
 
         var profile = await QueryUserDetailsAsync(userId);

@@ -11,7 +11,7 @@ public static class TransactionExtensions
         var existingTransaction = context.Database.CurrentTransaction;
 
         //  Reuse existing transaction
-        if (existingTransaction != null) return await operation();
+        if (existingTransaction is not null) return await operation();
 
         // Open a new transaction
         var strategy = context.Database.CreateExecutionStrategy();

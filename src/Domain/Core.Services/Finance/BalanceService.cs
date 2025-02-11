@@ -19,14 +19,14 @@ public class BalanceService(
         if (cache.IsReady())
         {
             var cached = await cache.UserBalance.GetAsync(userId);
-            if (cached != null) return cached;
+            if (cached is not null) return cached;
         }
 
         var balanceEntity = await db.Balances
             .AsNoTracking()
             .FirstOrDefaultAsync(b => b.UserId == userId, ct);
 
-        if (balanceEntity == null)
+        if (balanceEntity is null)
             throw new Exception("Balance not found");
 
         var balance = balanceMapper.ToData(balanceEntity);
@@ -42,7 +42,7 @@ public class BalanceService(
             .ForUpdate()
             .FirstOrDefaultAsync(b => b.UserId == userId, ct);
 
-        if (balanceEntity == null)
+        if (balanceEntity is null)
             throw new Exception("Balance not found");
 
         return balanceEntity;
@@ -72,7 +72,7 @@ public class BalanceService(
 
         if (transaction.Type == TransactionType.Win)
         {
-            if (gameRecord == null)
+            if (gameRecord is null)
                 throw new ArgumentException("GameRecord is required for game transactions");
 
             var won = transaction.Amount;
@@ -95,7 +95,7 @@ public class BalanceService(
 
         if (transaction.Type == TransactionType.Loss)
         {
-            if (gameRecord == null)
+            if (gameRecord is null)
                 throw new ArgumentException("GameRecord is required for game transactions");
 
             var lost = -transaction.Amount;

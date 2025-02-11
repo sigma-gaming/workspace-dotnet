@@ -129,7 +129,7 @@ public class AuthService(
             ProviderUsername = payload.ProviderUsername,
             ProviderUserFirstName = payload.ProviderUserFirstName,
             ProviderUserLastName = payload.ProviderUserLastName,
-            ProviderUserImage = payload.ProviderUserImage != null
+            ProviderUserImage = payload.ProviderUserImage is not null
                 ? await ValidateImageUrlAsync(payload.ProviderUserImage)
                 : null,
         };
@@ -145,7 +145,7 @@ public class AuthService(
             if (connectedAccount?.ProviderUserId != payload.ProviderUserId)
                 return AuthResult.AnotherAccountConnected();
 
-            if (account != null)
+            if (account is not null)
             {
                 // Account is connected to another user
                 if (payload.UserId != account.UserId)
@@ -153,7 +153,7 @@ public class AuthService(
 
                 // Account is already connected to current user
                 var user = await userService.TryGetUserAsync(payload.UserId.Value);
-                if (user == null)
+                if (user is null)
                     throw new InvalidOperationException("User of Account not found");
 
                 return AuthResult.SignedIn(user, accountMapper.ToData(account));
@@ -171,10 +171,10 @@ public class AuthService(
         }
 
         // Sign in with existing account
-        if (account != null)
+        if (account is not null)
         {
             var user = await userService.TryGetUserAsync(account.UserId);
-            if (user == null)
+            if (user is null)
                 throw new InvalidOperationException("User of Account not found");
 
             return AuthResult.SignedIn(user, accountMapper.ToData(account));
@@ -187,7 +187,7 @@ public class AuthService(
         if (!string.IsNullOrEmpty(payload.ReferralCampaignCode))
         {
             var campaign = await affiliateService.TryGetCampaignAsync(payload.ReferralCampaignCode);
-            if (campaign != null)
+            if (campaign is not null)
             {
                 referrerId = campaign.ReferrerId;
                 referralCampaignId = campaign.Id;

@@ -7,6 +7,7 @@ using Core.Contracts.Mappers;
 using Core.Db.Context;
 using Core.Services.Caching;
 using Core.Services.Finance;
+using Core.Services.Promotions.TaskCheckers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TaskStatus = Core.Contracts.Enums.TaskStatus;
@@ -66,7 +67,7 @@ public class GlobalTaskService(
         if (!cache.IsReady()) return await QueryTasksAsync();
 
         var cached = await cache.GlobalTasks.GetAsync();
-        if (cached != null) return cached;
+        if (cached is not null) return cached;
 
         var tasks = await QueryTasksAsync();
         await cache.GlobalTasks.SetAsync(tasks);
@@ -85,7 +86,7 @@ public class GlobalTaskService(
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.TaskKey == taskKey && s.UserId == userId);
 
-        return status != null
+        return status is not null
             ? new GlobalTaskStatusInfo(status.Status, true)
             : new GlobalTaskStatusInfo(TaskStatus.Pending, false);
     }
@@ -95,7 +96,7 @@ public class GlobalTaskService(
         if (!cache.IsReady()) return await QueryStatusAsync(taskKey, userId);
 
         var cached = await cache.GlobalTaskStatus.GetAsync($"{taskKey}:{userId}");
-        if (cached != null) return cached;
+        if (cached is not null) return cached;
 
         var status = await QueryStatusAsync(taskKey, userId);
         await cache.GlobalTaskStatus.SetAsync($"{taskKey}:{userId}", status);
@@ -131,7 +132,7 @@ public class GlobalTaskService(
     public async Task<GlobalTaskCompleteOutput> CompleteTaskAsync(
         Guid userId,
         GlobalTaskKey taskKey,
-        Func<Guid, GlobalTask, Task<GlobalTaskCheckResult>> checker)
+        IGlobalTaskChecker checker)
     {
         try
         {
@@ -146,13 +147,13 @@ public class GlobalTaskService(
 
                 var task = await GetTaskAsync(taskKey);
 
-                if (task == null)
+                if (task is null)
                     return new GlobalTaskCompleteOutput(GlobalTaskCompleteOutcome.Failed);
 
                 if (!task.IsActive)
                     return new GlobalTaskCompleteOutput(GlobalTaskCompleteOutcome.NotActive);
 
-                var checkResult = await checker(userId, task);
+                var checkResult = await checker.CheckAsync(userId, task);
 
                 if (!checkResult.Completed)
                     return new GlobalTaskCompleteOutput(GlobalTaskCompleteOutcome.NotCompleted,
@@ -166,7 +167,7 @@ public class GlobalTaskService(
 
             await cache.ExecuteIfConnectedAsync(async () =>
             {
-                if (output.UpdatedStatus != null)
+                if (output.UpdatedStatus is not null)
                     await cache.GlobalTaskStatus.SetAsync($"{taskKey}:{userId}",
                         new GlobalTaskStatusInfo(output.UpdatedStatus.Value, true));
             });
@@ -199,7 +200,7 @@ public class GlobalTaskService(
                 var task = await db.GlobalTasks
                     .FirstOrDefaultAsync(t => t.Key == taskKey);
 
-                if (task == null)
+                if (task is null)
                     return new GlobalTaskClaimRewardOutput(GlobalTaskClaimRewardOutcome.Failed);
 
                 var balanceEntity = await balanceService.GetBalanceForUpdateAsync(userId);
@@ -231,11 +232,11 @@ public class GlobalTaskService(
 
             await cache.ExecuteIfConnectedAsync(async () =>
             {
-                if (output.UpdatedStatus != null)
+                if (output.UpdatedStatus is not null)
                     await cache.GlobalTaskStatus.SetAsync($"{taskKey}:{userId}",
                         new GlobalTaskStatusInfo(output.UpdatedStatus.Value, true));
 
-                if (output.UpdatedBalance != null)
+                if (output.UpdatedBalance is not null)
                     await cache.UserBalance.SetAsync(userId, balanceMapper.ToData(output.UpdatedBalance));
             });
 

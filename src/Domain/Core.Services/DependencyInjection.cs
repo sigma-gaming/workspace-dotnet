@@ -2,12 +2,14 @@ using Core.Builder;
 using Core.Services.Auth;
 using Core.Services.Bots;
 using Core.Services.Caching;
+using Core.Services.Chat;
 using Core.Services.Finance;
 using Core.Services.Finance.Api;
 using Core.Services.Gaming;
 using Core.Services.Gaming.Runners;
 using Core.Services.Notifications;
 using Core.Services.Promotions;
+using Core.Services.Promotions.TaskCheckers;
 using Core.Services.PubSub;
 using Core.Services.System;
 using Core.Services.User;
@@ -49,10 +51,16 @@ public static class DependencyInjection
         builder.Services.AddScoped<PincodeGame>();
 
         builder.Services.AddScoped<AffiliateService>();
-        builder.Services.AddScoped<GlobalTaskService>();
         builder.Services.AddScoped<PromocodeService>();
+        builder.Services.AddScoped<GlobalTaskService>();
+        builder.Services.AddScoped<TelegramGroupSubscribeChecker>();
+        builder.Services.AddScoped<VkGroupSubscribeChecker>();
+        builder.Services.AddScoped<VkPinnedRepostChecker>();
+        builder.Services.AddScoped<GlobalTaskCheckerProvider>();
 
         builder.Services.AddScoped<NotificationService>();
+
+        builder.Services.AddScoped<ChatService>();
 
         return builder;
     }

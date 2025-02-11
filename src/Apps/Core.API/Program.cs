@@ -56,6 +56,11 @@ builder.Services.AddControllers(options =>
     options.AllowInputFormatterExceptionMessages = builder.Environment.IsDevelopment();
 });
 
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+});
+
 builder.Services.AddHttpClient();
 
 // Add infrastructure and domains

@@ -22,11 +22,11 @@ public class SessionAuthenticationHandler(
     {
         var sessionId = ExtractSessionIdFromRequest();
 
-        if (sessionId == null) return AuthenticateResult.NoResult();
+        if (sessionId is null) return AuthenticateResult.NoResult();
 
         var session = await sessionService.GetSessionAsync(sessionId.Value);
 
-        if (session == null) return AuthenticateResult.Fail("Session is invalid or expired");
+        if (session is null) return AuthenticateResult.Fail("Session is invalid or expired");
 
         var claims = new List<Claim>
         {

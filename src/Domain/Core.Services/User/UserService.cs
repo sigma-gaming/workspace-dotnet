@@ -23,15 +23,15 @@ public class UserService(
         if (!cache.IsReady())
         {
             var userEntity = await QueryUserAsync(userId);
-            return userEntity != null ? userMapper.ToData(userEntity) : null;
+            return userEntity is not null ? userMapper.ToData(userEntity) : null;
         }
 
         var cached = await cache.User.GetAsync(userId);
-        if (cached != null)
+        if (cached is not null)
             return cached;
 
         var freshUserEntity = await QueryUserAsync(userId);
-        if (freshUserEntity == null)
+        if (freshUserEntity is null)
             return null;
 
         var user = userMapper.ToData(freshUserEntity);
@@ -44,7 +44,7 @@ public class UserService(
     {
         var user = await TryGetUserAsync(userId);
 
-        if (user == null)
+        if (user is null)
             throw new Exception("User not found");
 
         return user;

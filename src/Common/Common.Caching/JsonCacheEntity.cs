@@ -93,7 +93,7 @@ public class JsonListCacheEntity<T>(
         var values = await db.ListRangeAsync(key);
         return values
             .Select(x => JsonSerializer.Deserialize<T>(x!))
-            .Where(x => x != null)
+            .Where(x => x is not null)
             .ToList()!;
     }
 
@@ -166,7 +166,7 @@ public class KeyedJsonListCacheEntity<TKey, TValue>(
         var values = await db.ListRangeAsync(keyGenerator(key));
         return values
             .Select(x => JsonSerializer.Deserialize<TValue>(x!))
-            .Where(x => x != null)
+            .Where(x => x is not null)
             .ToList()!;
     }
 
