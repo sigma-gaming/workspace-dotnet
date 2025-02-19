@@ -53,7 +53,7 @@ public class GameService(
             .FirstOrDefaultAsync(r => r.Id == gameRecordId, ct);
     }
 
-    public decimal CalculateWageringMultiplier(GameSnapshot snapshot)
+    private decimal CalculateWageringMultiplier(GameSnapshot snapshot)
     {
         switch (snapshot)
         {
@@ -66,7 +66,7 @@ public class GameService(
         }
     }
 
-    public long CalculateWageringChange(long bet, GameSnapshot snapshot)
+    private long CalculateWageringChange(long bet, GameSnapshot snapshot)
     {
         var multiplier = CalculateWageringMultiplier(snapshot);
         return (long)Math.Ceiling(-bet * multiplier);
