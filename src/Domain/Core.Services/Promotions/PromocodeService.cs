@@ -12,10 +12,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Services.Promotions;
 
-public abstract record PromocodeActivationResult
+public enum PromocodeActivationIssue
 {
-    public required PromocodeActivationOutcome Outcome { get; init; }
+    Blocked,
+    Expired,
+    NotFound,
+    Inactive,
+    UsageExceeded,
+    AlreadyUsed,
+    Unknown,
 }
+
+public abstract record PromocodeActivationResult;
 
 public sealed record PromocodeActivationPayoutResult : PromocodeActivationResult
 {
@@ -36,7 +44,7 @@ public sealed record PromocodeActivationWrongUsageResult : PromocodeActivationRe
     public required PromocodeBonusType BonusType { get; init; }
 }
 
-public sealed record PromocodeActivationFailedResult : PromocodeActivationResult;
+public sealed record PromocodeActivationFailedResult(PromocodeActivationIssue Issue) : PromocodeActivationResult;
 
 public class PromocodeService(
     ILogger<PromocodeService> logger,
@@ -46,9 +54,9 @@ public class PromocodeService(
     PromocodeMapper promocodeMapper,
     BalanceMapper balanceMapper)
 {
-    private const string DefaultAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private const string DEFAULT_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    public string GenerateOne(int length = 10, string alphabet = DefaultAlphabet)
+    public string GenerateOne(int length = 10, string alphabet = DEFAULT_ALPHABET)
     {
         var random = new Random();
         return new string(Enumerable.Range(0, length)
@@ -56,7 +64,7 @@ public class PromocodeService(
             .ToArray());
     }
 
-    public string[] GenerateMany(int count, int length = 10, string alphabet = DefaultAlphabet)
+    public string[] GenerateMany(int count, int length = 10, string alphabet = DEFAULT_ALPHABET)
     {
         return Enumerable.Range(0, count)
             .Select(_ => GenerateOne(length, alphabet))
@@ -104,10 +112,7 @@ public class PromocodeService(
                     .FirstOrDefaultAsync(p => p.Code == code);
 
                 if (promocode is null)
-                    return new PromocodeActivationFailedResult
-                    {
-                        Outcome = PromocodeActivationOutcome.NotFound,
-                    };
+                    return new PromocodeActivationFailedResult(PromocodeActivationIssue.NotFound);
 
                 var balance = await db.Balances
                     .ForUpdate()
@@ -119,54 +124,34 @@ public class PromocodeService(
                 if (promocode.BonusType != PromocodeBonusType.Payout)
                     return new PromocodeActivationWrongUsageResult
                     {
-                        Outcome = PromocodeActivationOutcome.WrongUsage,
                         BonusType = promocode.BonusType,
                     };
 
                 if (promocode.Bonus.Type != PromocodeBonusType.Payout)
                     return new PromocodeActivationWrongUsageResult
                     {
-                        Outcome = PromocodeActivationOutcome.WrongUsage,
                         BonusType = promocode.Bonus.Type,
                     };
 
                 if (promocode.UserId.HasValue && promocode.UserId != userId)
-                    return new PromocodeActivationFailedResult
-                    {
-                        Outcome = PromocodeActivationOutcome.NotFound,
-                    };
+                    return new PromocodeActivationFailedResult(PromocodeActivationIssue.NotFound);
 
                 if (await IsUsedAsync(promocode.Id, userId))
-                    return new PromocodeActivationFailedResult
-                    {
-                        Outcome = PromocodeActivationOutcome.AlreadyUsed,
-                    };
+                    return new PromocodeActivationFailedResult(PromocodeActivationIssue.AlreadyUsed);
 
                 if (!promocode.IsActive)
-                    return new PromocodeActivationFailedResult
-                    {
-                        Outcome = PromocodeActivationOutcome.Inactive,
-                    };
+                    return new PromocodeActivationFailedResult(PromocodeActivationIssue.Inactive);
 
                 if (promocode.ExpiresAt.HasValue && DateTime.UtcNow >= promocode.ExpiresAt)
-                    return new PromocodeActivationFailedResult
-                    {
-                        Outcome = PromocodeActivationOutcome.Expired,
-                    };
+                    return new PromocodeActivationFailedResult(PromocodeActivationIssue.Expired);
 
                 if (promocode.Usages >= promocode.MaxUsages)
-                    return new PromocodeActivationFailedResult
-                    {
-                        Outcome = PromocodeActivationOutcome.UsageExceeded,
-                    };
+                    return new PromocodeActivationFailedResult(PromocodeActivationIssue.UsageExceeded);
 
                 var risk = await fraudService.ActualizeRiskAsync(userId);
 
                 if (risk is FraudRisk.High or FraudRisk.Medium)
-                    return new PromocodeActivationFailedResult
-                    {
-                        Outcome = PromocodeActivationOutcome.Blocked,
-                    };
+                    return new PromocodeActivationFailedResult(PromocodeActivationIssue.Blocked);
 
                 var payout = ((PromocodeBonusPayout)promocode.Bonus).Payout;
                 var wageringRequired = (long)Math.Ceiling(payout * (promocode.WageringMultiplier / 100.0));
@@ -201,7 +186,6 @@ public class PromocodeService(
 
                 return new PromocodeActivationPayoutResult
                 {
-                    Outcome = PromocodeActivationOutcome.AppliedPayout,
                     Payout = payout,
                     UpdatedBalance = balance,
                     UpdatedPromocode = promocode,
@@ -225,7 +209,7 @@ public class PromocodeService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to apply Payout");
-            return new PromocodeActivationFailedResult { Outcome = PromocodeActivationOutcome.Failed };
+            return new PromocodeActivationFailedResult(PromocodeActivationIssue.Unknown);
         }
     }
 }

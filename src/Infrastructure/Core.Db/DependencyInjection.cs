@@ -41,6 +41,7 @@ public static class DependencyInjection
             {
                 npgsqOptions.EnableRetryOnFailure();
                 npgsqOptions.SetPostgresVersion(17, 0);
+                npgsqOptions.ConfigureDataSource(datasource => { datasource.EnableDynamicJson(); });
             });
             options.AddInterceptors(new ForUpdateInterceptor());
             optionsAction?.Invoke(options);

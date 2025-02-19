@@ -23,8 +23,8 @@ public sealed record ChatMessagePayload
 [ApiController]
 public class ChatController(ChatService chatService) : ControllerBase
 {
-    [ProducesResponseType<ChatMessage[]>(StatusCodes.Status200OK)]
-    [HttpGet("/chat/get-last-messages")]
+    [ProducesResponseType<ChatMessage[]>(StatusCodes.Status200OK, "application/json")]
+    [HttpGet("/chat/last-messages")]
     public async Task<Ok<ChatMessage[]>> GetLastMessages()
     {
         var lastMessages = await chatService.GetLastMessagesAsync();
@@ -32,7 +32,7 @@ public class ChatController(ChatService chatService) : ControllerBase
     }
 
     [Authorize]
-    [ProducesResponseType<ChatMessage>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ChatMessage>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/chat/send-message")]
     public async Task<Results<Ok<ChatMessage>, ValidationProblem>> SendMessage(
         [FromBody] ChatMessagePayload payload)

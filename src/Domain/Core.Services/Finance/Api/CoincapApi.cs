@@ -29,11 +29,11 @@ public sealed record CoincapRatesResponse
 
 public sealed class CoincapApi(HttpClient httpClient)
 {
-    private const string BaseUrl = "https://api.coincap.io/v2";
+    private const string BASE_URL = "https://api.coincap.io/v2";
 
     public async Task<List<CoincapRate>> GetRates(CancellationToken ct = default)
     {
-        var response = await httpClient.GetAsync($"{BaseUrl}/rates", ct);
+        var response = await httpClient.GetAsync($"{BASE_URL}/rates", ct);
         response.EnsureSuccessStatusCode();
 
         var content = await response.Content.ReadAsStringAsync(ct);

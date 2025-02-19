@@ -10,8 +10,8 @@ namespace Core.API.Controllers;
 public class NotificationsController(
     NotificationService notificationService) : ControllerBase
 {
-    [ProducesResponseType<Notification[]>(StatusCodes.Status200OK)]
-    [HttpGet("/notifications/get-actual")]
+    [ProducesResponseType<Notification[]>(StatusCodes.Status200OK, "application/json")]
+    [HttpGet("/notifications/actual")]
     public async Task<Ok<Notification[]>> GetActual()
     {
         var userId = HttpContext.GetUserId();

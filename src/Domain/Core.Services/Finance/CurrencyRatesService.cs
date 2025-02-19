@@ -27,6 +27,7 @@ public class CurrencyRatesService(
     private async Task<CurrencyExchangeRates> GetLatestRatesAsync()
     {
         var rates = new CurrencyExchangeRates();
+        var map = rates.Map;
 
         try
         {
@@ -44,34 +45,34 @@ public class CurrencyRatesService(
             if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Rub, out var rub) &&
                 fiatRawRatesMap.TryGetValue(CoincapSymbol.Usd, out var usd))
             {
-                rates[Currency.Rub] = 100;
-                rates[Currency.Usd] = rates[Currency.Rub] / rub;
+                map[Currency.Rub] = 100;
+                map[Currency.Usd] = map[Currency.Rub] / rub;
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Eur, out var eur))
-                    rates[Currency.Eur] = eur * rates[Currency.Usd];
+                    map[Currency.Eur] = eur * map[Currency.Usd];
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Kzt, out var kzt))
-                    rates[Currency.Kzt] = kzt * rates[Currency.Usd];
+                    map[Currency.Kzt] = kzt * map[Currency.Usd];
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Kgs, out var kgs))
-                    rates[Currency.Kgs] = kgs * rates[Currency.Usd];
+                    map[Currency.Kgs] = kgs * map[Currency.Usd];
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Uzs, out var uzs))
-                    rates[Currency.Uzs] = uzs * rates[Currency.Usd];
+                    map[Currency.Uzs] = uzs * map[Currency.Usd];
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Uah, out var uah))
-                    rates[Currency.Uah] = uah * rates[Currency.Usd];
+                    map[Currency.Uah] = uah * map[Currency.Usd];
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Usdt, out var usdt))
                 {
-                    rates[Currency.UsdtErc20] = usdt * rates[Currency.Usd];
-                    rates[Currency.UsdtTrc20] = usdt * rates[Currency.Usd];
+                    map[Currency.UsdtErc20] = usdt * map[Currency.Usd];
+                    map[Currency.UsdtTrc20] = usdt * map[Currency.Usd];
                 }
 
-                if (rates[Currency.UsdtTrc20].HasValue)
+                if (map[Currency.UsdtTrc20].HasValue)
                     foreach (var ticker in cryptoRates)
                         if (SymbolCurrencyMap.TryGetValue(ticker.Symbol, out var currency))
-                            rates[currency] = double.Parse(ticker.Price) * rates[Currency.UsdtTrc20]!.Value;
+                            map[currency] = double.Parse(ticker.Price) * map[Currency.UsdtTrc20]!.Value;
             }
         }
         catch (Exception ex)
@@ -99,8 +100,8 @@ public class CurrencyRatesService(
         if (rates is null)
             throw new InvalidOperationException("Currency rates not available");
 
-        if (!rates.TryGetValue(from, out var fromRate) || !fromRate.HasValue ||
-            !rates.TryGetValue(to, out var toRate) || !toRate.HasValue)
+        if (!rates.Map.TryGetValue(from, out var fromRate) || !fromRate.HasValue ||
+            !rates.Map.TryGetValue(to, out var toRate) || !toRate.HasValue)
             throw new InvalidOperationException("Specified currency rates not available");
 
         return amount * fromRate.Value / toRate.Value;
@@ -112,7 +113,7 @@ public class CurrencyRatesService(
         if (rates is null)
             throw new InvalidOperationException("Currency rates not available");
 
-        if (!rates.TryGetValue(to, out var toRate) || !toRate.HasValue)
+        if (!rates.Map.TryGetValue(to, out var toRate) || !toRate.HasValue)
             throw new InvalidOperationException("Specified currency rates not available");
 
         return amount / toRate.Value;

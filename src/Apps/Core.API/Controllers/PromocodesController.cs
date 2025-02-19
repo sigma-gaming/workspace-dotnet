@@ -31,7 +31,7 @@ public class PromocodesController(
     BalanceMapper balanceMapper,
     PromocodeService promocodeService) : ControllerBase
 {
-    [ProducesResponseType<ApplyPromocodeResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApplyPromocodeResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/promocodes/apply")]
     public async Task<Results<Ok<ApplyPromocodeResponse>, ValidationProblem>> Apply(
         [FromBody] ApplyPromocodePayload payload)
@@ -73,15 +73,15 @@ public class PromocodesController(
                     [nameof(ApplyPromocodePayload.Code)] = [wrongUsageMessage],
                 });
 
-            default:
-                var failureMessage = result.Outcome switch
+            case PromocodeActivationFailedResult failure:
+                var failureMessage = failure.Issue switch
                 {
-                    PromocodeActivationOutcome.NotFound => "Промокод не найден",
-                    PromocodeActivationOutcome.Expired => "Срок действия промокода истёк",
-                    PromocodeActivationOutcome.UsageExceeded => "Достигнут лимит использования промокода",
-                    PromocodeActivationOutcome.AlreadyUsed => "Вы уже использовали этот промокод",
-                    PromocodeActivationOutcome.Inactive => "Промокод не активен",
-                    PromocodeActivationOutcome.Blocked => "Промокод заблокирован",
+                    PromocodeActivationIssue.NotFound => "Промокод не найден",
+                    PromocodeActivationIssue.Expired => "Срок действия промокода истёк",
+                    PromocodeActivationIssue.UsageExceeded => "Достигнут лимит использования промокода",
+                    PromocodeActivationIssue.AlreadyUsed => "Вы уже использовали этот промокод",
+                    PromocodeActivationIssue.Inactive => "Промокод не активен",
+                    PromocodeActivationIssue.Blocked => "Промокод заблокирован",
                     _ => "Не удалось применить промокод. Попробуйте ещё раз или напишите в поддержку",
                 };
 
@@ -89,6 +89,9 @@ public class PromocodesController(
                 {
                     [nameof(ApplyPromocodePayload.Code)] = [failureMessage],
                 });
+
+            default:
+                throw new InvalidOperationException("Unknown promocode activation result");
         }
     }
 }

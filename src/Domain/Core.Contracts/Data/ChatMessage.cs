@@ -1,4 +1,5 @@
 using Core.Contracts.Enums;
+using Core.Contracts.Jsonb;
 
 namespace Core.Contracts.Data;
 
@@ -7,7 +8,7 @@ public sealed record ChatMessage
     public required Guid TrackingId { get; init; }
     public required DateTime CreatedAt { get; init; }
     public string? Text { get; init; }
-    public string? Attachments { get; init; }
+    public ChatMessageAttachment[] Attachments { get; init; } = [];
     public string? SenderName { get; init; }
     public string? SenderUsername { get; init; }
     public string? SenderImage { get; init; }

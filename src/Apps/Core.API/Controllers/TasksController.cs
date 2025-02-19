@@ -40,8 +40,8 @@ public class TasksController(
     BalanceMapper balanceMapper) : ControllerBase
 {
     [Authorize]
-    [ProducesResponseType<Dictionary<GlobalTaskKey, TaskStatus>>(StatusCodes.Status200OK)]
-    [HttpGet("/tasks/global/get-statuses")]
+    [ProducesResponseType<Dictionary<GlobalTaskKey, TaskStatus>>(StatusCodes.Status200OK, "application/json")]
+    [HttpGet("/tasks/global/my-statuses")]
     public async Task<Ok<Dictionary<GlobalTaskKey, TaskStatus>>> GetGlobalTaskStatuses()
     {
         var userId = HttpContext.GetUserId();
@@ -56,16 +56,16 @@ public class TasksController(
         return TypedResults.Ok(statuses);
     }
 
-    [ProducesResponseType<GlobalTask[]>(StatusCodes.Status200OK)]
-    [HttpGet("/tasks/global/get-tasks")]
-    public async Task<Ok<GlobalTask[]>> GetGlobalTasks()
+    [ProducesResponseType<GlobalTask[]>(StatusCodes.Status200OK, "application/json")]
+    [HttpGet("/tasks/global/list")]
+    public async Task<Ok<GlobalTask[]>> ListGlobalTasks()
     {
         var tasks = await globalTaskService.GetTasksAsync();
         return TypedResults.Ok(tasks);
     }
 
     [Authorize]
-    [ProducesResponseType<CompleteTaskResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<CompleteTaskResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/tasks/global/complete")]
     public async Task<Results<Ok<CompleteTaskResponse>, ValidationProblem>> CompleteGlobalTask(
         [FromBody] CompleteTaskPayload payload)
@@ -121,7 +121,7 @@ public class TasksController(
     }
 
     [Authorize]
-    [ProducesResponseType<ClaimRewardResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ClaimRewardResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/tasks/global/claim-reward")]
     public async Task<Results<Ok<ClaimRewardResponse>, ValidationProblem>> ClaimGlobalTaskReward(
         [FromBody] CompleteTaskPayload payload)

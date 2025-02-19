@@ -11,22 +11,37 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Services.Promotions;
 
+public enum ReferrerWithdrawalIssue
+{
+    NotConnected,
+    InsufficientBalance,
+}
+
+public record ReferrerWithdrawalResult;
+
+public sealed record ReferrerWithdrawalFailedResult(ReferrerWithdrawalIssue Issue) : ReferrerWithdrawalResult;
+
+public sealed record ReferrerWithdrawalSuccessResult(
+    Balance UpdatedBalance,
+    ReferrerBalance UpdatedReferrerBalance) : ReferrerWithdrawalResult;
+
 public class AffiliateService(
     CoreDbContext db,
     CoreCacheRegistry cache,
     ILogger<AffiliateService> logger,
     BalanceService balanceService,
+    BalanceMapper balanceMapper,
     ReferralCampaignMapper campaignMapper,
     ReferrerSettingsMapper settingsMapper,
-    ReferrerBalanceMapper balanceMapper,
+    ReferrerBalanceMapper referrerBalanceMapper,
     ReferrerPayoutMapper payoutMapper,
     ReferrerWithdrawalMapper withdrawalMapper)
 {
-    private const string CodeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private const int DefaultCodeLength = 6;
-    private const decimal RtpFee = 0.05m;
-    private const decimal PaymentFee = 0.05m;
-    private const decimal TotalFee = RtpFee + PaymentFee;
+    private const string CODE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private const int DEFAULT_CODE_LENGTH = 6;
+    private const decimal RTP_FEE = 0.05m;
+    private const decimal PAYMENT_FEE = 0.05m;
+    private const decimal TOTAL_FEE = RTP_FEE + PAYMENT_FEE;
 
     private static DateTime GenerateNextPayoutDate()
     {
@@ -41,11 +56,11 @@ public class AffiliateService(
         return new DateTime(current.Year, current.Month, current.Day, hour, 0, 0, DateTimeKind.Utc);
     }
 
-    private static string GenerateCode(int length = DefaultCodeLength)
+    private static string GenerateCode(int length = DEFAULT_CODE_LENGTH)
     {
         var random = new Random();
         return new string(Enumerable.Range(0, length)
-            .Select(_ => CodeAlphabet[random.Next(CodeAlphabet.Length)])
+            .Select(_ => CODE_ALPHABET[random.Next(CODE_ALPHABET.Length)])
             .ToArray());
     }
 
@@ -109,7 +124,7 @@ public class AffiliateService(
             .AsNoTracking()
             .FirstOrDefaultAsync(b => b.ReferrerId == referrerId, ct);
 
-        return balanceEntity is not null ? balanceMapper.ToData(balanceEntity) : null;
+        return balanceEntity is not null ? referrerBalanceMapper.ToData(balanceEntity) : null;
     }
 
     public async Task<ReferrerBalance?> GetReferrerBalanceAsync(Guid referrerId)
@@ -174,7 +189,7 @@ public class AffiliateService(
         return withdrawalMapper.ToData(withdrawalEntry.Entity);
     }
 
-    public async Task<ReferrerBalance> UpdateReferrerBalanceAsync(Guid referrerId, long available)
+    public async Task<ReferrerBalanceEntity> UpdateReferrerBalanceAsync(Guid referrerId, long available)
     {
         await db.ReferrerBalances.Where(b => b.ReferrerId == referrerId).ExecuteUpdateAsync(setters =>
             setters.SetProperty(b => b.Available, available));
@@ -184,11 +199,10 @@ public class AffiliateService(
         if (updatedEntity is null)
             throw new Exception("ReferrerBalance not found");
 
-        var result = balanceMapper.ToData(updatedEntity);
+        var updated = referrerBalanceMapper.ToData(updatedEntity);
+        await cache.ExecuteIfConnectedAsync(async () => await cache.ReferrerBalance.SetAsync(referrerId, updated));
 
-        await cache.ExecuteIfConnectedAsync(async () => await cache.ReferrerBalance.SetAsync(referrerId, result));
-
-        return result;
+        return updatedEntity;
     }
 
     public async Task ProcessReferralTransactionAsync(
@@ -206,7 +220,7 @@ public class AffiliateService(
         if (settings is null)
             return;
 
-        var finalAmount = (amount - amount * TotalFee) * (settings.RevShare / 100m);
+        var finalAmount = (amount - amount * TOTAL_FEE) * (settings.RevShare / 100m);
 
         var transactionEntity = new ReferrerTransactionEntity
         {
@@ -297,5 +311,52 @@ public class AffiliateService(
                 await cache.LastReferrerTransactions.DeleteAsync(payout.ReferrerId);
             });
         }
+    }
+
+    public async Task<ReferrerWithdrawalResult> WithdrawReferrerBalanceAsync(Guid userId)
+    {
+        var result = await db.ExecuteInTransactionAsync<ReferrerWithdrawalResult>(async () =>
+        {
+            var referrerBalance = await db.ReferrerBalances
+                .FirstOrDefaultAsync(b => b.ReferrerId == userId);
+
+            if (referrerBalance is null)
+                return new ReferrerWithdrawalFailedResult(ReferrerWithdrawalIssue.NotConnected);
+
+            if (referrerBalance.Available < 1)
+                return new ReferrerWithdrawalFailedResult(ReferrerWithdrawalIssue.InsufficientBalance);
+
+            var balance = await db.Balances
+                .FirstOrDefaultAsync(b => b.UserId == userId);
+
+            if (balance is null)
+                throw new InvalidOperationException("Balance not found");
+
+            var transaction = await balanceService.CreateTransactionAsync(new TransactionEntity
+            {
+                UserId = userId,
+                Type = TransactionType.Transfer,
+                Amount = referrerBalance.Available,
+                CreatedAt = DateTime.UtcNow,
+            });
+
+            var updatedBalance = await balanceService.UpdateBalanceAsync(balance, transaction);
+
+            await CreateReferrerWithdrawalAsync(userId, referrerBalance.Available);
+
+            var updatedReferrerBalance = await UpdateReferrerBalanceAsync(userId, 0);
+
+            return new ReferrerWithdrawalSuccessResult(balanceMapper.ToData(updatedBalance),
+                referrerBalanceMapper.ToData(updatedReferrerBalance));
+        });
+
+        if (result is ReferrerWithdrawalSuccessResult success)
+            await cache.ExecuteIfConnectedAsync(async () =>
+            {
+                await cache.UserBalance.SetAsync(userId, success.UpdatedBalance);
+                await cache.ReferrerBalance.SetAsync(userId, success.UpdatedReferrerBalance);
+            });
+
+        return result;
     }
 }

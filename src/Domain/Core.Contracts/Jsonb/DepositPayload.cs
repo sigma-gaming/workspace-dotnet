@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Core.Contracts.Enums;
 
@@ -9,17 +10,17 @@ namespace Core.Contracts.Jsonb;
     (int)DepositType.WhiteLabel)]
 public abstract record DepositPayload
 {
-    public abstract DepositType Type { get; }
+    [Required] public abstract DepositType Type { get; }
 }
 
 public sealed record DepositPayloadRedirect : DepositPayload
 {
-    public override DepositType Type => DepositType.Redirect;
+    [Required] public override DepositType Type => DepositType.Redirect;
     public required string RedirectUrl { get; init; }
 }
 
 public sealed record DepositPayloadWhiteLabel : DepositPayload
 {
-    public override DepositType Type => DepositType.WhiteLabel;
+    [Required] public override DepositType Type => DepositType.WhiteLabel;
     public required DepositInstructions Instructions { get; init; }
 }

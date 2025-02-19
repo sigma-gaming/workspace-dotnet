@@ -18,7 +18,7 @@ public class VkPinnedRepostChecker(
                 "Не удалось проверить задание. Попробуйте ещё раз или напишите в поддержку");
 
         var account = await db.Accounts.FirstOrDefaultAsync(a =>
-            a.Provider == AccountProvider.VK &&
+            a.Provider == AccountProvider.Vk &&
             a.UserId == userId);
 
         if (account == null)

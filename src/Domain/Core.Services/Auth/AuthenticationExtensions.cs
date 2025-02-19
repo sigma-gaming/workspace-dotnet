@@ -5,11 +5,11 @@ namespace Core.Services.Auth;
 
 public static class AuthenticationExtensions
 {
-    private const string DefaultScheme = "SessionScheme";
+    private const string DEFAULT_SCHEME = "SessionScheme";
 
     public static AuthenticationBuilder AddSessionAuthentication(
         this IServiceCollection services,
-        string schemeName = DefaultScheme)
+        string schemeName = DEFAULT_SCHEME)
     {
         return services
             .AddAuthentication(options =>

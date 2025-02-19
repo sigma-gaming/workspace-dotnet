@@ -9,7 +9,7 @@ namespace Core.API.Controllers;
 public class PaymentsController(
     CurrencyRatesService currencyRatesService) : ControllerBase
 {
-    [ProducesResponseType<CurrencyExchangeRates>(StatusCodes.Status200OK)]
+    [ProducesResponseType<CurrencyExchangeRates>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/payments/currency-rates")]
     public async Task<Ok<CurrencyExchangeRates>> GetCurrencyRates()
     {

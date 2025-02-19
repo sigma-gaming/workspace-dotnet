@@ -5,7 +5,7 @@ namespace Core.Contracts.Enums;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum AccountProvider
 {
-    VK,
+    Vk,
     Telegram,
 }
 

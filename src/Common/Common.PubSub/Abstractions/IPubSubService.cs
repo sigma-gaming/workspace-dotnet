@@ -8,6 +8,5 @@ public interface IPubSubService
 public interface ITypedPubSub<T> where T : class
 {
     Task PublishAsync(T message, CancellationToken cancellationToken = default);
-    IDisposable Subscribe(Action<T> handler);
     IDisposable Subscribe(Func<T, Task> handler);
 }

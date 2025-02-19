@@ -1,6 +1,7 @@
 // using Common.OpenApi.Transformers;
 // using Microsoft.AspNetCore.OpenApi;
 
+using Common.OpenApi.DocumentFilters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -36,16 +37,23 @@ public static class OpenApiExtensions
         this IServiceCollection services,
         Action<SwaggerGenOptions>? configureOptions = null)
     {
-        return services.AddSwaggerGen(options =>
-        {
-            options.UseOneOfForPolymorphism();
-            options.UseAllOfToExtendReferenceSchemas();
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-            configureOptions?.Invoke(options);
-        });
+        services
+            .AddEndpointsApiExplorer()
+            .AddSwaggerGen(options =>
+            {
+                options.SupportNonNullableReferenceTypes();
+                options.UseOneOfForPolymorphism();
+                options.UseAllOfToExtendReferenceSchemas();
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+                configureOptions?.Invoke(options);
+                options.DocumentFilter<DiscriminatedUnionDocumentFilter>();
+                options.DocumentFilter<FlattenAllOfRefDocumentFilter>();
+            });
+
+        return services;
     }
 
-    public static IApplicationBuilder MapCommonOpenApi(
+    public static WebApplication MapCommonOpenApi(
         this WebApplication app,
         Action<ScalarOptions>? configureOptions = null)
     {

@@ -12,13 +12,13 @@ namespace Core.API.Controllers;
 
 [Authorize]
 [ApiController]
-public class MeController(
+public class UserController(
     ProfileService profileService,
     BalanceService balanceService,
     BalanceMapper balanceMapper) : ControllerBase
 {
-    [ProducesResponseType<UserDetails>(StatusCodes.Status200OK)]
-    [HttpGet("/me/user-details")]
+    [ProducesResponseType<UserDetails>(StatusCodes.Status200OK, "application/json")]
+    [HttpGet("/user/details")]
     public async Task<Ok<UserDetails>> GetUserDetails()
     {
         var userId = HttpContext.GetUserId();
@@ -26,9 +26,9 @@ public class MeController(
         return TypedResults.Ok(details);
     }
 
-    [ProducesResponseType<BalancePublic>(StatusCodes.Status200OK)]
-    [HttpGet("/me/balance")]
-    public async Task<Ok<BalancePublic>> GetDetailedBalance()
+    [ProducesResponseType<BalancePublic>(StatusCodes.Status200OK, "application/json")]
+    [HttpGet("/user/balance")]
+    public async Task<Ok<BalancePublic>> GetUserBalance()
     {
         var userId = HttpContext.GetUserId();
         var balance = await balanceService.GetBalanceAsync(userId);

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Core.Contracts.Enums;
 
@@ -8,12 +9,12 @@ namespace Core.Contracts.Jsonb;
 [JsonDerivedType(typeof(PromocodeBonusPayout), (int)PromocodeBonusType.Payout)]
 public abstract record PromocodeBonus
 {
-    public abstract PromocodeBonusType Type { get; }
+    [Required] public abstract PromocodeBonusType Type { get; }
 }
 
 public sealed record PromocodeBonusDepositMultiplier : PromocodeBonus
 {
-    public override PromocodeBonusType Type => PromocodeBonusType.DepositMultiplier;
+    [Required] public override PromocodeBonusType Type => PromocodeBonusType.DepositMultiplier;
     public int Multiplier { get; init; }
     public long? MinDeposit { get; init; }
     public long? MaxPayout { get; init; }
@@ -22,7 +23,7 @@ public sealed record PromocodeBonusDepositMultiplier : PromocodeBonus
 
 public sealed record PromocodeBonusDepositFixed : PromocodeBonus
 {
-    public override PromocodeBonusType Type => PromocodeBonusType.DepositFixed;
+    [Required] public override PromocodeBonusType Type => PromocodeBonusType.DepositFixed;
     public long Payout { get; init; }
     public long MinDeposit { get; init; }
     public int ActiveHours { get; init; }
@@ -30,6 +31,6 @@ public sealed record PromocodeBonusDepositFixed : PromocodeBonus
 
 public sealed record PromocodeBonusPayout : PromocodeBonus
 {
-    public override PromocodeBonusType Type => PromocodeBonusType.Payout;
+    [Required] public override PromocodeBonusType Type => PromocodeBonusType.Payout;
     public long Payout { get; init; }
 }

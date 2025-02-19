@@ -100,8 +100,17 @@ public class JsonListCacheEntity<T>(
     public async Task SetAllAsync(List<T> items)
     {
         var db = redis.GetDatabase();
-        var json = JsonSerializer.Serialize(items);
-        await db.StringSetAsync(key, json, ttl);
+        var serialized = items.Select(x => (RedisValue)JsonSerializer.Serialize(x)).ToArray();
+        var transaction = db.CreateTransaction();
+#pragma warning disable CS4014
+        transaction.KeyDeleteAsync(key);
+        transaction.ListRightPushAsync(key, serialized);
+        if (ttl.HasValue)
+            transaction.KeyExpireAsync(key, ttl);
+#pragma warning restore CS4014
+        var succeed = await transaction.ExecuteAsync();
+        if (!succeed)
+            throw new Exception("Failed to set all items");
     }
 
     public async Task LeftPushAsync(T item)
@@ -173,8 +182,17 @@ public class KeyedJsonListCacheEntity<TKey, TValue>(
     public async Task SetAllAsync(TKey key, List<TValue> items)
     {
         var db = redis.GetDatabase();
-        var json = JsonSerializer.Serialize(items);
-        await db.StringSetAsync(keyGenerator(key), json, ttl);
+        var serialized = items.Select(x => (RedisValue)JsonSerializer.Serialize(x)).ToArray();
+        var transaction = db.CreateTransaction();
+#pragma warning disable CS4014
+        transaction.KeyDeleteAsync(keyGenerator(key));
+        transaction.ListRightPushAsync(keyGenerator(key), serialized);
+        if (ttl.HasValue)
+            transaction.KeyExpireAsync(keyGenerator(key), ttl);
+#pragma warning restore CS4014
+        var succeed = await transaction.ExecuteAsync();
+        if (!succeed)
+            throw new Exception("Failed to set all items");
     }
 
     public async Task LeftPushAsync(TKey key, TValue item)

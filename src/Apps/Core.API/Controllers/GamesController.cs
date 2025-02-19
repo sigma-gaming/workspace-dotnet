@@ -49,7 +49,7 @@ public class GamesController(
     DiceGame diceGame,
     PincodeGame pincodeGame) : ControllerBase
 {
-    [ProducesResponseType<string>(StatusCodes.Status200OK)]
+    [ProducesResponseType<string>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/games/ping")]
     public Ok<string> Ping()
     {
@@ -57,7 +57,7 @@ public class GamesController(
     }
 
     [Authorize]
-    [ProducesResponseType<PlayResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<PlayResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/games/play-dice")]
     public async Task<Results<Ok<PlayResponse>, ValidationProblem>> PlayDice([FromBody] PlayDicePayload payload)
     {
@@ -97,7 +97,7 @@ public class GamesController(
     }
 
     [Authorize]
-    [ProducesResponseType<PlayResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<PlayResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/games/play-pincode")]
     public async Task<Results<Ok<PlayResponse>, ValidationProblem>> PlayPincode([FromBody] PlayPincodePayload payload)
     {

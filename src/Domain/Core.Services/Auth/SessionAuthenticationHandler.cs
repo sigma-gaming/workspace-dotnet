@@ -33,11 +33,7 @@ public class SessionAuthenticationHandler(
             new(ClaimTypes.NameIdentifier, session.UserId.ToString()),
         };
 
-        foreach (var role in session.Roles)
-        {
-            Console.WriteLine(role.ToString());
-            claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
-        }
+        foreach (var role in session.Roles) claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
 
         var identity = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(identity);

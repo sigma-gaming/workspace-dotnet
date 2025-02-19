@@ -43,7 +43,7 @@ public class SettingsController(
     CoreCacheRegistry cache,
     ProfileService profileService) : ControllerBase
 {
-    [ProducesResponseType<UserDetails>(StatusCodes.Status200OK)]
+    [ProducesResponseType<UserDetails>(StatusCodes.Status200OK, "application/json")]
     [HttpPut("/settings/profile")]
     public async Task<Results<Ok<UserDetails>, ValidationProblem>> UpdateProfile(
         [FromBody] UpdateProfilePayload payload)
@@ -85,6 +85,7 @@ public class SettingsController(
         {
             Username = payload.Username,
             UsedProvider = payload.Provider,
+            Image = selectedProvider.ProviderUserImage,
         };
 
         var nameFromProvider = ProfileService.GetUserFullName(

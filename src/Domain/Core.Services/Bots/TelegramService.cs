@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -5,9 +6,9 @@ using Telegram.Bot.Types.Enums;
 namespace Core.Services.Bots;
 
 public class TelegramService(
-    TelegramOptions options)
+    IOptions<TelegramOptions> options)
 {
-    private TelegramBotClient Client { get; } = new(options.BotToken);
+    private TelegramBotClient Client { get; } = new(options.Value.BotToken);
 
     public async Task MessageUserAsync(long userId, string message)
     {

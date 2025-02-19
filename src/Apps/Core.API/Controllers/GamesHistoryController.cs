@@ -11,7 +11,7 @@ namespace Core.API.Controllers;
 public class GamesHistoryController(
     GameHistoryService gameHistoryService) : ControllerBase
 {
-    [ProducesResponseType<GameRecord[]>(StatusCodes.Status200OK)]
+    [ProducesResponseType<GameRecord[]>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/games-history/last-wins")]
     public async Task<Ok<GameRecord[]>> GetLastWins()
     {
@@ -19,7 +19,7 @@ public class GamesHistoryController(
         return TypedResults.Ok(lastWins);
     }
 
-    [ProducesResponseType<GameRecord[]>(StatusCodes.Status200OK)]
+    [ProducesResponseType<GameRecord[]>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/games-history/big-wins")]
     public async Task<Ok<GameRecord[]>> GetBigWins()
     {
@@ -28,7 +28,7 @@ public class GamesHistoryController(
     }
 
     [Authorize]
-    [ProducesResponseType<GameRecord[]>(StatusCodes.Status200OK)]
+    [ProducesResponseType<GameRecord[]>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/games-history/my-games")]
     public async Task<Ok<GameRecord[]>> GetMyGames()
     {

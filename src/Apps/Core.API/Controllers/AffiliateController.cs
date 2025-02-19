@@ -1,15 +1,14 @@
+using Common.Api.Responses;
 using Common.Db.Extensions;
 using Core.Contracts.Compounds;
 using Core.Contracts.Data;
 using Core.Contracts.Entities;
-using Core.Contracts.Enums;
 using Core.Contracts.Mappers;
 using Core.Contracts.Public;
 using Core.Contracts.Updates;
 using Core.Db.Context;
 using Core.Services.Auth;
 using Core.Services.Caching;
-using Core.Services.Finance;
 using Core.Services.Promotions;
 using Core.Services.PubSub;
 using Microsoft.AspNetCore.Authorization;
@@ -49,22 +48,18 @@ public class AffiliateController(
     CoreCacheRegistry cache,
     CorePubSubRegistry pubSub,
     AffiliateService affiliateService,
-    BalanceService balanceService,
     BalanceMapper balanceMapper,
     ReferrerTransactionMapper referrerTransactionMapper) : ControllerBase
 {
-    [ProducesResponseType<ConnectResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ConnectResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/affiliate/connect")]
-    public async Task<Results<Ok<ConnectResponse>, ValidationProblem>> Connect()
+    public async Task<Results<Ok<ConnectResponse>, BadRequest<ErrorResponse>>> Connect()
     {
         var userId = HttpContext.GetUserId();
         var settings = await affiliateService.GetReferrerSettingsAsync(userId);
 
         if (settings is not null)
-            return TypedResults.ValidationProblem(new Dictionary<string, string[]>
-            {
-                [""] = ["Вы уже подключены к партнерской программе"],
-            });
+            return TypedResults.BadRequest(new ErrorResponse("Вы уже подключены к партнерской программе"));
 
         await db.ExecuteInTransactionAsync(async () =>
         {
@@ -87,34 +82,29 @@ public class AffiliateController(
         return TypedResults.Ok(new ConnectResponse { Status = "success" });
     }
 
-    [ProducesResponseType<ReferrerBalance>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ReferrerBalance>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/affiliate/balance")]
-    public async Task<Results<Ok<ReferrerBalance>, ValidationProblem>> GetBalance()
+    public async Task<Results<Ok<ReferrerBalance>, BadRequest<ErrorResponse>>> GetBalance()
     {
         var userId = HttpContext.GetUserId();
         var balance = await affiliateService.GetReferrerBalanceAsync(userId);
 
         if (balance is null)
-            return TypedResults.ValidationProblem(new Dictionary<string, string[]>
-            {
-                [""] = ["Вы не подключены к партнерской программе"],
-            });
+            return TypedResults.BadRequest(new ErrorResponse("Вы не подключены к партнерской программе"));
 
         return TypedResults.Ok(balance);
     }
 
-    [ProducesResponseType<GetCampaignsResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<GetCampaignsResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/affiliate/campaigns")]
-    public async Task<Results<Ok<GetCampaignsResponse>, ValidationProblem>> GetCampaigns([FromQuery] int offset = 0)
+    public async Task<Results<Ok<GetCampaignsResponse>, BadRequest<ErrorResponse>>> GetCampaigns(
+        [FromQuery] int offset = 0)
     {
         var userId = HttpContext.GetUserId();
         var settings = await affiliateService.GetReferrerSettingsAsync(userId);
 
         if (settings is null)
-            return TypedResults.ValidationProblem(new Dictionary<string, string[]>
-            {
-                [""] = ["Вы не подключены к партнерской программе"],
-            });
+            return TypedResults.BadRequest(new ErrorResponse("Вы не подключены к партнерской программе"));
 
         var campaigns = await db.ReferralCampaigns
             .Where(c => c.ReferrerId == userId)
@@ -142,18 +132,15 @@ public class AffiliateController(
         });
     }
 
-    [ProducesResponseType<GetLastTransactionsResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<GetLastTransactionsResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/affiliate/last-transactions")]
-    public async Task<Results<Ok<GetLastTransactionsResponse>, ValidationProblem>> GetLastTransactions()
+    public async Task<Results<Ok<GetLastTransactionsResponse>, BadRequest<ErrorResponse>>> GetLastTransactions()
     {
         var userId = HttpContext.GetUserId();
         var settings = await affiliateService.GetReferrerSettingsAsync(userId);
 
         if (settings is null)
-            return TypedResults.ValidationProblem(new Dictionary<string, string[]>
-            {
-                [""] = ["Вы не подключены к партнерской программе"],
-            });
+            return TypedResults.BadRequest(new ErrorResponse("Вы не подключены к партнерской программе"));
 
         if (cache.IsReady())
         {
@@ -199,23 +186,20 @@ public class AffiliateController(
         });
     }
 
-    [ProducesResponseType<ReferrerSettings>(StatusCodes.Status200OK)]
-    [HttpGet("/affiliate/get-settings")]
-    public async Task<Results<Ok<ReferrerSettings>, ValidationProblem>> GetSettings()
+    [ProducesResponseType<ReferrerSettings>(StatusCodes.Status200OK, "application/json")]
+    [HttpGet("/affiliate/settings")]
+    public async Task<Results<Ok<ReferrerSettings>, BadRequest<ErrorResponse>>> GetSettings()
     {
         var userId = HttpContext.GetUserId();
         var settings = await affiliateService.GetReferrerSettingsAsync(userId);
 
         if (settings is null)
-            return TypedResults.ValidationProblem(new Dictionary<string, string[]>
-            {
-                [""] = ["Вы не подключены к партнерской программе"],
-            });
+            return TypedResults.BadRequest(new ErrorResponse("Вы не подключены к партнерской программе"));
 
         return TypedResults.Ok(settings);
     }
 
-    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/affiliate/is-connected")]
     public async Task<Ok<bool>> IsConnected()
     {
@@ -224,74 +208,51 @@ public class AffiliateController(
         return TypedResults.Ok(settings is not null);
     }
 
-    [ProducesResponseType<WithdrawResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<WithdrawResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/affiliate/withdraw")]
-    public async Task<Results<Ok<WithdrawResponse>, ValidationProblem>> Withdraw()
+    public async Task<Results<Ok<WithdrawResponse>, ValidationProblem, BadRequest<ErrorResponse>>> Withdraw()
     {
         var userId = HttpContext.GetUserId();
 
-        var (updatedBalance, updatedReferrerBalance) = await db.ExecuteInTransactionAsync(async () =>
+        var result = await affiliateService.WithdrawReferrerBalanceAsync(userId);
+
+        switch (result)
         {
-            var referrerBalance = await db.ReferrerBalances
-                .FirstOrDefaultAsync(b => b.ReferrerId == userId);
+            case ReferrerWithdrawalSuccessResult success:
+                var balanceUpdate = new UserUpdate<BalancePublic>
+                {
+                    UserId = userId,
+                    Mode = UpdateMode.Optimized,
+                    Data = balanceMapper.ToPublic(success.UpdatedBalance),
+                };
 
-            if (referrerBalance is null)
-                throw new BadHttpRequestException("Вы не подключены к партнерской программе");
+                var referrerBalanceUpdate = new UserUpdate<ReferrerBalance>
+                {
+                    UserId = userId,
+                    Mode = UpdateMode.Optimized,
+                    Data = success.UpdatedReferrerBalance,
+                };
 
-            if (referrerBalance.Available < 1)
-                throw new BadHttpRequestException("У вас нет доступных средств для вывода");
+                await pubSub.BalanceUpdated.PublishAsync(balanceUpdate);
 
-            var balance = await db.Balances
-                .FirstOrDefaultAsync(b => b.UserId == userId);
+                return TypedResults.Ok(new WithdrawResponse
+                {
+                    Balance = balanceUpdate,
+                    ReferrerBalance = referrerBalanceUpdate,
+                });
 
-            if (balance is null)
-                throw new InvalidOperationException("Balance not found");
+            case ReferrerWithdrawalFailedResult failed:
+                return failed.Issue switch
+                {
+                    ReferrerWithdrawalIssue.NotConnected => TypedResults.BadRequest(
+                        new ErrorResponse("Вы не подключены к партнерской программе")),
+                    ReferrerWithdrawalIssue.InsufficientBalance => TypedResults.BadRequest(
+                        new ErrorResponse("У вас нет доступных средств для вывода")),
+                    _ => throw new ArgumentOutOfRangeException(nameof(failed.Issue)),
+                };
 
-            var transaction = await balanceService.CreateTransactionAsync(new TransactionEntity
-            {
-                UserId = userId,
-                Type = TransactionType.Transfer,
-                Amount = referrerBalance.Available,
-                CreatedAt = DateTime.UtcNow,
-            });
-
-            var updatedBalance = await balanceService.UpdateBalanceAsync(balance, transaction);
-
-            await affiliateService.CreateReferrerWithdrawalAsync(userId, referrerBalance.Available);
-
-            var updatedReferrerBalance = await affiliateService.UpdateReferrerBalanceAsync(userId, 0);
-
-            return (updatedBalance, updatedReferrerBalance);
-        });
-
-        await cache.ExecuteIfConnectedAsync(async () =>
-        {
-            await cache.UserBalance.SetAsync(userId, balanceMapper.ToData(updatedBalance));
-            await cache.ReferrerBalance.SetAsync(userId, updatedReferrerBalance);
-        });
-
-        var time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
-        var balanceUpdate = new UserUpdate<BalancePublic>
-        {
-            Time = time,
-            UserId = userId,
-            Mode = UpdateMode.Optimized,
-            Data = balanceMapper.ToPublic(updatedBalance),
-        };
-
-        await pubSub.BalanceUpdated.PublishAsync(balanceUpdate);
-
-        return TypedResults.Ok(new WithdrawResponse
-        {
-            Balance = balanceUpdate,
-            ReferrerBalance = new UserUpdate<ReferrerBalance>
-            {
-                Time = time,
-                UserId = userId,
-                Mode = UpdateMode.Optimized,
-                Data = updatedReferrerBalance,
-            },
-        });
+            default:
+                throw new ArgumentOutOfRangeException(nameof(result));
+        }
     }
 }

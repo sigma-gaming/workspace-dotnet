@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Core.Contracts.Enums;
 
@@ -11,19 +12,19 @@ namespace Core.Contracts.Jsonb;
     (int)GlobalTaskKey.TelegramGroupSubscribe)]
 public abstract record GlobalTaskRequirements
 {
-    public abstract GlobalTaskKey Type { get; }
+    [Required] public abstract GlobalTaskKey Type { get; }
 }
 
 public sealed record GlobalTaskRequirementsVkGroupSubscribe : GlobalTaskRequirements
 {
-    public override GlobalTaskKey Type => GlobalTaskKey.VkGroupSubscribe;
+    [Required] public override GlobalTaskKey Type => GlobalTaskKey.VkGroupSubscribe;
     public required string GroupHandle { get; init; }
     public required int GroupId { get; init; }
 }
 
 public sealed record GlobalTaskRequirementsVkPinnedRepost : GlobalTaskRequirements
 {
-    public override GlobalTaskKey Type => GlobalTaskKey.VkPinnedRepost;
+    [Required] public override GlobalTaskKey Type => GlobalTaskKey.VkPinnedRepost;
     public required string GroupHandle { get; init; }
     public required int GroupId { get; init; }
     public required int PostId { get; init; }
@@ -31,7 +32,7 @@ public sealed record GlobalTaskRequirementsVkPinnedRepost : GlobalTaskRequiremen
 
 public sealed record GlobalTaskRequirementsTelegramGroupSubscribe : GlobalTaskRequirements
 {
-    public override GlobalTaskKey Type => GlobalTaskKey.TelegramGroupSubscribe;
+    [Required] public override GlobalTaskKey Type => GlobalTaskKey.TelegramGroupSubscribe;
     public required string GroupHandle { get; init; }
     public required int GroupId { get; init; }
 }

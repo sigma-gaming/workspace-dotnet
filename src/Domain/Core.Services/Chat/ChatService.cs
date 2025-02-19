@@ -7,7 +7,6 @@ using Core.Db.Context;
 using Core.Services.Caching;
 using Core.Services.PubSub;
 using Core.Services.User;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -100,27 +99,27 @@ public class ChatService(
         return message;
     }
 
-    private async Task ValidateGameAttachmentAsync(Guid userId, ChatMessageAttachmentGame attachment)
-    {
-        var gameRecord = await db.GameRecords
-            .Where(g => g.Id == attachment.GameRecordId)
-            .FirstOrDefaultAsync();
-
-        if (gameRecord is null) throw new Exception("Game record not found");
-
-        if (gameRecord.UserId != userId) throw new BadHttpRequestException("Нельзя отправлять чужие игры");
-    }
-
-    private async Task ValidateAttachmentAsync(Guid userId, ChatMessageAttachment attachment)
-    {
-        if (attachment is ChatMessageAttachmentGame gameAttachment)
-        {
-            await ValidateGameAttachmentAsync(userId, gameAttachment);
-            return;
-        }
-
-        throw new BadHttpRequestException("Недопустимое вложение");
-    }
+    // private async Task ValidateGameAttachmentAsync(Guid userId, ChatMessageAttachmentGame attachment)
+    // {
+    //     var gameRecord = await db.GameRecords
+    //         .Where(g => g.Id == attachment.GameRecordId)
+    //         .FirstOrDefaultAsync();
+    //
+    //     if (gameRecord is null) throw new Exception("Game record not found");
+    //
+    //     if (gameRecord.UserId != userId) throw new BadHttpRequestException("Нельзя отправлять чужие игры");
+    // }
+    //
+    // private async Task ValidateAttachmentAsync(Guid userId, ChatMessageAttachment attachment)
+    // {
+    //     if (attachment is ChatMessageAttachmentGame gameAttachment)
+    //     {
+    //         await ValidateGameAttachmentAsync(userId, gameAttachment);
+    //         return;
+    //     }
+    //
+    //     throw new BadHttpRequestException("Недопустимое вложение");
+    // }
 }
 
 public record SendMessagePayload

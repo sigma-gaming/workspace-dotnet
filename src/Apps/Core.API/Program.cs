@@ -1,26 +1,21 @@
-using System.Text.Json;
+using Common.Api.Extensions;
 using Common.Logging;
+using Common.OpenApi.DocumentFilters;
 using Common.OpenApi.Extensions;
 using Core.API.Configuration;
 using Core.Builder;
 using Core.Contracts;
+using Core.Contracts.Enums;
 using Core.Infrastructure;
 using Core.Services;
 using Core.Services.Auth;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using Core.Services.System;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateSlimBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.Limits.Http2.MaxStreamsPerConnection = 1000;
-    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
-    options.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(30);
-    options.Limits.MinRequestBodyDataRate = null;
-    options.AddServerHeader = false;
-});
+builder.AddCommonHttpConfiguration().AddCommonMvcConfiguration();
 
 builder.AddLogging("Core API");
 
@@ -35,31 +30,14 @@ if (apiOptions.EnableOpenApi)
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Description = "Authorization header using the Bearer scheme (session)",
-            Name = "Authorization",
+            Type = SecuritySchemeType.ApiKey,
             In = ParameterLocation.Header,
-            Type = SecuritySchemeType.Http,
-            Scheme = "Bearer",
-            BearerFormat = "UUID",
+            Name = "Authorization",
         });
+
+        // Add additional models
+        options.DocumentFilter<IncludeModelDocumentFilter<Currency>>();
     });
-
-builder.Services.AddCors(options => { options.AddDefaultPolicy(policy => { policy.AllowAnyOrigin(); }); });
-
-builder.Services.AddControllers(options =>
-{
-    // Use camelCase for validation errors serialization
-    options.ModelMetadataDetailsProviders.Add(
-        new SystemTextJsonValidationMetadataProvider(JsonNamingPolicy.CamelCase));
-}).AddJsonOptions(options =>
-{
-    // Hide detailed serialization error messages in production
-    options.AllowInputFormatterExceptionMessages = builder.Environment.IsDevelopment();
-});
-
-builder.Services.ConfigureHttpJsonOptions(options =>
-{
-    options.SerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
-});
 
 builder.Services.AddHttpClient();
 
@@ -67,22 +45,28 @@ builder.Services.AddHttpClient();
 builder.Services.Core()
     .AddInfrastructure(builder.Configuration)
     .AddMappers()
-    .AddCommonServices();
+    .AddCommonServices()
+    .AddTelegram(builder.Configuration)
+    .AddGlobalTasks();
 
 // Add authentication
 builder.Services.AddSessionAuthentication();
 builder.Services.AddAuthorization();
 
-builder.Services.AddEndpointsApiExplorer();
-
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) app.UseHttpsRedirection();
+app.UseCommonHttpConfiguration();
 
 if (apiOptions.EnableOpenApi) app.MapCommonOpenApi(options => { options.WithTitle("Core API"); });
 
-app.UseCors();
+app.UseDomainCors([DomainApp.CoreApp], options =>
+{
+    options.WithHeaders("content-type",
+        "sentry-trace",
+        "baggage",
+        "x-bypass-rate-limit",
+        "x-bypass-waf");
+});
+
 app.UseAuthentication().UseAuthorization();
 
 app.MapControllers();

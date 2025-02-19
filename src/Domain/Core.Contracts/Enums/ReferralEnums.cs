@@ -6,6 +6,5 @@ namespace Core.Contracts.Enums;
 public enum ReferralAction
 {
     Deposit,
-    Loss,
     Withdrawal,
 }

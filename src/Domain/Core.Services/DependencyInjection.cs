@@ -52,11 +52,6 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<AffiliateService>();
         builder.Services.AddScoped<PromocodeService>();
-        builder.Services.AddScoped<GlobalTaskService>();
-        builder.Services.AddScoped<TelegramGroupSubscribeChecker>();
-        builder.Services.AddScoped<VkGroupSubscribeChecker>();
-        builder.Services.AddScoped<VkPinnedRepostChecker>();
-        builder.Services.AddScoped<GlobalTaskCheckerProvider>();
 
         builder.Services.AddScoped<NotificationService>();
 
@@ -68,7 +63,19 @@ public static class DependencyInjection
     public static CoreBuilder AddTelegram(this CoreBuilder builder, IConfiguration configuration)
     {
         builder.Services.Configure<TelegramOptions>(configuration.GetSection("Telegram"));
+        builder.Services.AddOptionsWithValidateOnStart<TelegramOptions>();
         builder.Services.AddSingleton<TelegramService>();
+
+        return builder;
+    }
+
+    public static CoreBuilder AddGlobalTasks(this CoreBuilder builder)
+    {
+        builder.Services.AddScoped<GlobalTaskService>();
+        builder.Services.AddScoped<TelegramGroupSubscribeChecker>();
+        builder.Services.AddScoped<VkGroupSubscribeChecker>();
+        builder.Services.AddScoped<VkPinnedRepostChecker>();
+        builder.Services.AddScoped<GlobalTaskCheckerProvider>();
 
         return builder;
     }
