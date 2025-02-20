@@ -1,4 +1,19 @@
 name: sigma-dotnet-preview
+  
+x-common-env: &common-env
+  CoreDb__Host: "pgbouncer"
+  CoreDb__Port: "5432"
+  CoreDb__Database: "postgres"
+  CoreDb__Username: "postgres"
+  CoreDb__Password: "SECRET_REMOVED"
+
+  CoreCache__Version: "local"
+  CoreCache__Host: "dragonfly"
+  CoreCache__Password: "SECRET_REMOVED"
+
+  CorePubSub__Version: "local"
+  CorePubSub__Host: "dragonfly"
+  CorePubSub__Password: "SECRET_REMOVED"
 
 services:
   core-ws:
@@ -12,19 +27,7 @@ services:
     networks:
       - sigma
     environment:
-      CoreDb__Host: "pgbouncer"
-      CoreDb__Port: "5432"
-      CoreDb__Database: "postgres"
-      CoreDb__Username: "postgres"
-      CoreDb__Password: "SECRET_REMOVED"
-      
-      CoreCache__Version: "local"
-      CoreCache__Host: "dragonfly"
-      CoreCache__Password: "SECRET_REMOVED"
-      
-      CorePubSub__Version: "local"
-      CorePubSub__Host: "dragonfly"
-      CorePubSub__Password: "SECRET_REMOVED"
+      <<: *common-env
 
 networks:
   sigma:
