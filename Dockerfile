@@ -7,6 +7,7 @@ COPY src/Common/Common.Db/Common.Db.csproj src/Common/Common.Db/
 COPY src/Common/Common.Caching/Common.Caching.csproj src/Common/Common.Caching/
 COPY src/Common/Common.PubSub/Common.PubSub.csproj src/Common/Common.PubSub/
 COPY src/Common/Common.OpenApi/Common.OpenApi.csproj src/Common/Common.OpenApi/
+COPY src/Common/Common.Api/Common.Api.csproj src/Common/Common.Api/
 COPY src/Common/Common.Validation/Common.Validation.csproj src/Common/Common.Validation/
 
 COPY src/Infrastructure/Core.Builder/Core.Builder.csproj src/Infrastructure/Core.Builder/
@@ -20,6 +21,7 @@ COPY src/Domain/Core.Contracts/Core.Contracts.csproj src/Domain/Core.Contracts/
 COPY src/Domain/Core.Services/Core.Services.csproj src/Domain/Core.Services/
 
 COPY src/Apps/Core.API/Core.API.csproj src/Apps/Core.API/
+COPY src/Apps/Core.WS/Core.WS.csproj src/Apps/Core.WS/
 
 RUN dotnet restore
 COPY . .
@@ -30,7 +32,11 @@ RUN dotnet publish $APP_PROJECT -c Release -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 ARG APP_NAME
-ENV APP_NAME_EXE=$APP_NAME.dll
 WORKDIR /app
 COPY --from=build /app ./
-ENTRYPOINT dotnet ${APP_NAME_EXE}
+
+RUN mv $APP_NAME.dll app.dll && \
+    mv $APP_NAME.deps.json app.deps.json && \
+    mv $APP_NAME.runtimeconfig.json app.runtimeconfig.json
+
+ENTRYPOINT ["dotnet", "app.dll"]

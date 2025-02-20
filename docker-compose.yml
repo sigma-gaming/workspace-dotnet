@@ -1,16 +1,30 @@
 name: sigma-dotnet-preview
 
 services:
-  core-api:
+  core-ws:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        APP_NAME: Core.API
+        APP_NAME: Core.WS
     ports:
       - "8080:8080"
     networks:
       - sigma
+    environment:
+      CoreDb__Host: "pgbouncer"
+      CoreDb__Port: "5432"
+      CoreDb__Database: "postgres"
+      CoreDb__Username: "postgres"
+      CoreDb__Password: "SECRET_REMOVED"
+      
+      CoreCache__Version: "local"
+      CoreCache__Host: "dragonfly"
+      CoreCache__Password: "SECRET_REMOVED"
+      
+      CorePubSub__Version: "local"
+      CorePubSub__Host: "dragonfly"
+      CorePubSub__Password: "SECRET_REMOVED"
 
 networks:
   sigma:

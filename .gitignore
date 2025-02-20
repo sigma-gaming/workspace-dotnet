@@ -29,9 +29,6 @@ obj/
 
 # Environment files
 *.env
-appsettings.*.json
-!appsettings.json
-!appsettings.Example.json
 
 # Logs
 logs/
