@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Core.API.Infrastructure.RateLimiting;
 using Core.Contracts.Enums;
 using Core.Contracts.Mappers;
 using Core.Contracts.Public;
@@ -9,6 +10,7 @@ using Core.Services.PubSub;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Core.API.Controllers;
 
@@ -31,6 +33,7 @@ public class PromocodesController(
     BalanceMapper balanceMapper,
     PromocodeService promocodeService) : ControllerBase
 {
+    [EnableRateLimiting(RateLimitPolicies.Promocode.Apply)]
     [ProducesResponseType<ApplyPromocodeResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/promocodes/apply")]
     public async Task<Results<Ok<ApplyPromocodeResponse>, ValidationProblem>> Apply(

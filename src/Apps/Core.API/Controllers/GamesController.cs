@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Common.Validation.Attributes;
+using Core.API.Infrastructure.RateLimiting;
 using Core.Contracts.Data;
 using Core.Contracts.Enums;
 using Core.Contracts.Mappers;
@@ -11,6 +12,7 @@ using Core.Services.PubSub;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Core.API.Controllers;
 
@@ -57,6 +59,7 @@ public class GamesController(
     }
 
     [Authorize]
+    [EnableRateLimiting(RateLimitPolicies.Game.Play)]
     [ProducesResponseType<PlayResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/games/play-dice")]
     public async Task<Results<Ok<PlayResponse>, ValidationProblem>> PlayDice([FromBody] PlayDicePayload payload)
@@ -97,6 +100,7 @@ public class GamesController(
     }
 
     [Authorize]
+    [EnableRateLimiting(RateLimitPolicies.Game.Play)]
     [ProducesResponseType<PlayResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/games/play-pincode")]
     public async Task<Results<Ok<PlayResponse>, ValidationProblem>> PlayPincode([FromBody] PlayPincodePayload payload)

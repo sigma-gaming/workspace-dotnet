@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Core.API.Infrastructure.RateLimiting;
 using Core.Contracts.Data;
 using Core.Contracts.Jsonb;
 using Core.Services.Auth;
@@ -6,6 +7,7 @@ using Core.Services.Chat;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Core.API.Controllers;
 
@@ -32,6 +34,7 @@ public class ChatController(ChatService chatService) : ControllerBase
     }
 
     [Authorize]
+    [EnableRateLimiting(RateLimitPolicies.Chat.Message)]
     [ProducesResponseType<ChatMessage>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/chat/send-message")]
     public async Task<Results<Ok<ChatMessage>, ValidationProblem>> SendMessage(

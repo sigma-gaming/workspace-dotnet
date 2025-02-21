@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Core.API.Infrastructure.RateLimiting;
 using Core.Contracts.Compounds;
 using Core.Contracts.Enums;
 using Core.Db.Context;
@@ -8,6 +9,7 @@ using Core.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.API.Controllers;
@@ -43,6 +45,7 @@ public class SettingsController(
     CoreCacheRegistry cache,
     ProfileService profileService) : ControllerBase
 {
+    [EnableRateLimiting(RateLimitPolicies.Profile.Update)]
     [ProducesResponseType<UserDetails>(StatusCodes.Status200OK, "application/json")]
     [HttpPut("/settings/profile")]
     public async Task<Results<Ok<UserDetails>, ValidationProblem>> UpdateProfile(

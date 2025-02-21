@@ -1,5 +1,6 @@
 using Common.Api.Responses;
 using Common.Db.Extensions;
+using Core.API.Infrastructure.RateLimiting;
 using Core.Contracts.Compounds;
 using Core.Contracts.Data;
 using Core.Contracts.Entities;
@@ -14,6 +15,7 @@ using Core.Services.PubSub;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.API.Controllers;
@@ -208,6 +210,7 @@ public class AffiliateController(
         return TypedResults.Ok(settings is not null);
     }
 
+    [EnableRateLimiting(RateLimitPolicies.Affiliate.Withdraw)]
     [ProducesResponseType<WithdrawResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/affiliate/withdraw")]
     public async Task<Results<Ok<WithdrawResponse>, ValidationProblem, BadRequest<ErrorResponse>>> Withdraw()

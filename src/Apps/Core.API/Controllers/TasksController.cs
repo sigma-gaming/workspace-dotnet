@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Core.API.Infrastructure.RateLimiting;
 using Core.Contracts.Data;
 using Core.Contracts.Enums;
 using Core.Contracts.Mappers;
@@ -11,6 +12,7 @@ using Core.Services.PubSub;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using TaskStatus = Core.Contracts.Enums.TaskStatus;
 
 namespace Core.API.Controllers;
@@ -65,6 +67,7 @@ public class TasksController(
     }
 
     [Authorize]
+    [EnableRateLimiting(RateLimitPolicies.Task.Action)]
     [ProducesResponseType<CompleteTaskResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/tasks/global/complete")]
     public async Task<Results<Ok<CompleteTaskResponse>, ValidationProblem>> CompleteGlobalTask(
@@ -121,6 +124,7 @@ public class TasksController(
     }
 
     [Authorize]
+    [EnableRateLimiting(RateLimitPolicies.Task.Action)]
     [ProducesResponseType<ClaimRewardResponse>(StatusCodes.Status200OK, "application/json")]
     [HttpPost("/tasks/global/claim-reward")]
     public async Task<Results<Ok<ClaimRewardResponse>, ValidationProblem>> ClaimGlobalTaskReward(
