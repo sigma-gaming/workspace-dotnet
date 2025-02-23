@@ -42,29 +42,23 @@ public class NotificationService(
 
     private async Task<Notification[]> GetPersonalAsync(Guid userId)
     {
-        if (!cache.IsReady())
-            return await QueryPersonalAsync(userId);
-
-        var cached = await cache.PersonalNotifications.GetAsync(userId);
+        var cached = await cache.PersonalNotifications.TryGetAsync(userId);
         if (cached is not null)
             return cached;
 
         var personal = await QueryPersonalAsync(userId);
-        await cache.PersonalNotifications.SetAsync(userId, personal);
+        await cache.PersonalNotifications.TrySetAsync(userId, personal);
         return personal;
     }
 
     private async Task<Notification[]> GetGlobalAsync()
     {
-        if (!cache.IsReady())
-            return await QueryGlobalAsync();
-
-        var cached = await cache.GlobalNotifications.GetAsync();
+        var cached = await cache.GlobalNotifications.TryGetAsync();
         if (cached is not null)
             return cached;
 
         var global = await QueryGlobalAsync();
-        await cache.GlobalNotifications.SetAsync(global);
+        await cache.GlobalNotifications.TrySetAsync(global);
         return global;
     }
 
@@ -90,15 +84,12 @@ public class NotificationService(
 
         var result = mapper.ToData(notification);
 
-        if (!cache.IsReady())
-            return result;
-
         if (notification.UserId.HasValue)
-            await cache.PersonalNotifications.DeleteAsync(notification.UserId.Value);
+            await cache.PersonalNotifications.TryDeleteAsync(notification.UserId.Value);
         else
-            await cache.GlobalNotifications.DeleteAsync();
+            await cache.GlobalNotifications.TryDeleteAsync();
 
-        await pubSub.Notifications.PublishAsync(result);
+        await pubSub.Notifications.TryPublishAsync(result);
         return result;
     }
 }

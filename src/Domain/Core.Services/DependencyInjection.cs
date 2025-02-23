@@ -1,3 +1,7 @@
+using Common.Caching;
+using Common.Caching.Abstractions;
+using Common.PubSub;
+using Common.PubSub.Abstractions;
 using Core.Builder;
 using Core.Services.Auth;
 using Core.Services.Bots;
@@ -23,7 +27,10 @@ public static class DependencyInjection
     public static CoreBuilder AddCommonServices(
         this CoreBuilder builder)
     {
+        builder.Services.AddSingleton<ICacheService, CacheService>();
         builder.Services.AddSingleton<CoreCacheRegistry>();
+
+        builder.Services.AddSingleton<IPubSubService, NatsPubSubService>();
         builder.Services.AddSingleton<CorePubSubRegistry>();
 
         builder.Services.AddHttpClient<BinanceApi>();

@@ -145,15 +145,12 @@ public class ProfileService(
 
     public async Task<UserDetails> GetUserDetailsAsync(Guid userId)
     {
-        if (!cache.IsReady())
-            return await QueryUserDetailsAsync(userId);
-
-        var cached = await cache.UserDetails.GetAsync(userId);
+        var cached = await cache.UserDetails.TryGetAsync(userId);
         if (cached is not null)
             return cached;
 
         var profile = await QueryUserDetailsAsync(userId);
-        await cache.UserDetails.SetAsync(userId, profile);
+        await cache.UserDetails.TrySetAsync(userId, profile);
         return profile;
     }
 }

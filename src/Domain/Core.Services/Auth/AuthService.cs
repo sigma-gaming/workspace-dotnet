@@ -164,8 +164,7 @@ public class AuthService(
             await db.Accounts.AddAsync(accountData);
             await db.SaveChangesAsync();
 
-            await cache.ExecuteIfConnectedAsync(async () =>
-                await cache.UserDetails.DeleteAsync(payload.UserId.Value));
+            await cache.UserDetails.TryDeleteAsync(payload.UserId.Value);
 
             return AuthResult.Connected();
         }
@@ -236,8 +235,7 @@ public class AuthService(
 
         var createdUser = userMapper.ToData(createdUserEntity);
 
-        await cache.ExecuteIfConnectedAsync(
-            async () => await cache.User.SetAsync(createdUserEntity.Id, createdUser));
+        await cache.User.TrySetAsync(createdUserEntity.Id, createdUser);
 
         return AuthResult.SignedUp(createdUser, accountMapper.ToData(createdAccountEntity));
     }

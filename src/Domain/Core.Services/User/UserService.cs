@@ -20,13 +20,7 @@ public class UserService(
 
     public async Task<Contracts.Data.User?> TryGetUserAsync(Guid userId)
     {
-        if (!cache.IsReady())
-        {
-            var userEntity = await QueryUserAsync(userId);
-            return userEntity is not null ? userMapper.ToData(userEntity) : null;
-        }
-
-        var cached = await cache.User.GetAsync(userId);
+        var cached = await cache.User.TryGetAsync(userId);
         if (cached is not null)
             return cached;
 
@@ -35,7 +29,7 @@ public class UserService(
             return null;
 
         var user = userMapper.ToData(freshUserEntity);
-        await cache.User.SetAsync(userId, user);
+        await cache.User.TrySetAsync(userId, user);
 
         return user;
     }

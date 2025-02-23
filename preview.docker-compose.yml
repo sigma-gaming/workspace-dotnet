@@ -1,0 +1,34 @@
+name: sigma-dotnet-preview
+
+x-common-env: &common-env
+  CoreDb__Host: "pgbouncer"
+  CoreDb__Port: "5432"
+  CoreDb__Database: "postgres"
+  CoreDb__Username: "postgres"
+  CoreDb__Password: "SECRET_REMOVED"
+
+  CoreCache__Version: "local"
+  CoreCache__Host: "dragonfly"
+  CoreCache__Password: "SECRET_REMOVED"
+  
+  CoreNats__Url: "nats://nats:4222"
+  CoreNats__Password: "SECRET_REMOVED"
+
+services:
+  core-ws:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: Core.WS
+    ports:
+      - "8080:8080"
+    networks:
+      - sigma
+    environment:
+      <<: *common-env
+
+networks:
+  sigma:
+    name: sigma
+    external: true

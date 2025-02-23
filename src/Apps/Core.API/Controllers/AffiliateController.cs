@@ -144,16 +144,13 @@ public class AffiliateController(
         if (settings is null)
             return TypedResults.BadRequest(new ErrorResponse("Вы не подключены к партнерской программе"));
 
-        if (cache.IsReady())
-        {
-            var cached = await cache.LastReferrerTransactions.GetAsync(userId);
-            if (cached is not null)
-                return TypedResults.Ok(new GetLastTransactionsResponse
-                {
-                    Transactions = cached.Transactions,
-                    TotalAmount = cached.TotalAmount,
-                });
-        }
+        var cached = await cache.LastReferrerTransactions.TryGetAsync(userId);
+        if (cached is not null)
+            return TypedResults.Ok(new GetLastTransactionsResponse
+            {
+                Transactions = cached.Transactions,
+                TotalAmount = cached.TotalAmount,
+            });
 
         var payout = await db.ReferrerPayouts
             .FirstOrDefaultAsync(p => p.ReferrerId == userId);
@@ -172,13 +169,10 @@ public class AffiliateController(
 
         var totalAmount = transactionEntities.Sum(t => t.Amount);
 
-        await cache.ExecuteIfConnectedAsync(async () =>
+        await cache.LastReferrerTransactions.TrySetAsync(userId, new LastReferrerTransactions
         {
-            await cache.LastReferrerTransactions.SetAsync(userId, new LastReferrerTransactions
-            {
-                Transactions = transactions,
-                TotalAmount = totalAmount,
-            });
+            Transactions = transactions,
+            TotalAmount = totalAmount,
         });
 
         return TypedResults.Ok(new GetLastTransactionsResponse
@@ -236,7 +230,7 @@ public class AffiliateController(
                     Data = success.UpdatedReferrerBalance,
                 };
 
-                await pubSub.BalanceUpdated.PublishAsync(balanceUpdate);
+                await pubSub.BalanceUpdated.TryPublishAsync(balanceUpdate);
 
                 return TypedResults.Ok(new WithdrawResponse
                 {

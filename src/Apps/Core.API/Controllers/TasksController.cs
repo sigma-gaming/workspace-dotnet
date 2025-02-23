@@ -118,7 +118,7 @@ public class TasksController(
             },
         };
 
-        await pubSub.GlobalTaskStatusUpdated.PublishAsync(task);
+        await pubSub.GlobalTaskStatusUpdated.TryPublishAsync(task);
 
         return TypedResults.Ok(new CompleteTaskResponse { Task = task });
     }
@@ -169,8 +169,8 @@ public class TasksController(
             Data = balanceMapper.ToPublic(claim.UpdatedBalance!),
         };
 
-        await pubSub.BalanceUpdated.PublishAsync(balance);
-        await pubSub.GlobalTaskStatusUpdated.PublishAsync(task);
+        await pubSub.BalanceUpdated.TryPublishAsync(balance);
+        await pubSub.GlobalTaskStatusUpdated.TryPublishAsync(task);
 
         return TypedResults.Ok(new ClaimRewardResponse
         {

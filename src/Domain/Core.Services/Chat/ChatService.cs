@@ -28,35 +28,33 @@ public class ChatService(
             return;
         }
 
-        await cache.ExecuteIfConnectedAsync(async () =>
-        {
-            var exists = await cache.LastChatMessages.ExistsAsync();
+        var exists = await cache.LastChatMessages.ExistsAsync();
+        if (exists) return;
 
-            if (exists) return;
+        var messages = await db.ChatMessages
+            .OrderByDescending(m => m.Id)
+            .Take(50)
+            .ToListAsync();
 
-            var messages = await db.ChatMessages
-                .OrderByDescending(m => m.Id)
-                .Take(50)
-                .ToListAsync();
-
-            await cache.LastChatMessages.SetAllAsync(messages.Select(mapper.ToData).ToList());
-        });
+        await cache.LastChatMessages.SetAllAsync(messages.Select(mapper.ToData).ToList());
     }
 
     public async Task<ChatMessage[]> GetLastMessagesAsync()
     {
-        if (!cache.IsReady())
+        if (await cache.LastChatMessages.TryExistsAsync())
         {
-            var messages = await db.ChatMessages
-                .OrderByDescending(m => m.Id)
-                .Take(50)
-                .ToArrayAsync();
-
-            return messages.Select(mapper.ToData).ToArray();
+            var (saved, succeed) = await cache.LastChatMessages.TryGetAllAsync();
+            if (succeed) return saved.ToArray();
         }
 
-        var saved = await cache.LastChatMessages.GetAllAsync();
-        return saved.ToArray();
+        var messages = await db.ChatMessages
+            .OrderByDescending(m => m.Id)
+            .Take(50)
+            .ToArrayAsync();
+
+        var list = messages.Select(mapper.ToData).ToList();
+        await cache.LastChatMessages.TrySetAllAsync(list);
+        return list.ToArray();
     }
 
     public async Task<ChatMessage> SendMessageAsync(
@@ -84,7 +82,7 @@ public class ChatService(
         }
         else
         {
-            messageInsert.SenderRoles = new[] { UserRole.Admin };
+            messageInsert.SenderRoles = [UserRole.Admin];
         }
 
         var entry = await db.ChatMessages.AddAsync(messageInsert);
@@ -92,9 +90,8 @@ public class ChatService(
 
         var message = mapper.ToData(entry.Entity);
 
-        await cache.ExecuteIfConnectedAsync(async () => { await cache.LastChatMessages.LeftPushAsync(message); });
-
-        await pubSub.ChatMessages.PublishAsync(message);
+        await cache.LastChatMessages.TryLeftPushAsync(message);
+        await pubSub.ChatMessages.TryPublishAsync(message);
 
         return message;
     }

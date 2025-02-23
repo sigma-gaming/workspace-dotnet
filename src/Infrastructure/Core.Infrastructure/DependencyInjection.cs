@@ -1,7 +1,7 @@
 using Core.Builder;
 using Core.Cache;
 using Core.Db;
-using Core.PubSub;
+using Core.Nats;
 using Microsoft.Extensions.Configuration;
 
 namespace Core.Infrastructure;
@@ -14,7 +14,7 @@ public static class DependencyInjection
     {
         builder.AddCoreDb(configuration);
         builder.AddCoreCache(configuration);
-        builder.AddCorePubSub(configuration);
+        builder.AddNats(configuration);
 
         return builder;
     }

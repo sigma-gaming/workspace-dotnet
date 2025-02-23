@@ -64,13 +64,11 @@ public class GlobalTaskService(
 
     public async Task<GlobalTask[]> GetTasksAsync()
     {
-        if (!cache.IsReady()) return await QueryTasksAsync();
-
-        var cached = await cache.GlobalTasks.GetAsync();
+        var cached = await cache.GlobalTasks.TryGetAsync();
         if (cached is not null) return cached;
 
         var tasks = await QueryTasksAsync();
-        await cache.GlobalTasks.SetAsync(tasks);
+        await cache.GlobalTasks.TrySetAsync(tasks);
         return tasks;
     }
 
@@ -93,13 +91,11 @@ public class GlobalTaskService(
 
     public async Task<GlobalTaskStatusInfo> GetStatusAsync(GlobalTaskKey taskKey, Guid userId)
     {
-        if (!cache.IsReady()) return await QueryStatusAsync(taskKey, userId);
-
-        var cached = await cache.GlobalTaskStatus.GetAsync($"{taskKey}:{userId}");
+        var cached = await cache.GlobalTaskStatus.TryGetAsync($"{taskKey}:{userId}");
         if (cached is not null) return cached;
 
         var status = await QueryStatusAsync(taskKey, userId);
-        await cache.GlobalTaskStatus.SetAsync($"{taskKey}:{userId}", status);
+        await cache.GlobalTaskStatus.TrySetAsync($"{taskKey}:{userId}", status);
         return status;
     }
 
@@ -165,12 +161,9 @@ public class GlobalTaskService(
                     TaskStatus.Completed);
             });
 
-            await cache.ExecuteIfConnectedAsync(async () =>
-            {
-                if (output.UpdatedStatus is not null)
-                    await cache.GlobalTaskStatus.SetAsync($"{taskKey}:{userId}",
-                        new GlobalTaskStatusInfo(output.UpdatedStatus.Value, true));
-            });
+            if (output.UpdatedStatus is not null)
+                await cache.GlobalTaskStatus.TrySetAsync($"{taskKey}:{userId}",
+                    new GlobalTaskStatusInfo(output.UpdatedStatus.Value, true));
 
             return output;
         }
@@ -230,15 +223,12 @@ public class GlobalTaskService(
                     updatedBalance);
             });
 
-            await cache.ExecuteIfConnectedAsync(async () =>
-            {
-                if (output.UpdatedStatus is not null)
-                    await cache.GlobalTaskStatus.SetAsync($"{taskKey}:{userId}",
-                        new GlobalTaskStatusInfo(output.UpdatedStatus.Value, true));
+            if (output.UpdatedStatus is not null)
+                await cache.GlobalTaskStatus.TrySetAsync($"{taskKey}:{userId}",
+                    new GlobalTaskStatusInfo(output.UpdatedStatus.Value, true));
 
-                if (output.UpdatedBalance is not null)
-                    await cache.UserBalance.SetAsync(userId, balanceMapper.ToData(output.UpdatedBalance));
-            });
+            if (output.UpdatedBalance is not null)
+                await cache.UserBalance.TrySetAsync(userId, balanceMapper.ToData(output.UpdatedBalance));
 
             return output;
         }

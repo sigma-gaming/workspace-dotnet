@@ -104,16 +104,13 @@ public class AffiliateService(
 
     public async Task<ReferrerSettings?> GetReferrerSettingsAsync(Guid referrerId)
     {
-        if (!cache.IsReady())
-            return await QueryReferrerSettingsAsync(referrerId);
-
-        var cached = await cache.ReferrerSettings.GetAsync(referrerId);
+        var cached = await cache.ReferrerSettings.TryGetAsync(referrerId);
         if (cached is not null)
             return cached;
 
         var settings = await QueryReferrerSettingsAsync(referrerId);
         if (settings is not null)
-            await cache.ReferrerSettings.SetAsync(referrerId, settings);
+            await cache.ReferrerSettings.TrySetAsync(referrerId, settings);
 
         return settings;
     }
@@ -129,16 +126,13 @@ public class AffiliateService(
 
     public async Task<ReferrerBalance?> GetReferrerBalanceAsync(Guid referrerId)
     {
-        if (!cache.IsReady())
-            return await QueryReferrerBalanceAsync(referrerId);
-
-        var cached = await cache.ReferrerBalance.GetAsync(referrerId);
+        var cached = await cache.ReferrerBalance.TryGetAsync(referrerId);
         if (cached is not null)
             return cached;
 
         var balance = await QueryReferrerBalanceAsync(referrerId);
         if (balance is not null)
-            await cache.ReferrerBalance.SetAsync(referrerId, balance);
+            await cache.ReferrerBalance.TrySetAsync(referrerId, balance);
 
         return balance;
     }
@@ -200,7 +194,7 @@ public class AffiliateService(
             throw new Exception("ReferrerBalance not found");
 
         var updated = referrerBalanceMapper.ToData(updatedEntity);
-        await cache.ExecuteIfConnectedAsync(async () => await cache.ReferrerBalance.SetAsync(referrerId, updated));
+        await cache.ReferrerBalance.TrySetAsync(referrerId, updated);
 
         return updatedEntity;
     }
@@ -305,11 +299,9 @@ public class AffiliateService(
                 await db.SaveChangesAsync();
             });
 
-            await cache.ExecuteIfConnectedAsync(async () =>
-            {
-                await cache.ReferrerBalance.DeleteAsync(payout.ReferrerId);
-                await cache.LastReferrerTransactions.DeleteAsync(payout.ReferrerId);
-            });
+
+            await cache.ReferrerBalance.TryDeleteAsync(payout.ReferrerId);
+            await cache.LastReferrerTransactions.TryDeleteAsync(payout.ReferrerId);
         }
     }
 
@@ -351,11 +343,10 @@ public class AffiliateService(
         });
 
         if (result is ReferrerWithdrawalSuccessResult success)
-            await cache.ExecuteIfConnectedAsync(async () =>
-            {
-                await cache.UserBalance.SetAsync(userId, success.UpdatedBalance);
-                await cache.ReferrerBalance.SetAsync(userId, success.UpdatedReferrerBalance);
-            });
+        {
+            await cache.UserBalance.TrySetAsync(userId, success.UpdatedBalance);
+            await cache.ReferrerBalance.TrySetAsync(userId, success.UpdatedReferrerBalance);
+        }
 
         return result;
     }

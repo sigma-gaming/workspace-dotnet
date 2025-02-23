@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.Nats\Common.Nats.csproj"/>
+    <ProjectReference Include="..\Core.Builder\Core.Builder.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.2"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2"/>
+    <PackageReference Include="NATS.Net" Version="2.5.8"/>
+  </ItemGroup>
+
+</Project>

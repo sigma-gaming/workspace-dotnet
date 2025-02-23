@@ -116,7 +116,7 @@ public class SettingsController(
                 .SetProperty(p => p.HasCustomName, updates.HasCustomName)
             );
 
-        await cache.ExecuteIfConnectedAsync(async () => { await cache.UserDetails.DeleteAsync(userId); });
+        await cache.UserDetails.TryDeleteAsync(userId);
 
         var details = await profileService.GetUserDetailsAsync(userId);
         return TypedResults.Ok(details);

@@ -12,10 +12,10 @@ public class GameHistoryService(
 {
     public async Task<GameRecord[]> GetLastWinHistoryAsync(CancellationToken ct = default)
     {
-        if (cache.IsReady() && await cache.LastWinHistory.ExistsAsync())
+        if (await cache.LastWinHistory.TryExistsAsync())
         {
-            var cached = await cache.LastWinHistory.GetAllAsync();
-            return cached.ToArray();
+            var (cached, succeed) = await cache.LastWinHistory.TryGetAllAsync();
+            if (succeed) return cached.ToArray();
         }
 
         var records = await (
@@ -40,17 +40,17 @@ public class GameHistoryService(
             .AsNoTracking()
             .ToArrayAsync(ct);
 
-        await cache.ExecuteIfConnectedAsync(async () => { await cache.LastWinHistory.SetAllAsync(records.ToList()); });
+        await cache.LastWinHistory.TrySetAllAsync(records.ToList());
 
         return records;
     }
 
     public async Task<GameRecord[]> GetBigWinHistoryAsync(CancellationToken ct = default)
     {
-        if (cache.IsReady() && await cache.BigWinHistory.ExistsAsync())
+        if (await cache.BigWinHistory.TryExistsAsync())
         {
-            var cached = await cache.BigWinHistory.GetAllAsync();
-            return cached.ToArray();
+            var (cached, succeed) = await cache.BigWinHistory.TryGetAllAsync();
+            if (succeed) return cached.ToArray();
         }
 
         var records = await (
@@ -75,17 +75,17 @@ public class GameHistoryService(
             .AsNoTracking()
             .ToArrayAsync(ct);
 
-        await cache.ExecuteIfConnectedAsync(async () => { await cache.BigWinHistory.SetAllAsync(records.ToList()); });
+        await cache.BigWinHistory.TrySetAllAsync(records.ToList());
 
         return records;
     }
 
     public async Task<GameRecord[]> GetUserGameHistoryAsync(Guid userId, CancellationToken ct = default)
     {
-        if (cache.IsReady() && await cache.UserGameHistory.ExistsAsync(userId))
+        if (await cache.UserGameHistory.TryExistsAsync(userId))
         {
-            var cached = await cache.UserGameHistory.GetAllAsync(userId);
-            return cached.ToArray();
+            var (cached, succeed) = await cache.UserGameHistory.TryGetAllAsync(userId);
+            if (succeed) return cached.ToArray();
         }
 
         var records = await (
@@ -110,25 +110,19 @@ public class GameHistoryService(
             .AsNoTracking()
             .ToArrayAsync(ct);
 
-        await cache.ExecuteIfConnectedAsync(async () =>
-        {
-            await cache.UserGameHistory.SetAllAsync(userId, records.ToList());
-        });
+        await cache.UserGameHistory.TrySetAllAsync(userId, records.ToList());
 
         return records;
     }
 
     public async Task AddGameRecordAsync(GameRecord record)
     {
-        if (!cache.IsReady())
-            return;
-
-        await cache.UserGameHistory.LeftPushAsync(record.UserId, record);
+        await cache.UserGameHistory.TryLeftPushAsync(record.UserId, record);
 
         if (record.Bet + record.Payout >= 3000 && record.Multiplier >= 150)
-            await cache.BigWinHistory.LeftPushAsync(record);
+            await cache.BigWinHistory.TryLeftPushAsync(record);
 
         if (record.Outcome == GameOutcome.Win)
-            await cache.LastWinHistory.LeftPushAsync(record);
+            await cache.LastWinHistory.TryLeftPushAsync(record);
     }
 }

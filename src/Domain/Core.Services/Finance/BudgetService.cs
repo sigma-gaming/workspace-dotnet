@@ -1,9 +1,11 @@
 using Core.Contracts.Data;
+using Core.Contracts.Entities;
 using Core.Contracts.Mappers;
 using Core.Db.Context;
 using Core.Services.Caching;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Z.EntityFramework.Plus;
 
 namespace Core.Services.Finance;
 
@@ -25,36 +27,41 @@ public class BudgetService(
 
     public async Task<Budget> GetBudgetAsync()
     {
-        if (!cache.IsReady()) return await QueryBudgetAsync();
-
-        var cached = await cache.Budget.GetAsync();
+        var cached = await cache.Budget.TryGetAsync();
         if (cached is not null) return cached;
 
         var budget = await QueryBudgetAsync();
-        await cache.Budget.SetAsync(budget);
+
+        await cache.Budget.TrySetAsync(budget);
 
         return budget;
     }
 
     public async Task<long> GetAvailableAsync()
     {
-        if (!cache.IsReady()) return (await QueryBudgetAsync()).Available;
-
-        var cached = await cache.BudgetAvailable.GetAsync();
+        var cached = await cache.BudgetAvailable.TryGetAsync();
         if (cached is not null) return cached.Value;
 
         var budget = await GetBudgetAsync();
-        await cache.BudgetAvailable.SetAsync(budget.Available);
+
+        await cache.BudgetAvailable.TrySetAsync(budget.Available);
 
         return budget.Available;
+    }
+
+    private async Task SetBudgetAsync(long amount)
+    {
+        var available = await GetAvailableAsync();
+
+        await db.Budget.ExecuteUpdateAsync(setters =>
+            setters.SetProperty(b => b.Available, available)
+                .SetProperty(b => b.LastSyncAt, DateTime.UtcNow));
     }
 
     public async Task SyncBudgetAsync()
     {
         var available = await GetAvailableAsync();
-
-        await db.Budget.ExecuteUpdateAsync(setters =>
-            setters.SetProperty(b => b.Available, available));
+        await SetBudgetAsync(available);
     }
 
     public async Task<DateTime> GetSyncedAtAsync()
@@ -63,33 +70,23 @@ public class BudgetService(
         return budget.LastSyncAt;
     }
 
-    public async Task IncreaseAvailableAsync(long amount)
-    {
-        try
-        {
-            await cache.BudgetAvailable.IncrementByAsync(amount);
-        }
-        catch (Exception)
-        {
-            logger.LogError("Failed to increase available budget");
-        }
-    }
-
-    public async Task DecreaseAvailableAsync(long amount)
-    {
-        try
-        {
-            await cache.BudgetAvailable.DecrementByAsync(amount);
-        }
-        catch (Exception)
-        {
-            logger.LogError("Failed to decrease available budget");
-        }
-    }
-
     public async Task ChangeAvailableAsync(long diff)
     {
-        if (diff > 0) await IncreaseAvailableAsync(diff);
-        else await DecreaseAvailableAsync(Math.Abs(diff));
+        try
+        {
+            if (cache.IsReady())
+            {
+                if (diff > 0) await cache.BudgetAvailable.TryIncrementByAsync(diff);
+                else await cache.BudgetAvailable.TryDecrementByAsync(Math.Abs(diff));
+            }
+            else
+            {
+                await db.Budget.UpdateAsync(x => new BudgetEntity { Available = x.Available + diff });
+            }
+        }
+        catch (Exception)
+        {
+            logger.LogError("Failed to change available budget");
+        }
     }
 }

@@ -56,7 +56,7 @@ public class PromocodeService(
 {
     private const string DEFAULT_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    public string GenerateOne(int length = 10, string alphabet = DEFAULT_ALPHABET)
+    private static string GenerateOne(int length = 10, string alphabet = DEFAULT_ALPHABET)
     {
         var random = new Random();
         return new string(Enumerable.Range(0, length)
@@ -64,7 +64,7 @@ public class PromocodeService(
             .ToArray());
     }
 
-    public string[] GenerateMany(int count, int length = 10, string alphabet = DEFAULT_ALPHABET)
+    public static string[] GenerateMany(int count, int length = 10, string alphabet = DEFAULT_ALPHABET)
     {
         return Enumerable.Range(0, count)
             .Select(_ => GenerateOne(length, alphabet))
@@ -73,11 +73,8 @@ public class PromocodeService(
 
     public async Task<Promocode?> GetPromocodeAsync(string code)
     {
-        if (cache.IsReady())
-        {
-            var cached = await cache.Promocode.GetAsync(code);
-            if (cached is not null) return cached;
-        }
+        var cached = await cache.Promocode.TryGetAsync(code);
+        if (cached is not null) return cached;
 
         var promocodeEntity = await db.Promocodes
             .AsNoTracking()
@@ -87,7 +84,7 @@ public class PromocodeService(
 
         var promocode = promocodeMapper.ToData(promocodeEntity);
 
-        await cache.ExecuteIfConnectedAsync(async () => { await cache.Promocode.SetAsync(code, promocode); });
+        await cache.Promocode.TrySetAsync(code, promocode);
 
         return promocode;
     }
@@ -193,16 +190,13 @@ public class PromocodeService(
                 };
             });
 
-            await cache.ExecuteIfConnectedAsync(async () =>
+            if (result is PromocodeActivationPayoutResult payoutResult)
             {
-                if (result is PromocodeActivationPayoutResult payoutResult)
-                {
-                    var balance = balanceMapper.ToData(payoutResult.UpdatedBalance);
-                    var promocode = promocodeMapper.ToData(payoutResult.UpdatedPromocode);
-                    await cache.UserBalance.SetAsync(userId, balance);
-                    await cache.Promocode.SetAsync(code, promocode);
-                }
-            });
+                var balance = balanceMapper.ToData(payoutResult.UpdatedBalance);
+                var promocode = promocodeMapper.ToData(payoutResult.UpdatedPromocode);
+                await cache.UserBalance.TrySetAsync(userId, balance);
+                await cache.Promocode.TrySetAsync(code, promocode);
+            }
 
             return result;
         }

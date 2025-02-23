@@ -13,7 +13,7 @@ public class SessionService(
 {
     public async Task<Session?> GetSessionAsync(Guid sessionId)
     {
-        var cachedSession = await cache.Session.GetAsync(sessionId);
+        var cachedSession = await cache.Session.TryGetAsync(sessionId);
 
         if (cachedSession is not null)
             return cachedSession.ExpiresAt > DateTime.UtcNow ? cachedSession : null;
@@ -29,7 +29,7 @@ public class SessionService(
         if (session.ExpiresAt <= DateTime.UtcNow)
             return null;
 
-        await cache.Session.SetAsync(session.Id, session);
+        await cache.Session.TrySetAsync(session.Id, session);
 
         return session;
     }

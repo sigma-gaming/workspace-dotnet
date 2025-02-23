@@ -7,11 +7,11 @@ namespace Common.Api.RateLimiting;
 
 public sealed class RateLimitingOptionsBuilder
 {
+    private readonly Func<HttpContext, string> clientIpResolver = DefaultClientIpResolver;
+    private readonly Func<OnRejectedContext, CancellationToken, ValueTask> onRejected = DefaultOnRejected;
     private readonly List<RateLimitPolicySettings> policies = [];
     private string? bypassToken;
-    private readonly Func<HttpContext, string> clientIpResolver = DefaultClientIpResolver;
     private RateLimitPolicySettings? globalLimit;
-    private readonly Func<OnRejectedContext, CancellationToken, ValueTask> onRejected = DefaultOnRejected;
 
     private static string DefaultClientIpResolver(HttpContext context)
     {
@@ -31,10 +31,7 @@ public sealed class RateLimitingOptionsBuilder
             context.HttpContext.Response.Headers.RetryAfter =
                 ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
 
-        await context.HttpContext.Response.WriteAsJsonAsync(new
-        {
-            message = "Слишком много запросов. Попробуйте позже.",
-        }, ct);
+        await context.HttpContext.Response.WriteAsync("Too Many Requests", ct);
     }
 
     public RateLimitingOptionsBuilder WithBypassToken(string? token)

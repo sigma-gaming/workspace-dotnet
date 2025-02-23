@@ -53,7 +53,7 @@ public class PromocodesController(
                     Data = balanceMapper.ToPublic(payout.UpdatedBalance),
                 };
 
-                await pubSub.BalanceUpdated.PublishAsync(balanceUpdate);
+                await pubSub.BalanceUpdated.TryPublishAsync(balanceUpdate);
 
                 return TypedResults.Ok(new ApplyPromocodeResponse
                 {

@@ -32,7 +32,7 @@ public class GameHistoryBroadcastService(
         while (!ct.IsCancellationRequested)
             try
             {
-                var lastWins = await cache.LastWinHistory.GetAllAsync();
+                var (lastWins, _) = await cache.LastWinHistory.TryGetAllAsync();
 
                 var newWins = lastWins.Where(record => record.Id.CompareTo(lastWinSent) > 0).ToList();
 
@@ -61,7 +61,7 @@ public class GameHistoryBroadcastService(
         while (!ct.IsCancellationRequested)
             try
             {
-                var bigWins = await cache.BigWinHistory.GetAllAsync();
+                var (bigWins, _) = await cache.BigWinHistory.TryGetAllAsync();
 
                 var newWins = bigWins.Where(record => record.Id.CompareTo(lastBigWinSent) > 0).ToList();
 

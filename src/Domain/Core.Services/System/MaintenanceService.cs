@@ -24,15 +24,12 @@ public class MaintenanceService(
 
     private async Task<bool> CheckMaintenanceEnabledAsync()
     {
-        if (!cache.IsReady())
-            return await QueryMaintenanceEnabledAsync();
-
-        var cached = await cache.MaintenanceEnabled.GetAsync();
+        var cached = await cache.MaintenanceEnabled.TryGetAsync();
         if (cached is not null)
             return cached.Value;
 
         var maintenance = await QueryMaintenanceEnabledAsync();
-        await cache.MaintenanceEnabled.SetAsync(maintenance);
+        await cache.MaintenanceEnabled.TrySetAsync(maintenance);
         return maintenance;
     }
 
@@ -61,10 +58,7 @@ public class MaintenanceService(
                 .SetProperty(c => c.MaintenanceEnabled, state)
                 .SetProperty(c => c.UpdatedAt, DateTime.UtcNow));
 
-        if (!cache.IsReady())
-            return state;
-
-        await cache.MaintenanceEnabled.SetAsync(state);
+        await cache.MaintenanceEnabled.TrySetAsync(state);
         return state;
     }
 
@@ -82,15 +76,12 @@ public class MaintenanceService(
 
     public async Task<bool> AreBackgroundJobsEnabledAsync()
     {
-        if (!cache.IsReady())
-            return await QueryBackgroundJobsEnabledAsync();
-
-        var cached = await cache.BackgroundJobsEnabled.GetAsync();
+        var cached = await cache.BackgroundJobsEnabled.TryGetAsync();
         if (cached is not null)
             return cached.Value;
 
         var enabled = await QueryBackgroundJobsEnabledAsync();
-        await cache.BackgroundJobsEnabled.SetAsync(enabled);
+        await cache.BackgroundJobsEnabled.TrySetAsync(enabled);
         return enabled;
     }
 
@@ -101,10 +92,7 @@ public class MaintenanceService(
                 .SetProperty(c => c.BackgroundJobsEnabled, state)
                 .SetProperty(c => c.UpdatedAt, DateTime.UtcNow));
 
-        if (!cache.IsReady())
-            return state;
-
-        await cache.BackgroundJobsEnabled.SetAsync(state);
+        await cache.BackgroundJobsEnabled.TrySetAsync(state);
         return state;
     }
 }

@@ -5,6 +5,7 @@ COPY Sigma.sln .
 COPY src/Common/Common.Logging/Common.Logging.csproj src/Common/Common.Logging/
 COPY src/Common/Common.Db/Common.Db.csproj src/Common/Common.Db/
 COPY src/Common/Common.Caching/Common.Caching.csproj src/Common/Common.Caching/
+COPY src/Common/Common.Nats/Common.Nats.csproj src/Common/Common.Nats/
 COPY src/Common/Common.PubSub/Common.PubSub.csproj src/Common/Common.PubSub/
 COPY src/Common/Common.OpenApi/Common.OpenApi.csproj src/Common/Common.OpenApi/
 COPY src/Common/Common.Api/Common.Api.csproj src/Common/Common.Api/
@@ -13,7 +14,7 @@ COPY src/Common/Common.Validation/Common.Validation.csproj src/Common/Common.Val
 COPY src/Infrastructure/Core.Builder/Core.Builder.csproj src/Infrastructure/Core.Builder/
 COPY src/Infrastructure/Core.Infrastructure/Core.Infrastructure.csproj src/Infrastructure/Core.Infrastructure/
 COPY src/Infrastructure/Core.Cache/Core.Cache.csproj src/Infrastructure/Core.Cache/
-COPY src/Infrastructure/Core.PubSub/Core.PubSub.csproj src/Infrastructure/Core.PubSub/
+COPY src/Infrastructure/Core.Nats/Core.Nats.csproj src/Infrastructure/Core.Nats/
 COPY src/Infrastructure/Core.Db/Core.Db.csproj src/Infrastructure/Core.Db/
 COPY src/Infrastructure/Core.Migrations/Core.Migrations.csproj src/Infrastructure/Core.Migrations/
 

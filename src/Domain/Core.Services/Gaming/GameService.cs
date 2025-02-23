@@ -53,20 +53,17 @@ public class GameService(
             .FirstOrDefaultAsync(r => r.Id == gameRecordId, ct);
     }
 
-    private decimal CalculateWageringMultiplier(GameSnapshot snapshot)
+    private static decimal CalculateWageringMultiplier(GameSnapshot snapshot)
     {
-        switch (snapshot)
+        return snapshot switch
         {
-            case GameSnapshotDice dice:
-                return (6.0m / dice.InputSides.Length - 1) / 5;
-            case GameSnapshotPincode pincode:
-                return pincode.Mode == PincodeMode.Easy ? 0.75m : 1;
-            default:
-                throw new InvalidOperationException("Unknown game snapshot type");
-        }
+            GameSnapshotDice dice => (6.0m / dice.InputSides.Length - 1) / 5,
+            GameSnapshotPincode pincode => pincode.Mode == PincodeMode.Easy ? 0.75m : 1,
+            _ => throw new InvalidOperationException("Unknown game snapshot type"),
+        };
     }
 
-    private long CalculateWageringChange(long bet, GameSnapshot snapshot)
+    private static long CalculateWageringChange(long bet, GameSnapshot snapshot)
     {
         var multiplier = CalculateWageringMultiplier(snapshot);
         return (long)Math.Ceiling(-bet * multiplier);
@@ -145,11 +142,9 @@ public class GameService(
             return (gameRecord: gameRecordEntity, updatedBalance);
         });
 
-        await cache.ExecuteIfConnectedAsync(async () =>
-        {
-            await cache.UserBalance.SetAsync(payload.UserId, balanceMapper.ToData(updatedBalance));
-            await budgetService.ChangeAvailableAsync(-payload.Payout);
-        });
+        await cache.UserBalance.TrySetAsync(payload.UserId, balanceMapper.ToData(updatedBalance));
+
+        await budgetService.ChangeAvailableAsync(-payload.Payout);
 
         _ = gameHistoryService.AddGameRecordAsync(gameRecordMapper.ToData(gameRecord));
 

@@ -16,11 +16,8 @@ public class BalanceService(
 {
     public async Task<Balance> GetBalanceAsync(Guid userId, CancellationToken ct = default)
     {
-        if (cache.IsReady())
-        {
-            var cached = await cache.UserBalance.GetAsync(userId);
-            if (cached is not null) return cached;
-        }
+        var cached = await cache.UserBalance.TryGetAsync(userId);
+        if (cached is not null) return cached;
 
         var balanceEntity = await db.Balances
             .AsNoTracking()
@@ -31,7 +28,7 @@ public class BalanceService(
 
         var balance = balanceMapper.ToData(balanceEntity);
 
-        await cache.ExecuteIfConnectedAsync(async () => { await cache.UserBalance.SetAsync(userId, balance); });
+        await cache.UserBalance.TrySetAsync(userId, balance);
 
         return balance;
     }

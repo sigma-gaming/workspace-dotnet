@@ -81,7 +81,7 @@ public class GamesController(
                 Data = balanceMapper.ToPublic(playResult.UpdatedBalance),
             };
 
-            await pubSub.BalanceUpdated.PublishAsync(balanceUpdate);
+            await pubSub.BalanceUpdated.TryPublishAsync(balanceUpdate);
 
             return TypedResults.Ok(new PlayResponse
             {
@@ -122,7 +122,7 @@ public class GamesController(
                 Data = balanceMapper.ToPublic(playResult.UpdatedBalance),
             };
 
-            await pubSub.BalanceUpdated.PublishAsync(balanceUpdate);
+            await pubSub.BalanceUpdated.TryPublishAsync(balanceUpdate);
 
             return TypedResults.Ok(new PlayResponse
             {
