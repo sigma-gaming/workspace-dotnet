@@ -11,11 +11,9 @@ public class UpdatesBroadcastService(
     IHubContext<MainHub> mainHub,
     ILogger<UpdatesBroadcastService> logger) : BackgroundService
 {
-    private readonly List<IDisposable> subscriptions = [];
-
     protected override Task ExecuteAsync(CancellationToken ct)
     {
-        subscriptions.Add(pubSubRegistry.BalanceUpdated.Subscribe(async update =>
+        pubSubRegistry.BalanceUpdated.Subscribe(async update =>
         {
             try
             {
@@ -27,9 +25,9 @@ public class UpdatesBroadcastService(
             {
                 logger.LogError(ex, "Failed to send balance update to user {UserId}", update.UserId);
             }
-        }));
+        }, ct);
 
-        subscriptions.Add(pubSubRegistry.GlobalTaskStatusUpdated.Subscribe(async update =>
+        pubSubRegistry.GlobalTaskStatusUpdated.Subscribe(async update =>
         {
             try
             {
@@ -41,17 +39,8 @@ public class UpdatesBroadcastService(
             {
                 logger.LogError(ex, "Failed to send task status update to user {UserId}", update.UserId);
             }
-        }));
+        }, ct);
 
         return Task.CompletedTask;
-    }
-
-    public override Task StopAsync(CancellationToken ct)
-    {
-        foreach (var subscription in subscriptions) subscription.Dispose();
-
-        subscriptions.Clear();
-
-        return base.StopAsync(ct);
     }
 }

@@ -11,11 +11,9 @@ public class ChatBroadcastService(
     IHubContext<MainHub> mainHub,
     ILogger<UpdatesBroadcastService> logger) : BackgroundService
 {
-    private readonly List<IDisposable> subscriptions = [];
-
     protected override Task ExecuteAsync(CancellationToken ct)
     {
-        subscriptions.Add(pubSubRegistry.ChatMessages.Subscribe(async message =>
+        pubSubRegistry.ChatMessages.Subscribe(async message =>
         {
             try
             {
@@ -26,17 +24,8 @@ public class ChatBroadcastService(
             {
                 logger.LogError(ex, "Failed to send maintenance started event");
             }
-        }));
+        }, ct);
 
         return Task.CompletedTask;
-    }
-
-    public override Task StopAsync(CancellationToken ct)
-    {
-        foreach (var subscription in subscriptions) subscription.Dispose();
-
-        subscriptions.Clear();
-
-        return base.StopAsync(ct);
     }
 }

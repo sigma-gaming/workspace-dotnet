@@ -11,11 +11,9 @@ public class SystemBroadcastService(
     IHubContext<MainHub> mainHub,
     ILogger<UpdatesBroadcastService> logger) : BackgroundService
 {
-    private readonly List<IDisposable> subscriptions = [];
-
     protected override Task ExecuteAsync(CancellationToken ct)
     {
-        subscriptions.Add(pubSubRegistry.MaintenanceStarted.Subscribe(async _ =>
+        pubSubRegistry.MaintenanceStarted.Subscribe(async _ =>
         {
             try
             {
@@ -26,9 +24,9 @@ public class SystemBroadcastService(
             {
                 logger.LogError(ex, "Failed to send maintenance started event");
             }
-        }));
+        }, ct);
 
-        subscriptions.Add(pubSubRegistry.Notifications.Subscribe(async notification =>
+        pubSubRegistry.Notifications.Subscribe(async notification =>
         {
             try
             {
@@ -44,17 +42,8 @@ public class SystemBroadcastService(
             {
                 logger.LogError(ex, "Failed to send notification to user {UserId}", notification.UserId);
             }
-        }));
+        }, ct);
 
         return Task.CompletedTask;
-    }
-
-    public override Task StopAsync(CancellationToken ct)
-    {
-        foreach (var subscription in subscriptions) subscription.Dispose();
-
-        subscriptions.Clear();
-
-        return base.StopAsync(ct);
     }
 }

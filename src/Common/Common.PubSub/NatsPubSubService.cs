@@ -42,11 +42,11 @@ file class NatsTypedPubSub<T>(
         }
     }
 
-    public async Task Subscribe(Func<T, Task> handler)
+    public async Task Subscribe(Func<T, Task> handler, CancellationToken ct = default)
     {
         try
         {
-            await foreach (var message in connection.SubscribeAsync<byte[]>(subject))
+            await foreach (var message in connection.SubscribeAsync<byte[]>(subject, null, null, null, ct))
                 try
                 {
                     var data = JsonSerializer.Deserialize<T>(message.Data, jsonOptions);
