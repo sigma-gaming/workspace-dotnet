@@ -50,7 +50,6 @@ file class NatsTypedPubSub<T>(
                 try
                 {
                     var data = JsonSerializer.Deserialize<T>(message.Data, jsonOptions);
-                    logger.LogInformation("Received message {Data}", data);
                     if (data is not null) await handler(data);
                 }
                 catch (Exception ex)
