@@ -30,6 +30,7 @@ public class SessionAuthenticationHandler(
 
         var claims = new List<Claim>
         {
+            new(ClaimTypes.Sid, session.Id.ToString()),
             new(ClaimTypes.NameIdentifier, session.UserId.ToString()),
         };
 
@@ -44,7 +45,7 @@ public class SessionAuthenticationHandler(
 
     private Guid? ExtractSessionIdFromRequest()
     {
-        var authHeader = Request.Headers["Authorization"].ToString();
+        var authHeader = Request.Headers.Authorization.ToString();
 
         if (!string.IsNullOrWhiteSpace(authHeader))
             if (AuthenticationHeaderValue.TryParse(authHeader, out var headerVal))

@@ -7,12 +7,12 @@ namespace Core.Services.System;
 
 public static class CorsExtensions
 {
-    public static WebApplication UseDomainCors(
-        this WebApplication app,
+    public static IApplicationBuilder UseDomainCors(
+        this IApplicationBuilder app,
         DomainApp[] allowedApps,
         Action<CorsPolicyBuilder>? configureOptions = null)
     {
-        var domainService = app.Services.GetRequiredService<DomainService>();
+        var domainService = app.ApplicationServices.GetRequiredService<DomainService>();
 
         app.UseCors(options =>
         {

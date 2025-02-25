@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.Db\Common.Db.csproj"/>
+    <ProjectReference Include="..\..\Common\Common.Monitoring\Common.Monitoring.csproj"/>
     <ProjectReference Include="..\..\Domain\Core.Contracts\Core.Contracts.csproj"/>
   </ItemGroup>
 

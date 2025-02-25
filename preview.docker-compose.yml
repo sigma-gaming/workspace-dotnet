@@ -23,6 +23,7 @@ services:
         APP_NAME: Core.WS
     ports:
       - "8080:8080"
+      - "9090:9090"
     networks:
       - sigma
     environment:

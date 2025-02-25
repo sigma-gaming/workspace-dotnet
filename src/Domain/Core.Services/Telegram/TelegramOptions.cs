@@ -1,4 +1,4 @@
-namespace Core.Services.Bots;
+namespace Core.Services.Telegram;
 
 public class TelegramOptions
 {

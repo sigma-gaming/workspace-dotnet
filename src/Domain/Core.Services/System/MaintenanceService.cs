@@ -33,7 +33,7 @@ public class MaintenanceService(
         return maintenance;
     }
 
-    public async Task<bool> IsMaintenanceEnabledAsync()
+    public async Task<bool> IsMaintenanceEnabledAsync(CancellationToken ct = default)
     {
         for (var i = 0; i < 3; i++)
             try
@@ -45,7 +45,7 @@ public class MaintenanceService(
                 logger.LogInformation("Failed to get maintenance mode");
                 logger.LogError(error, "Error getting maintenance mode");
                 logger.LogInformation("Retrying in 1 second...");
-                await Task.Delay(1000);
+                await Task.Delay(1000, ct);
             }
 
         return true;

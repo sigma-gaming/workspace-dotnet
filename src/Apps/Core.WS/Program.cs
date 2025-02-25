@@ -1,11 +1,14 @@
 using Common.Api.Extensions;
-using Common.Logging;
+using Common.Monitoring.HealthChecks;
+using Common.Monitoring.Logging;
 using Common.OpenApi.DocumentFilters;
 using Common.OpenApi.Extensions;
 using Core.Builder;
+using Core.Cache;
 using Core.Contracts;
 using Core.Contracts.Enums;
-using Core.Infrastructure;
+using Core.Db;
+using Core.Nats;
 using Core.Services;
 using Core.Services.Auth;
 using Core.Services.System;
@@ -16,10 +19,11 @@ using Core.WS.Services;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 
+const string apiName = "Core WS";
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddCommonHttpConfiguration();
-builder.AddLogging("Core WS");
+builder.AddLogging(apiName);
 
 var apiOptions = new ApiOptions();
 builder.Configuration.Bind("Api", apiOptions);
@@ -44,41 +48,58 @@ builder.Services.AddCors();
 builder.Services.AddSignalR();
 builder.Services.AddHttpClient();
 
-// Add infrastructure and domains
 builder.Services.Core()
-    .AddInfrastructure(builder.Configuration)
+    .AddCoreDb(builder.Configuration)
+    .AddCoreCache(builder.Configuration)
+    .AddCoreNats(builder.Configuration)
     .AddMappers()
-    .AddCommonServices();
+    .AddCommonServices(builder.Configuration)
+    .AddPubSub()
+    .AddSystem();
 
 builder.Services.AddHostedService<SystemBroadcastService>();
 builder.Services.AddHostedService<UpdatesBroadcastService>();
 builder.Services.AddHostedService<ChatBroadcastService>();
 builder.Services.AddHostedService<GameHistoryBroadcastService>();
 
-// Add authentication
-builder.Services.AddSessionAuthentication();
+builder.Services.AddSessionAuth();
 builder.Services.AddAuthorization();
 
+builder.Services.AddHealthChecks().AddMaintenanceHealthCheck(true);
+
 var app = builder.Build();
-app.UseCommonHttpConfiguration();
 
-if (apiOptions.EnableOpenApi) app.MapCommonOpenApi(options => { options.WithTitle("Core WS"); });
-
-app.UseDomainCors([DomainApp.CoreApp], options =>
+app.MapPublicPort(appBuilder =>
 {
-    options.WithHeaders("content-type",
-        "sentry-trace",
-        "baggage",
-        "x-bypass-rate-limit",
-        "x-bypass-waf",
-        "x-requested-with",
-        "x-signalr-user-agent"
-    );
+    if (apiOptions.EnableOpenApi) appBuilder.UseCommonOpenApi();
+    appBuilder.UseDomainCors([DomainApp.CoreApp], options =>
+    {
+        options.WithHeaders("content-type",
+            "sentry-trace",
+            "baggage",
+            "x-bypass-rate-limit",
+            "x-bypass-waf",
+            "x-requested-with",
+            "x-signalr-user-agent"
+        );
+    });
+
+    appBuilder.UseAuthentication().UseAuthorization();
+
+    appBuilder.UseEndpoints(endpoints =>
+    {
+        if (apiOptions.EnableOpenApi) endpoints.MapCommonOpenApi(options => { options.WithTitle(apiName); });
+        endpoints.MapHub<MainHub>("/hub");
+    });
 });
 
-app.UseAuthentication().UseAuthorization();
-
-app.UseRouting();
-app.MapHub<MainHub>("/hub");
+app.MapInternalPort(appBuilder =>
+{
+    appBuilder.UseEndpoints(endpoints =>
+    {
+        endpoints.MapLivenessHealthCheck();
+        endpoints.MapReadinessHealthCheck();
+    });
+});
 
 await app.RunAsync();

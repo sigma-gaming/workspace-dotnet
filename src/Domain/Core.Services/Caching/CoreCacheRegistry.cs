@@ -39,8 +39,8 @@ public class CoreCacheRegistry(IConnectionMultiplexer connection, ICacheService 
             sessionId => $"{options.Version}:session:{sessionId}",
             TimeSpan.FromHours(1));
 
-    public IKeyedStringCacheEntity<Guid> SessionCodeToSessionId { get; } =
-        cacheService.CreateKeyedString<Guid>(
+    public IKeyedStringCacheEntity<string> SessionCodeToSessionId { get; } =
+        cacheService.CreateKeyedString<string>(
             sessionCode => $"sessionCodeToToken:{sessionCode}",
             TimeSpan.FromMinutes(5));
 

@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Common.Validation.Attributes;
 using Core.API.Infrastructure.RateLimiting;
+using Core.API.Metrics;
 using Core.Contracts.Data;
 using Core.Contracts.Enums;
+using Core.Contracts.Jsonb;
 using Core.Contracts.Mappers;
 using Core.Contracts.Public;
 using Core.Contracts.Updates;
@@ -83,9 +85,14 @@ public class GamesController(
 
             await pubSub.BalanceUpdated.TryPublishAsync(balanceUpdate);
 
+            var gameRecord = gameRecordMapper.ToData(playResult.GameRecord);
+            MetricsRegistry.UpdateBets(gameRecord);
+            if (gameRecord.Snapshot is GameSnapshotDice snapshot)
+                MetricsRegistry.Games.DiceSides.Observe(snapshot.InputSides.Length);
+
             return TypedResults.Ok(new PlayResponse
             {
-                Record = gameRecordMapper.ToData(playResult.GameRecord),
+                Record = gameRecord,
                 BalanceUpdate = balanceUpdate,
             });
         }
@@ -124,9 +131,14 @@ public class GamesController(
 
             await pubSub.BalanceUpdated.TryPublishAsync(balanceUpdate);
 
+            var gameRecord = gameRecordMapper.ToData(playResult.GameRecord);
+            MetricsRegistry.UpdateBets(gameRecord);
+            if (gameRecord.Snapshot is GameSnapshotPincode snapshot)
+                MetricsRegistry.Games.PincodeGames.WithLabels(snapshot.Mode.ToString()).Inc();
+
             return TypedResults.Ok(new PlayResponse
             {
-                Record = gameRecordMapper.ToData(playResult.GameRecord),
+                Record = gameRecord,
                 BalanceUpdate = balanceUpdate,
             });
         }

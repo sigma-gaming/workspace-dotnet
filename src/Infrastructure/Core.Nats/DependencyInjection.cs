@@ -9,7 +9,7 @@ namespace Core.Nats;
 
 public static class DependencyInjection
 {
-    public static CoreBuilder AddNats(
+    public static CoreBuilder AddCoreNats(
         this CoreBuilder builder,
         IConfiguration configuration)
     {

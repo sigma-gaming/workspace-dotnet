@@ -2,7 +2,7 @@ using Core.Contracts.Data;
 using Core.Contracts.Enums;
 using Core.Contracts.Jsonb;
 using Core.Db.Context;
-using Core.Services.Bots;
+using Core.Services.Telegram;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Services.Promotions.TaskCheckers;

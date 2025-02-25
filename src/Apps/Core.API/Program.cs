@@ -1,28 +1,35 @@
 using Common.Api.Extensions;
 using Common.Api.RateLimiting;
-using Common.Logging;
+using Common.Monitoring.HealthChecks;
+using Common.Monitoring.Logging;
 using Common.OpenApi.DocumentFilters;
 using Common.OpenApi.Extensions;
 using Core.API.Configuration;
 using Core.API.Infrastructure.RateLimiting;
 using Core.Builder;
+using Core.Cache;
+using Core.Cache.HealthChecks;
 using Core.Contracts;
 using Core.Contracts.Enums;
-using Core.Infrastructure;
+using Core.Db;
+using Core.Db.HealthChecks;
+using Core.Nats;
+using Core.Nats.HealthChecks;
 using Core.Services;
 using Core.Services.Auth;
 using Core.Services.System;
 using Microsoft.OpenApi.Models;
+using Prometheus;
 using Scalar.AspNetCore;
 
+const string apiName = "Core API";
 var builder = WebApplication.CreateSlimBuilder(args);
-
-builder.AddCommonHttpConfiguration().AddCommonMvcConfiguration();
-
-builder.AddLogging("Core API");
 
 var apiOptions = new ApiOptions();
 builder.Configuration.Bind("Api", apiOptions);
+
+builder.AddCommonHttpConfiguration().AddCommonMvcConfiguration();
+builder.AddLogging(apiName);
 
 if (apiOptions.EnableOpenApi)
     builder.Services.AddCommonOpenApi(options =>
@@ -43,17 +50,20 @@ if (apiOptions.EnableOpenApi)
 
 builder.Services.AddHttpClient();
 
-// Add infrastructure and domains
 builder.Services.Core()
-    .AddInfrastructure(builder.Configuration)
+    .AddCoreDb(builder.Configuration)
+    .AddCoreCache(builder.Configuration)
+    .AddCoreNats(builder.Configuration)
     .AddMappers()
-    .AddCommonServices()
+    .AddCommonServices(builder.Configuration)
+    .AddPubSub()
+    .AddSystem()
+    .AddChat()
+    .AddNotifications()
     .AddTelegram(builder.Configuration)
     .AddGlobalTasks();
 
-// Add authentication
-builder.Services.AddSessionAuthentication();
-builder.Services.AddAuthorization();
+builder.Services.AddSessionAuth();
 
 builder.Services.AddRateLimiting(options => options
     .WithBypassToken(apiOptions.RateLimitBypassToken)
@@ -77,23 +87,44 @@ builder.Services.AddRateLimiting(options => options
         RateLimitPolicies.Affiliate.Withdraw,
         new TokenBucketRateLimitSettings(3, 1, TimeSpan.FromMinutes(1))));
 
+builder.Services.AddHealthChecks()
+    .AddCoreDbHealthCheck(true)
+    .AddCoreCacheHealthCheck()
+    .AddCoreNatsHealthCheck()
+    .AddMaintenanceHealthCheck(true);
+
+builder.Services.AddMetrics();
+
 var app = builder.Build();
-app.UseCommonHttpConfiguration();
 
-if (apiOptions.EnableOpenApi) app.MapCommonOpenApi(options => { options.WithTitle("Core API"); });
-
-app.UseDomainCors([DomainApp.CoreApp], options =>
+app.MapPublicPort(appBuilder =>
 {
-    options.WithHeaders("content-type",
-        "sentry-trace",
-        "baggage",
-        "x-bypass-rate-limit",
-        "x-bypass-waf");
+    if (apiOptions.EnableOpenApi) appBuilder.UseCommonOpenApi();
+    appBuilder.UseDomainCors([DomainApp.CoreApp], options =>
+    {
+        options.WithHeaders("content-type",
+            "sentry-trace",
+            "baggage",
+            "x-bypass-rate-limit",
+            "x-bypass-waf");
+    });
+    appBuilder.UseRateLimiter();
+    appBuilder.UseSessionAuth();
+    appBuilder.UseEndpoints(endpoints =>
+    {
+        if (apiOptions.EnableOpenApi) endpoints.MapCommonOpenApi(options => { options.WithTitle(apiName); });
+        endpoints.MapControllers();
+    });
 });
 
-app.UseRateLimiter();
+app.MapInternalPort(appBuilder =>
+{
+    appBuilder.UseEndpoints(endpoints =>
+    {
+        endpoints.MapLivenessHealthCheck();
+        endpoints.MapReadinessHealthCheck();
+        endpoints.MapMetrics();
+    });
+});
 
-app.UseAuthentication().UseAuthorization();
-
-app.MapControllers();
 await app.RunAsync();

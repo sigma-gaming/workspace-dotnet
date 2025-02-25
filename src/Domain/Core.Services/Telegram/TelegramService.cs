@@ -3,7 +3,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace Core.Services.Bots;
+namespace Core.Services.Telegram;
 
 public class TelegramService(
     IOptions<TelegramOptions> options)

@@ -4,9 +4,9 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 
-namespace Common.Logging;
+namespace Common.Monitoring.Logging;
 
-public static class Logging
+public static class LoggingExtensions
 {
     public static WebApplicationBuilder AddLogging(this WebApplicationBuilder builder, string appName)
     {

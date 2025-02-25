@@ -39,7 +39,7 @@ public static class DependencyInjection
         {
             options.UseNpgsql(connectionString, npgsqOptions =>
             {
-                npgsqOptions.EnableRetryOnFailure();
+                npgsqOptions.EnableRetryOnFailure(3);
                 npgsqOptions.SetPostgresVersion(17, 0);
                 npgsqOptions.ConfigureDataSource(datasource => { datasource.EnableDynamicJson(); });
             });

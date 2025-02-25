@@ -3,6 +3,7 @@
 
 using Common.OpenApi.DocumentFilters;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
@@ -53,14 +54,21 @@ public static class OpenApiExtensions
         return services;
     }
 
-    public static WebApplication MapCommonOpenApi(
-        this WebApplication app,
+    public static IApplicationBuilder UseCommonOpenApi(
+        this IApplicationBuilder builder)
+    {
+        builder.UseSwagger(options => { options.RouteTemplate = "/openapi/{documentName}.json"; });
+
+        return builder;
+    }
+
+    public static IEndpointRouteBuilder MapCommonOpenApi(
+        this IEndpointRouteBuilder builder,
         Action<ScalarOptions>? configureOptions = null)
     {
-        app.MapSwagger();
-        app.UseSwagger(options => { options.RouteTemplate = "/openapi/{documentName}.json"; });
-        app.MapScalarApiReference(options => { configureOptions?.Invoke(options); });
+        builder.MapSwagger();
+        builder.MapScalarApiReference(options => { configureOptions?.Invoke(options); });
 
-        return app;
+        return builder;
     }
 }

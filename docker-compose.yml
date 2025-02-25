@@ -82,6 +82,8 @@ services:
     ports:
       - "4222:4222"
       - "8222:8222"
+    networks:
+      - sigma
     volumes:
       - ./compose/nats.conf:/etc/nats/nats.conf
       - jetstream:/data/jetstream

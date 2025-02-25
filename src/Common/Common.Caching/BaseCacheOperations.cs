@@ -14,11 +14,7 @@ public abstract class BaseCacheOperations(IConnectionMultiplexer redis, ILogger 
         Func<Task<TResult>> operation,
         TResult? defaultValue)
     {
-        if (!IsReady())
-        {
-            logger.LogWarning("Cache is not ready, skipping operation");
-            return defaultValue;
-        }
+        if (!IsReady()) return defaultValue;
 
         try
         {
@@ -33,11 +29,7 @@ public abstract class BaseCacheOperations(IConnectionMultiplexer redis, ILogger 
 
     protected async Task ExecuteWithSafetyAsync(Func<Task> operation)
     {
-        if (!IsReady())
-        {
-            logger.LogWarning("Cache is not ready, skipping operation");
-            return;
-        }
+        if (!IsReady()) return;
 
         try
         {
