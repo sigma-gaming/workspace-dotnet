@@ -42,6 +42,7 @@ public static class OpenApiExtensions
             .AddEndpointsApiExplorer()
             .AddSwaggerGen(options =>
             {
+                options.DescribeAllParametersInCamelCase();
                 options.SupportNonNullableReferenceTypes();
                 options.UseOneOfForPolymorphism();
                 options.UseAllOfToExtendReferenceSchemas();

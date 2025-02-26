@@ -1,5 +1,7 @@
+using Core.Contracts.Data;
 using Core.Contracts.Entities;
 using Core.Contracts.Enums;
+using Core.Contracts.Mappers;
 using Core.Db.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -7,10 +9,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Services.System;
 
-public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFactory, ILogger<DomainService> logger)
+public sealed class DomainService(
+    IDbContextFactory<CoreDbContext> dbContextFactory,
+    ILogger<DomainService> logger,
+    DomainMapper mapper)
     : BackgroundService
 {
-    private readonly List<DomainEntity> cached = new();
+    private readonly List<Domain> cached = [];
     private readonly TimeSpan refreshInterval = TimeSpan.FromMinutes(5);
     private readonly TimeSpan retryDelay = TimeSpan.FromSeconds(5);
 
@@ -30,7 +35,7 @@ public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFact
         {
             var domains = await QueryDomainsAsync();
             cached.Clear();
-            cached.AddRange(domains);
+            cached.AddRange(domains.Select(mapper.ToData));
             logger.LogInformation("Refreshed domains");
         }
         catch (Exception ex)
@@ -59,7 +64,7 @@ public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFact
             }
     }
 
-    public IReadOnlyList<DomainEntity> GetDomains(params DomainApp[]? apps)
+    public IReadOnlyList<Domain> GetDomains(params DomainApp[]? apps)
     {
         if (apps is null || apps.Length == 0)
             return cached;
@@ -67,12 +72,12 @@ public sealed class DomainService(IDbContextFactory<CoreDbContext> dbContextFact
         return cached.Where(d => apps.Contains(d.App)).ToList();
     }
 
-    public DomainEntity? GetLatestDomain(DomainApp app)
+    public Domain? GetLatestDomain(DomainApp app)
     {
         return cached.FirstOrDefault(d => d.App == app);
     }
 
-    public IReadOnlyList<DomainEntity> GetDomainsByApp(DomainApp app)
+    public IReadOnlyList<Domain> GetDomainsByApp(DomainApp app)
     {
         return cached.Where(d => d.App == app).ToList();
     }

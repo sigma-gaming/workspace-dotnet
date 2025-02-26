@@ -17,9 +17,19 @@ http:
         - web
       service: auth-app
       tls: {}
+    auth-api:
+      rule: "Host(`api.auth.local`)"
+      entryPoints:
+        - web
+      service: auth-api
+      tls: {}
 
   services:
     auth-app:
       loadBalancer:
         servers:
           - url: "http://host.docker.internal:4321"
+    auth-api:
+      loadBalancer:
+        servers:
+          - url: "https://host.docker.internal:5140"

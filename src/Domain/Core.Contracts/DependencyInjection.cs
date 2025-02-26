@@ -28,6 +28,7 @@ public static class DependencyInjection
         builder.Services.AddSingleton<PromocodeMapper>();
         builder.Services.AddSingleton<NotificationMapper>();
         builder.Services.AddSingleton<ChatMessageMapper>();
+        builder.Services.AddSingleton<DomainMapper>();
 
         return builder;
     }
