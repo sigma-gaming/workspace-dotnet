@@ -11,7 +11,7 @@ namespace Access.API.Controllers;
 public sealed record ExchangePayload
 {
     public required string Code { get; init; }
-    public required Uri RedirectUrl { get; init; }
+    public required Uri ReturnUrl { get; init; }
 }
 
 public sealed record RefreshResponse
@@ -48,7 +48,7 @@ public class SessionController(
         if (session is null)
             return TypedResults.BadRequest("Сессия истекла или не существует, повторите вход");
 
-        var hostname = payload.RedirectUrl.Host;
+        var hostname = payload.ReturnUrl.Host;
         var domain = SessionManager.GetBaseDomain(HttpContext);
 
         if (hostname != domain && !hostname.EndsWith("." + domain))
@@ -57,7 +57,7 @@ public class SessionController(
         await cache.SessionCodeToSessionId.DeleteAsync(payload.Code);
         sessionManager.AttachSession(HttpContext, new SessionInfo(sessionId, session.ExpiresAt));
 
-        return TypedResults.Redirect(payload.RedirectUrl.ToString());
+        return TypedResults.Redirect(payload.ReturnUrl.ToString());
     }
 
     [Authorize]

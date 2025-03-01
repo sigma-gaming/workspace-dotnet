@@ -14,6 +14,7 @@ public class SessionAuthenticationOptions : AuthenticationSchemeOptions
 public class SessionAuthenticationHandler(
     SessionService sessionService,
     IOptionsMonitor<SessionAuthenticationOptions> options,
+    IOptions<SessionOptions> sessionOptions,
     ILoggerFactory logger,
     UrlEncoder encoder)
     : AuthenticationHandler<SessionAuthenticationOptions>(options, logger, encoder)
@@ -53,8 +54,10 @@ public class SessionAuthenticationHandler(
                     ? headerSessionId
                     : null;
 
-        return Request.Cookies.ContainsKey("session_id")
-            ? Guid.TryParse(Request.Cookies["session_id"], out var cookieSessionId) ? cookieSessionId : null
+        return Request.Cookies.ContainsKey(sessionOptions.Value.SessionIdKey)
+            ? Guid.TryParse(Request.Cookies[sessionOptions.Value.SessionIdKey], out var cookieSessionId)
+                ? cookieSessionId
+                : null
             : null;
     }
 }

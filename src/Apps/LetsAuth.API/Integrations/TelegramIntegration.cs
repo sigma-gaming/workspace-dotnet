@@ -7,12 +7,12 @@ namespace LetsAuth.API.Integrations;
 
 public sealed record TelegramAuthData
 {
-    public required string Id { get; init; }
+    public required long Id { get; init; }
     public required string FirstName { get; init; }
     public string? LastName { get; init; }
     public string? Username { get; init; }
     public string? PhotoUrl { get; init; }
-    public required string AuthDate { get; init; }
+    public required long AuthDate { get; init; }
     public required string Hash { get; init; }
 }
 
@@ -27,9 +27,9 @@ public class TelegramIntegration(ILogger<TelegramIntegration> logger, IOptions<T
             // Build the data check string by sorting parameters
             var dataCheckParams = new Dictionary<string, string>
             {
-                ["id"] = authData.Id,
+                ["id"] = authData.Id.ToString(),
                 ["first_name"] = authData.FirstName,
-                ["auth_date"] = authData.AuthDate,
+                ["auth_date"] = authData.AuthDate.ToString(),
             };
 
             // Add optional parameters if present

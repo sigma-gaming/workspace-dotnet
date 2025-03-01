@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Core.Services.Vk;
 using Microsoft.Extensions.Options;
 
@@ -6,6 +7,11 @@ namespace LetsAuth.API.Integrations;
 
 public class VkIntegration(HttpClient httpClient, ILogger<VkIntegration> logger, IOptions<VkOptions> options)
 {
+    private static readonly JsonSerializerOptions VkJsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+    };
+
     public async Task<VkTokenExchangeResponse> ExchangeSilentAuthToken(string token, string uuid)
     {
         try
@@ -17,15 +23,11 @@ public class VkIntegration(HttpClient httpClient, ILogger<VkIntegration> logger,
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            var responseObj = JsonSerializer.Deserialize<VkResponse<VkTokenExchangeResponse>>(content);
+            var responseObj = JsonSerializer.Deserialize<VkResponse<VkTokenExchangeResponse>>(content, VkJsonOptions);
 
-            if (responseObj?.Response == null)
-            {
-                logger.LogError("Failed to exchange VK silent auth token. Response: {Response}", content);
-                throw new Exception("Failed to exchange VK auth token");
-            }
-
-            return responseObj.Response;
+            if (responseObj?.Response != null) return responseObj.Response;
+            logger.LogError("Failed to exchange VK silent auth token. Response: {Response}", content);
+            throw new Exception("Failed to exchange VK auth token");
         }
         catch (HttpRequestException ex)
         {
@@ -49,15 +51,11 @@ public class VkIntegration(HttpClient httpClient, ILogger<VkIntegration> logger,
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            var responseObj = JsonSerializer.Deserialize<VkResponse<VkProfileResponse>>(content);
+            var responseObj = JsonSerializer.Deserialize<VkResponse<VkProfileResponse>>(content, VkJsonOptions);
 
-            if (responseObj?.Response == null)
-            {
-                logger.LogError("Failed to get VK profile. Response: {Response}", content);
-                throw new Exception("Failed to get VK profile");
-            }
-
-            return responseObj.Response;
+            if (responseObj?.Response != null) return responseObj.Response;
+            logger.LogError("Failed to get VK profile. Response: {Response}", content);
+            throw new Exception("Failed to get VK profile");
         }
         catch (HttpRequestException ex)
         {
@@ -113,7 +111,7 @@ public sealed record VkTokenExchangeResponse
 public sealed record VkProfileResponse
 {
     public required int Id { get; init; }
-    public string? Photo200 { get; init; }
+    [JsonPropertyName("photo_200")] public string? Photo200 { get; init; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
     public string? ScreenName { get; init; }

@@ -4,6 +4,7 @@ using Common.Api.Extensions;
 using Common.Api.RateLimiting;
 using Common.Monitoring.HealthChecks;
 using Common.Monitoring.Logging;
+using Common.OpenApi.DocumentFilters;
 using Common.OpenApi.Extensions;
 using Core.Builder;
 using Core.Cache;
@@ -39,6 +40,8 @@ if (apiOptions.EnableOpenApi)
             In = ParameterLocation.Header,
             Name = "Authorization",
         });
+
+        options.DocumentFilter<IncludeModelDocumentFilter<AuthenticationAction>>();
     });
 
 builder.Services.AddHttpClient();

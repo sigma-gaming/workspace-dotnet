@@ -72,6 +72,7 @@ app.MapPublicPort(appBuilder =>
     appBuilder.UseCors(options =>
     {
         options.WithOrigins(apiOptions.ClientUrl)
+            .WithHeaders("content-type")
             .AllowCredentials()
             .AllowAnyMethod()
             .SetPreflightMaxAge(TimeSpan.FromDays(1));

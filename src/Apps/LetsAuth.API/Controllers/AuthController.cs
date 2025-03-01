@@ -6,7 +6,6 @@ using Core.Contracts.Enums;
 using Core.Services.Auth;
 using Core.Services.Caching;
 using Core.Services.User;
-using LetsAuth.API.Contracts;
 using LetsAuth.API.Infrastructure.RateLimiting;
 using LetsAuth.API.Integrations;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -37,9 +36,21 @@ public class AuthController(
     TelegramIntegration telegramIntegration,
     VkIntegration vkIntegration,
     FraudService fraudService,
-    CoreCacheRegistry cache) : ControllerBase
+    CoreCacheRegistry cache,
+    ILogger<AuthController> logger) : ControllerBase
 {
     private const string LATIN_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    private static readonly JsonSerializerOptions VkJsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+    };
+
+    private static readonly JsonSerializerOptions TelegramJsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+    };
+
     private static readonly string CodeAlphabet = $"{LATIN_ALPHABET}{LATIN_ALPHABET.ToLower()}0123456789";
 
     private string? GetAppCookie(string app, string cookieName)
@@ -81,7 +92,7 @@ public class AuthController(
         try
         {
             var jsonPayload = Encoding.UTF8.GetString(Convert.FromBase64String(payload));
-            authData = JsonSerializer.Deserialize<TelegramAuthData>(jsonPayload);
+            authData = JsonSerializer.Deserialize<TelegramAuthData>(jsonPayload, TelegramJsonOptions);
 
             if (authData is null) throw new Exception("Invalid Telegram payload");
         }
@@ -93,7 +104,7 @@ public class AuthController(
         if (!telegramIntegration.VerifyAuthHash(authData))
             throw new Exception("Invalid Telegram authentication data");
 
-        var authTimestamp = long.Parse(authData.AuthDate) * 1000;
+        var authTimestamp = authData.AuthDate * 1000;
         var validUntil = DateTimeOffset.FromUnixTimeMilliseconds(authTimestamp)
             .AddHours(1);
 
@@ -105,7 +116,7 @@ public class AuthController(
         {
             UserId = userId,
             Provider = AccountProvider.Telegram,
-            ProviderUserId = authData.Id,
+            ProviderUserId = authData.Id.ToString(),
             ProviderUsername = authData.Username,
             ProviderUserFirstName = authData.FirstName,
             ProviderUserLastName = authData.LastName,
@@ -121,21 +132,20 @@ public class AuthController(
 
         try
         {
-            authData = JsonSerializer.Deserialize<VkAuthData>(payload);
+            authData = JsonSerializer.Deserialize<VkAuthData>(payload, VkJsonOptions);
 
             if (authData is null || authData.Type != "silent_token") throw new Exception("Invalid VK payload");
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
-            throw new Exception("Invalid JSON in VK payload");
+            logger.LogError(ex, "Invalid VK payload");
+            throw;
         }
 
-        // Exchange token
         var tokenExchangeResult = await vkIntegration.ExchangeSilentAuthToken(
             authData.Token,
             authData.Uuid);
 
-        // Get profile information
         var vkProfile = await vkIntegration.GetProfile(tokenExchangeResult.AccessToken);
 
         return new Core.Services.Auth.AuthenticatePayload

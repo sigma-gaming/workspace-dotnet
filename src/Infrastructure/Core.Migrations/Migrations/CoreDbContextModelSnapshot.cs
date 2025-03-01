@@ -840,11 +840,11 @@ namespace Core.Migrations.Migrations
                         .HasColumnName("referrer_id");
 
                     b.Property<DateTime?>("LastPayoutAt")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_payout_at");
 
                     b.Property<DateTime>("NextPayoutAt")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("next_payout_at");
 
                     b.HasKey("ReferrerId");

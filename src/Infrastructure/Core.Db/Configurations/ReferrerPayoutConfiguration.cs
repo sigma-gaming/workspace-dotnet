@@ -16,10 +16,10 @@ public class ReferrerPayoutConfiguration : IEntityTypeConfiguration<ReferrerPayo
             .ValueGeneratedNever()
             .HasColumnName("referrer_id");
         entity.Property(e => e.LastPayoutAt)
-            .HasColumnType("timestamp without time zone")
+            .HasColumnType("timestamp with time zone")
             .HasColumnName("last_payout_at");
         entity.Property(e => e.NextPayoutAt)
-            .HasColumnType("timestamp without time zone")
+            .HasColumnType("timestamp with time zone")
             .HasColumnName("next_payout_at");
 
         entity.HasOne(d => d.Referrer).WithOne(p => p.ReferrerPayout)

@@ -142,7 +142,9 @@ public class AuthService(
                     a.UserId == payload.UserId &&
                     a.Provider == payload.Provider);
 
-            if (connectedAccount?.ProviderUserId != payload.ProviderUserId)
+            logger.LogInformation("Connected account: {Account}", connectedAccount);
+
+            if (connectedAccount is not null && connectedAccount.ProviderUserId != payload.ProviderUserId)
                 return AuthResult.AnotherAccountConnected();
 
             if (account is not null)
@@ -200,6 +202,7 @@ public class AuthService(
                 ReferrerId = referrerId,
                 ReferralCampaignId = referralCampaignId,
                 Virtual = payload.Virtual ?? false,
+                Roles = [UserRole.User],
             };
 
             await db.Users.AddAsync(createdUserEntity);
