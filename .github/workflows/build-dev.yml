@@ -32,7 +32,7 @@ jobs:
     runs-on: [ ubuntu-22.04 ]
 
     outputs:
-      apps: ${{ steps.affected.outputs.affected_apps }}
+      apps: ${{ steps.affected.outputs.affected }}
 
     steps:
       - uses: actions/checkout@v4
