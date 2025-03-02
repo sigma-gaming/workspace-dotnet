@@ -126,7 +126,7 @@ jobs:
               - ${BASE_CACHE_IMAGE}
           EOF
 
-          echo "images:" >> cloudbuild.yaml
+          IMAGES=""
           
           while IFS= read -r project; do
           project_name=$(basename "$project" .csproj)
@@ -156,7 +156,11 @@ jobs:
           echo "  - ${IMAGE}:latest" >> cloudbuild.yaml
           echo "  - ${IMAGE}:dev-${TIMESTAMP}" >> cloudbuild.yaml
           
+          IMAGES="${IMAGES}  - ${IMAGE}:latest\n  - ${IMAGE}:dev-${TIMESTAMP}\n"
           done <<< "$filtered"
+          
+          echo "images:" >> cloudbuild.yaml
+          echo -e "${IMAGES}" >> cloudbuild.yaml
           
           echo "===== Generated cloudbuild.yaml ====="
           cat cloudbuild.yaml
