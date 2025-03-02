@@ -113,8 +113,9 @@ jobs:
               - --target=build
               - --tag=${BASE_CACHE_IMAGE}
               - .
-          EOF
 
+          EOF
+          
           cat <<EOF >> cloudbuild.yaml
           - name: "gcr.io/cloud-builders/docker"
             id: "push-base"
@@ -153,9 +154,6 @@ jobs:
               - .
           EOF
           
-          echo "  - ${IMAGE}:latest" >> cloudbuild.yaml
-          echo "  - ${IMAGE}:dev-${TIMESTAMP}" >> cloudbuild.yaml
-          
           IMAGES="${IMAGES}  - ${IMAGE}:latest\n  - ${IMAGE}:dev-${TIMESTAMP}\n"
           done <<< "$filtered"
           
@@ -164,3 +162,13 @@ jobs:
           
           echo "===== Generated cloudbuild.yaml ====="
           cat cloudbuild.yaml
+
+      - name: Submit build to Cloud Build
+        run: |
+          if [ -f cloudbuild.yaml ]; then
+            gcloud builds submit . \
+              --config cloudbuild.yaml \
+              --region europe-west1 \
+              --async
+          else
+            echo "No cloudbuild.yaml generated, skipping."
