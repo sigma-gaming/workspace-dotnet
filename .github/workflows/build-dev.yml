@@ -165,10 +165,7 @@ jobs:
 
       - name: Submit build to Cloud Build
         run: |
-          if [ -f cloudbuild.yaml ]; then
-            gcloud builds submit . \
-              --config cloudbuild.yaml \
-              --region europe-west1 \
-              --async
-          else
-            echo "No cloudbuild.yaml generated, skipping."
+          gcloud builds submit . \
+            --config cloudbuild.yaml \
+            --region europe-west1 \
+            --async
