@@ -50,7 +50,7 @@ jobs:
       - uses: leonardochaia/dotnet-affected-action@v1.4
         id: affected
         with:
-          from: ${{ github.event.inputs.from  }}
+          from: ${{ steps.shas.outputs.base  }}
           to: ${{ steps.shas.outputs.head }}
 
       - name: Install dependencies
