@@ -29,13 +29,14 @@ COPY src/Apps/Affiliate.API/Affiliate.API.csproj src/Apps/Affiliate.API/
 COPY src/Apps/Domain.API/Domain.API.csproj src/Apps/Domain.API/
 
 RUN dotnet restore
+RUN dotnet build Sigma.sln --no-restore
 
 FROM build AS publish
 COPY . .
 
 ARG APP_NAME
 ENV APP_PROJECT=src/Apps/$APP_NAME/$APP_NAME.csproj
-RUN dotnet publish $APP_PROJECT -c Release -o /app --no-restore
+RUN dotnet publish $APP_PROJECT -c Release -o /app --no-build
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 ARG APP_NAME
