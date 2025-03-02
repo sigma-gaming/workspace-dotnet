@@ -31,7 +31,7 @@ if (apiOptions.EnableOpenApi)
         options.AddServer(new OpenApiServer { Url = "http://localhost:8080" });
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
-            Description = "Authorization header using the Bearer scheme (session)",
+            Description = "Authorization header using the Bearer scheme (session id)",
             Type = SecuritySchemeType.ApiKey,
             In = ParameterLocation.Header,
             Name = "Authorization",

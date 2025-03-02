@@ -1,0 +1,66 @@
+name: Build development images with Google Cloud Build
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+    inputs:
+      from:
+        description: SHA for base commit to find affected apps
+
+env:
+  DOCKER_REGISTRY: europe-west4-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  timestamp:
+    name: Get current unix timestamp
+    runs-on: [ubuntu-22.04]
+
+    outputs:
+      timestamp: ${{ steps.timestamp.outputs.timestamp }}
+
+    steps:
+      - name: Get current unix timestamp
+        id: timestamp
+        uses: release-kit/unix-timestamp@v1
+
+  affected:
+    name: Get affected apps
+    runs-on: [ubuntu-22.04]
+
+    outputs:
+      apps: ${{ steps.affected.outputs.affected_apps }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        id: shas
+        uses: nrwl/nx-set-shas@v4
+
+      - uses: leonardochaia/dotnet-affected-action@v1.4
+        id: affected
+        with:
+          from: ${{ github.event.inputs.from  }}
+          to: ${{ steps.shas.outputs.head }}
+
+      - name: Install dependencies
+        if: steps.affected.outputs.affected != ''
+        run: dotnet restore affected.proj
+        
+      - name: Build
+        if: steps.affected.outputs.affected != ''
+        run: dotnet build --configuration Release --no-restore affected.proj
+        
+      - name: Test
+        if: steps.affected.outputs.affected != ''
+        run: dotnet test --no-restore --verbosity normal affected.proj
