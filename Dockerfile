@@ -15,11 +15,11 @@ COPY src/Infrastructure/Core.Builder/Core.Builder.csproj src/Infrastructure/Core
 COPY src/Infrastructure/Core.Cache/Core.Cache.csproj src/Infrastructure/Core.Cache/
 COPY src/Infrastructure/Core.Nats/Core.Nats.csproj src/Infrastructure/Core.Nats/
 COPY src/Infrastructure/Core.Db/Core.Db.csproj src/Infrastructure/Core.Db/
-COPY src/Infrastructure/Core.Migrations/Core.Migrations.csproj src/Infrastructure/Core.Migrations/
 
 COPY src/Domain/Core.Contracts/Core.Contracts.csproj src/Domain/Core.Contracts/
 COPY src/Domain/Core.Services/Core.Services.csproj src/Domain/Core.Services/
 
+COPY src/Apps/Core.Migrations/Core.Migrations.csproj src/Apps/Core.Migrations/
 COPY src/Apps/Core.API/Core.API.csproj src/Apps/Core.API/
 COPY src/Apps/Core.WS/Core.WS.csproj src/Apps/Core.WS/
 COPY src/Apps/Access.API/Access.API.csproj src/Apps/Access.API/

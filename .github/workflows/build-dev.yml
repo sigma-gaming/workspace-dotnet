@@ -69,7 +69,7 @@ jobs:
     name: Build Docker Images in Google Cloud
     runs-on: [ ubuntu-22.04 ]
     needs: [ timestamp, affected ]
-    if: ${{ needs.affected.outputs.apps != '' }}  # Если нет затронутых проектов, пропускаем
+    if: ${{ needs.affected.outputs.apps != '' }}
 
     steps:
       - name: Check out code
@@ -98,7 +98,7 @@ jobs:
           fi
 
           TIMESTAMP="${{ needs.timestamp.outputs.timestamp }}"
-          BASE_CACHE_IMAGE="${DOCKER_REGISTRY}/base-cache"
+          BASE_CACHE_IMAGE="${DOCKER_REGISTRY}/dotnet-cache"
 
           echo "steps:" > cloudbuild.yaml
           
