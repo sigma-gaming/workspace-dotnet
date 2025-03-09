@@ -21,11 +21,6 @@ public static class DependencyInjection
         var options = new NatsOpts
         {
             Url = natsOptions.Url,
-            AuthOpts = new NatsAuthOpts
-            {
-                Username = natsOptions.Username,
-                Password = natsOptions.Password,
-            },
         };
 
         var connection = new NatsConnection(options);
