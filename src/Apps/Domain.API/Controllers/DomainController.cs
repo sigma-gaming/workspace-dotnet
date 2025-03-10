@@ -29,9 +29,10 @@ public class DomainController(DomainService domainService) : ControllerBase
 
     [ProducesResponseType<Core.Contracts.Data.Domain>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/domains/latest")]
-    public Ok<Core.Contracts.Data.Domain> GetLatestDomain([FromQuery] GetLatestDomainPayload payload)
+    public Results<Ok<Core.Contracts.Data.Domain>, NotFound> GetLatestDomain([FromQuery] GetLatestDomainPayload payload)
     {
         var domain = domainService.GetLatestDomain(payload.App);
+        if (domain is null) return TypedResults.NotFound();
         return TypedResults.Ok(domain);
     }
 }
