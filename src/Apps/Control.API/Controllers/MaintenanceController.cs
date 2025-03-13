@@ -32,7 +32,7 @@ public class MaintenanceController(
     CorePubSubRegistry pubSub) : ControllerBase
 {
     [ProducesResponseType<GetMaintenanceStateResponse>(StatusCodes.Status200OK, "application/json")]
-    [HttpGet("/maintenance/get-state")]
+    [HttpGet("/maintenance/state")]
     public async Task<Ok<GetMaintenanceStateResponse>> GetState()
     {
         var maintenanceEnabled = await maintenanceService.IsMaintenanceEnabledAsync();
@@ -47,7 +47,7 @@ public class MaintenanceController(
 
     [AuthorizeRoles(UserRole.Admin)]
     [ProducesResponseType<UpdateMaintenanceStateResponse>(StatusCodes.Status200OK, "application/json")]
-    [HttpPost("/maintenance/update-state")]
+    [HttpPut("/maintenance/state")]
     public async Task<Results<Ok<UpdateMaintenanceStateResponse>, ValidationProblem>> UpdateState(
         [FromBody] UpdateMaintenanceStatePayload payload)
     {

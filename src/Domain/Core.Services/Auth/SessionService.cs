@@ -60,6 +60,7 @@ public class SessionService(
             ReferrerId = payload.ReferrerId,
             ReferralCampaignId = payload.ReferralCampaignId,
             Provider = payload.Provider,
+            Roles = user.Roles,
             ExpiresAt = expiresAt,
         };
 

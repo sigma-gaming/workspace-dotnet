@@ -25,7 +25,7 @@ public sealed record CreatePromocodePayload
 
     public string? Code { get; init; }
 
-    [Required] public required string ExpiresAt { get; init; }
+    [Required] public required DateTime ExpiresAt { get; init; }
 
     [Required] public required PromocodeBonusType BonusType { get; init; }
 
@@ -57,9 +57,8 @@ public sealed record GeneratePromocodeResponse
 [ApiController]
 public class PromocodesController(CoreDbContext db) : ControllerBase
 {
-    [AuthorizeRoles(UserRole.Admin)]
     [ProducesResponseType<GeneratePromocodeResponse>(StatusCodes.Status200OK, "application/json")]
-    [HttpPost("/promocodes/generate")]
+    [HttpGet("/promocodes/random")]
     public Ok<GeneratePromocodeResponse> Generate()
     {
         var promocode = PromocodeService.GenerateOne();
@@ -87,7 +86,7 @@ public class PromocodesController(CoreDbContext db) : ControllerBase
                 [nameof(CreatePromocodePayload.MaxUsages)] = ["Персональный промокод должен быть одноразовым"],
             });
 
-        if (DateTime.UtcNow >= DateTime.Parse(payload.ExpiresAt))
+        if (DateTime.UtcNow >= payload.ExpiresAt)
             return TypedResults.ValidationProblem(new Dictionary<string, string[]>
             {
                 [nameof(CreatePromocodePayload.ExpiresAt)] = ["Дата истечения уже наступила"],
@@ -146,7 +145,7 @@ public class PromocodesController(CoreDbContext db) : ControllerBase
                     MaxUsages = payload.MaxUsages,
                     IsActive = payload.IsActive,
                     UserId = payload.UserId,
-                    ExpiresAt = DateTime.Parse(payload.ExpiresAt),
+                    ExpiresAt = payload.ExpiresAt,
                     CreatedBy = userId,
                 });
 
