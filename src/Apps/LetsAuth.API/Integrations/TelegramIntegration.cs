@@ -18,6 +18,19 @@ public sealed record TelegramAuthData
 
 public class TelegramIntegration(ILogger<TelegramIntegration> logger, IOptions<TelegramOptions> options)
 {
+    public static string NormalizeTelegramPayload(string base64)
+    {
+        var padding = 4 - base64.Length % 4;
+
+        if (padding == 1)
+            throw new FormatException("Invalid base64 string");
+
+        if (padding is 2 or 3)
+            base64 += new string('=', padding);
+
+        return base64;
+    }
+
     public bool VerifyAuthHash(TelegramAuthData authData)
     {
         try

@@ -91,7 +91,8 @@ public class AuthController(
 
         try
         {
-            var jsonPayload = Encoding.UTF8.GetString(Convert.FromBase64String(payload));
+            var normalized = TelegramIntegration.NormalizeTelegramPayload(payload);
+            var jsonPayload = Encoding.UTF8.GetString(Convert.FromBase64String(normalized));
             authData = JsonSerializer.Deserialize<TelegramAuthData>(jsonPayload, TelegramJsonOptions);
 
             if (authData is null) throw new Exception("Invalid Telegram payload");
