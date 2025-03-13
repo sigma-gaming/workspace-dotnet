@@ -98,6 +98,7 @@ public class AuthController(
         }
         catch (Exception ex) when (ex is FormatException or JsonException)
         {
+            logger.LogError(ex, "Invalid Telegram payload format");
             throw new Exception("Invalid Telegram payload format");
         }
 
