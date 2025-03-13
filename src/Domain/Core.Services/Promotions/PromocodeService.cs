@@ -56,7 +56,7 @@ public class PromocodeService(
 {
     private const string DEFAULT_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    private static string GenerateOne(int length = 10, string alphabet = DEFAULT_ALPHABET)
+    public static string GenerateOne(int length = 10, string alphabet = DEFAULT_ALPHABET)
     {
         var random = new Random();
         return new string(Enumerable.Range(0, length)

@@ -27,6 +27,7 @@ COPY src/Apps/LetsAuth.API/LetsAuth.API.csproj src/Apps/LetsAuth.API/
 COPY src/Apps/Redirect.API/Redirect.API.csproj src/Apps/Redirect.API/
 COPY src/Apps/Affiliate.API/Affiliate.API.csproj src/Apps/Affiliate.API/
 COPY src/Apps/Domain.API/Domain.API.csproj src/Apps/Domain.API/
+COPY src/Apps/Control.API/Control.API.csproj src/Apps/Control.API/
 
 RUN dotnet restore
 
