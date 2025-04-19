@@ -1,0 +1,8 @@
+{
+  "Payment": {
+    "Plisio": {
+      "ApiKey": "your-plisio-api-key",
+      "ApiUrl": "https://plisio.net/api/v1"
+    }
+  }
+}

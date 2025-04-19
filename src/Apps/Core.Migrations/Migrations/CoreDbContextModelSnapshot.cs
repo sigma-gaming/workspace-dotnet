@@ -1265,6 +1265,58 @@ namespace Core.Migrations.Migrations
                     b.ToTable("user_stats", (string)null);
                 });
 
+            modelBuilder.Entity("Core.Contracts.Entities.UserWalletEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v7()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<short>("Currency")
+                        .HasColumnType("smallint")
+                        .HasColumnName("currency");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<short>("Provider")
+                        .HasColumnType("smallint")
+                        .HasColumnName("provider");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("WalletAddress")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("wallet_address");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Provider", "Currency")
+                        .IsUnique()
+                        .HasFilter("is_active = true");
+
+                    b.ToTable("user_wallet", (string)null);
+                });
+
             modelBuilder.Entity("Core.Contracts.Entities.WithdrawalEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1637,6 +1689,17 @@ namespace Core.Migrations.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Core.Contracts.Entities.UserWalletEntity", b =>
+                {
+                    b.HasOne("Core.Contracts.Entities.UserEntity", "User")
+                        .WithMany("UserWallets")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Core.Contracts.Entities.WithdrawalEntity", b =>
                 {
                     b.HasOne("Core.Contracts.Entities.TransactionEntity", "Transaction")
@@ -1735,6 +1798,8 @@ namespace Core.Migrations.Migrations
                     b.Navigation("UserSecurity");
 
                     b.Navigation("UserStats");
+
+                    b.Navigation("UserWallets");
 
                     b.Navigation("Withdrawals");
                 });

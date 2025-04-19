@@ -46,23 +46,26 @@ public enum DepositType
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum DepositMethod
 {
-    Sbp,
-    CreditCard,
-    Piastrix,
-    Toncoin,
+    Plisio,
+    CryptoCloud,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum WithdrawalMethod
 {
-    Sbp,
-    CreditCard,
-    Piastrix,
+    Plisio,
+    CryptoCloud,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum PaymentProvider
 {
-    Bovapay,
-    Test,
+    Plisio,
+    CryptoCloud,
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum DepositInstructionsType
+{
+    CryptoWallet,
 }

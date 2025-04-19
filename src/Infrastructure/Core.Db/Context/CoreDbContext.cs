@@ -67,6 +67,8 @@ public class CoreDbContext : DbContext
 
     public virtual DbSet<WithdrawalEntity> Withdrawals { get; set; }
 
+    public virtual DbSet<UserWalletEntity> UserWallets { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ConfigEntity>().HasData(

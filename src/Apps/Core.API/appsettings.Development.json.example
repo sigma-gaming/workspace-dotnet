@@ -1,0 +1,18 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "Payment": {
+    "Plisio": {
+      "ApiKey": "your-plisio-api-key",
+      "ApiUrl": "https://plisio.net/api/v1",
+      "CallbackUrl": "https://your-domain.com/api/webhooks/plisio",
+      "DefaultCurrency": "TON",
+      "DefaultFiatCurrency": "USD",
+      "InvoiceExpirationMinutes": 60
+    }
+  }
+}

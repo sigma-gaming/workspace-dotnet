@@ -92,8 +92,8 @@ public class AuthService(
     AffiliateService affiliateService,
     AccountMapper accountMapper,
     UserMapper userMapper,
-    ILogger<AuthService> logger,
-    HttpClient httpClient)
+    HttpClient httpClient,
+    ILogger<AuthService>? logger = null)
 {
     private static string GetUserFullName(string firstName, string? lastName)
     {
@@ -109,7 +109,7 @@ public class AuthService(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to validate image URL: {ImageUrl}", imageUrl);
+            logger?.LogWarning(ex, "Failed to validate image URL: {ImageUrl}", imageUrl);
             return null;
         }
     }
@@ -142,7 +142,7 @@ public class AuthService(
                     a.UserId == payload.UserId &&
                     a.Provider == payload.Provider);
 
-            logger.LogInformation("Connected account: {Account}", connectedAccount);
+            logger?.LogInformation("Connected account: {Account}", connectedAccount);
 
             if (connectedAccount is not null && connectedAccount.ProviderUserId != payload.ProviderUserId)
                 return AuthResult.AnotherAccountConnected();

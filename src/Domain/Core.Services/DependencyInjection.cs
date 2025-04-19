@@ -11,6 +11,11 @@ using Core.Services.Finance.Api;
 using Core.Services.Gaming;
 using Core.Services.Gaming.Runners;
 using Core.Services.Notifications;
+using Core.Services.Payment;
+using Core.Services.Payment.Interfaces;
+using Core.Services.Payment.Providers;
+using Core.Services.Payment.Providers.Plisio;
+using Core.Services.Payment.Providers.CryptoCloud;
 using Core.Services.Promotions;
 using Core.Services.Promotions.TaskCheckers;
 using Core.Services.PubSub;
@@ -116,6 +121,37 @@ public static class DependencyInjection
         builder.Services.AddScoped<VkGroupSubscribeChecker>();
         builder.Services.AddScoped<VkPinnedRepostChecker>();
         builder.Services.AddScoped<GlobalTaskCheckerProvider>();
+
+        return builder;
+    }
+
+    public static CoreBuilder AddPayment(this CoreBuilder builder, IConfiguration configuration)
+    {
+        // Register Plisio services
+        builder.Services.Configure<PlisioOptions>(configuration.GetSection("Payment:Plisio"));
+        builder.Services.AddHttpClient<PlisioApiClient>();
+        builder.Services.AddScoped<PlisioApiClient>();
+        builder.Services.AddScoped<PlisioPaymentProvider>();
+        builder.Services.AddScoped<PlisioWebhookHandler>();
+        builder.Services.AddScoped<IPaymentProviderService, PlisioPaymentProvider>();
+        builder.Services.AddScoped<IDepositProvider>(sp => sp.GetRequiredService<PlisioPaymentProvider>());
+        builder.Services.AddScoped<IWithdrawalProvider>(sp => sp.GetRequiredService<PlisioPaymentProvider>());
+
+        // Register CryptoCloud services
+        builder.Services.Configure<CryptoCloudOptions>(configuration.GetSection("Payment:CryptoCloud"));
+        builder.Services.AddHttpClient<CryptoCloudApiClient>();
+        builder.Services.AddScoped<CryptoCloudApiClient>();
+        builder.Services.AddScoped<CryptoCloudPaymentProvider>();
+        builder.Services.AddScoped<CryptoCloudWebhookHandler>();
+        builder.Services.AddScoped<IPaymentProviderService, CryptoCloudPaymentProvider>();
+        builder.Services.AddScoped<IDepositProvider>(sp => sp.GetRequiredService<CryptoCloudPaymentProvider>());
+        builder.Services.AddScoped<IStaticWalletProvider>(sp => sp.GetRequiredService<CryptoCloudPaymentProvider>());
+
+        // Register common payment services
+        builder.Services.AddScoped<PaymentProviderFactory>();
+        builder.Services.AddScoped<WalletService>();
+        builder.Services.AddScoped<PaymentService>();
+        builder.Services.AddScoped<PaymentWebhookHandler>();
 
         return builder;
     }

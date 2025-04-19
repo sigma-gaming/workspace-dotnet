@@ -1,0 +1,5 @@
+- Use modern language features if possible (primary constructors, collection expressions, pattern matching, etc.)
+- Use english language for code and comments
+- Only comment code that is not self-explanatory
+- NEVER! use variable/property names that start with underscores
+- Use DbContext's ExecuteInTransactionAsync extension method instead of using transactions directly

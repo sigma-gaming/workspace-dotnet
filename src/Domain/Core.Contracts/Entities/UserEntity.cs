@@ -44,4 +44,5 @@ public sealed record UserEntity
     public ICollection<SessionEntity> SessionUsers { get; set; } = new List<SessionEntity>();
     public ICollection<TransactionEntity> Transactions { get; set; } = new List<TransactionEntity>();
     public ICollection<WithdrawalEntity> Withdrawals { get; set; } = new List<WithdrawalEntity>();
+    public ICollection<UserWalletEntity> UserWallets { get; set; } = new List<UserWalletEntity>();
 }
