@@ -79,11 +79,6 @@ public class DepositIntegrationTests(
         }
     }
 
-    public override Task DisposeAsync()
-    {
-        return base.DisposeAsync();
-    }
-
     [Fact]
     public async Task Should_CreateDeposit_Successfully()
     {

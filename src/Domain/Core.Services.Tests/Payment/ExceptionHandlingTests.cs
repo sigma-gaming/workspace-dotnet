@@ -2,7 +2,6 @@ using Core.Contracts.Enums;
 using Core.Services.Payment;
 using Core.Services.Payment.Exceptions;
 using Core.Services.Payment.Models;
-using Core.Tests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using InvalidOp = Core.Services.Payment.Exceptions.InvalidOperationException;
@@ -12,26 +11,20 @@ namespace Core.Services.Tests.Payment;
 /// <summary>
 ///     Tests for payment service error handling
 /// </summary>
-public class ExceptionHandlingTests : PaymentIntegrationTestBase, IAsyncLifetime
+public class ExceptionHandlingTests(
+    PaymentDbFixture dbFixture,
+    PaymentCacheFixture cacheFixture,
+    PaymentNatsFixture natsFixture)
+    : PaymentIntegrationTestBase(dbFixture, cacheFixture, natsFixture)
 {
     private PaymentService? paymentService;
     private WalletService? walletService;
-
-    public ExceptionHandlingTests(PaymentDbFixture dbFixture, PaymentCacheFixture cacheFixture, PaymentNatsFixture natsFixture) 
-        : base(dbFixture, cacheFixture, natsFixture)
-    {
-    }
 
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         paymentService = ServiceProvider.GetRequiredService<PaymentService>();
         walletService = ServiceProvider.GetRequiredService<WalletService>();
-    }
-
-    public override Task DisposeAsync()
-    {
-        return base.DisposeAsync();
     }
 
     [Fact]

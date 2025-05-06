@@ -68,7 +68,7 @@ jobs:
 
       - name: Test
         if: steps.affected.outputs.affected != ''
-        run: dotnet test --no-build affected.proj
+        run: dotnet test --configuration Release --no-build affected.proj
   
   build-in-cloud:
     name: Build Docker Images in Google Cloud
