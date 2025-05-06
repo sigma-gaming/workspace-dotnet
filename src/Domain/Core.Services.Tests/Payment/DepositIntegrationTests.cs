@@ -6,14 +6,17 @@ using Core.Services.Payment;
 using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Models;
 using Core.Services.Payment.Providers;
-using Core.Tests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Core.Services.Tests.Payment;
 
-public class DepositIntegrationTests : PaymentIntegrationTestBase, IAsyncLifetime
+public class DepositIntegrationTests(
+    PaymentDbFixture dbFixture,
+    PaymentCacheFixture cacheFixture,
+    PaymentNatsFixture natsFixture)
+    : PaymentIntegrationTestBase(dbFixture, cacheFixture, natsFixture)
 {
     private BalanceService? balanceService;
     private ILogger<DepositIntegrationTests>? logger;
@@ -22,11 +25,6 @@ public class DepositIntegrationTests : PaymentIntegrationTestBase, IAsyncLifetim
     private PaymentService? realPaymentService;
     private TestDepositProvider? testDepositProvider;
     private PaymentWebhookHandler? webhookHandler;
-
-    public DepositIntegrationTests(PaymentDbFixture dbFixture, PaymentCacheFixture cacheFixture, PaymentNatsFixture natsFixture) 
-        : base(dbFixture, cacheFixture, natsFixture)
-    {
-    }
 
     public override async Task InitializeAsync()
     {
@@ -71,8 +69,9 @@ public class DepositIntegrationTests : PaymentIntegrationTestBase, IAsyncLifetim
             {
                 var withdrawalProvider = ServiceProvider.GetRequiredService<TestWithdrawalProvider>();
                 var staticWalletProvider = ServiceProvider.GetRequiredService<StaticWalletMockProvider>();
-                
-                logger.LogInformation("Available providers: Deposit={Deposit}, Withdrawal={Withdrawal}, StaticWallet={StaticWallet}", 
+
+                logger.LogInformation(
+                    "Available providers: Deposit={Deposit}, Withdrawal={Withdrawal}, StaticWallet={StaticWallet}",
                     testDepositProvider.GetType().Name,
                     withdrawalProvider.GetType().Name,
                     staticWalletProvider.GetType().Name);

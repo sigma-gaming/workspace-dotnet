@@ -10,16 +10,10 @@ namespace Core.Services.Tests.Payment;
 ///     Tests to verify that PostgreSQL container setup is working correctly.
 /// </summary>
 [Collection("PaymentTestCollection")]
-public class PostgreSqlSetupTests : IAsyncLifetime
+public class PostgreSqlSetupTests(PaymentDbFixture dbFixture) : IAsyncLifetime
 {
-    private readonly PaymentDbFixture dbFixture;
     private CoreDbContext dbContext = null!;
 
-    public PostgreSqlSetupTests(PaymentDbFixture dbFixture)
-    {
-        this.dbFixture = dbFixture;
-    }
-    
     public async Task InitializeAsync()
     {
         dbContext = await dbFixture.CreateDbContextAsync();

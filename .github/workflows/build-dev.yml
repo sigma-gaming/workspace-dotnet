@@ -54,6 +54,9 @@ jobs:
         with:
           from: ${{ github.event.inputs.from || steps.shas.outputs.base }}
           to: ${{ github.event.inputs.to || steps.shas.outputs.head }}
+      
+      - name: Print affected apps
+        run: cat affected.proj
 
       - name: Install dependencies
         if: steps.affected.outputs.affected != ''
