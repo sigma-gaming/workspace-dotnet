@@ -31,17 +31,10 @@ public sealed class DomainService(
 
     private async Task RefreshDomainsAsync()
     {
-        try
-        {
-            var domains = await QueryDomainsAsync();
-            cached.Clear();
-            cached.AddRange(domains.Select(mapper.ToData));
-            logger.LogInformation("Refreshed domains");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to refresh domains");
-        }
+        var domains = await QueryDomainsAsync();
+        cached.Clear();
+        cached.AddRange(domains.Select(mapper.ToData));
+        logger.LogInformation("Refreshed domains");
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
