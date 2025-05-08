@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 namespace Core.Services.Payment.Providers.CryptoCloud;
 
 /// <summary>
-/// Client for CryptoCloud API
+///     Client for CryptoCloud API
 /// </summary>
 public class CryptoCloudApiClient
 {
@@ -18,7 +18,7 @@ public class CryptoCloudApiClient
     private readonly CryptoCloudOptions options;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CryptoCloudApiClient"/> class
+    ///     Initializes a new instance of the <see cref="CryptoCloudApiClient" /> class
     /// </summary>
     public CryptoCloudApiClient(
         HttpClient httpClient,
@@ -33,14 +33,15 @@ public class CryptoCloudApiClient
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
-        
+
         // Set base address and default headers
-        this.httpClient.BaseAddress = new Uri(this.options.ApiUrl);
-        this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", this.options.ApiKey);
+        this.httpClient.BaseAddress = new Uri("https://api.cryptocloud.plus");
+        this.httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Token", this.options.ApiKey);
     }
 
     /// <summary>
-    /// Creates a new wallet
+    ///     Creates a new wallet
     /// </summary>
     public async Task<CryptoCloudWalletData> CreateWalletAsync(CryptoCloudCreateWalletRequest request)
     {
@@ -48,14 +49,12 @@ public class CryptoCloudApiClient
         {
             var response = await httpClient.PostAsJsonAsync("/api/v2/wallet/create/", request);
             response.EnsureSuccessStatusCode();
-            
+
             var result = await response.Content.ReadFromJsonAsync<CryptoCloudCreateWalletResponse>(jsonOptions);
-            
+
             if (result?.Status != "success" || result.Data == null)
-            {
                 throw new Exception($"Failed to create wallet: {result?.Message ?? "Unknown error"}");
-            }
-            
+
             return result.Data;
         }
         catch (Exception ex)
@@ -66,7 +65,7 @@ public class CryptoCloudApiClient
     }
 
     /// <summary>
-    /// Gets wallet information
+    ///     Gets wallet information
     /// </summary>
     public async Task<CryptoCloudWalletInfo> GetWalletInfoAsync(string walletId)
     {
@@ -74,14 +73,12 @@ public class CryptoCloudApiClient
         {
             var response = await httpClient.GetAsync($"/api/v2/wallet/info/{walletId}/");
             response.EnsureSuccessStatusCode();
-            
+
             var result = await response.Content.ReadFromJsonAsync<CryptoCloudWalletInfoResponse>(jsonOptions);
-            
+
             if (result?.Status != "success" || result.Data == null)
-            {
                 throw new Exception($"Failed to get wallet info: {result?.Message ?? "Unknown error"}");
-            }
-            
+
             return result.Data;
         }
         catch (Exception ex)
@@ -92,7 +89,7 @@ public class CryptoCloudApiClient
     }
 
     /// <summary>
-    /// Gets wallet address
+    ///     Gets wallet address
     /// </summary>
     public async Task<string> GetWalletAddressAsync(string walletId)
     {
@@ -100,24 +97,20 @@ public class CryptoCloudApiClient
         {
             var response = await httpClient.GetAsync($"/api/v2/wallet/address/{walletId}/");
             response.EnsureSuccessStatusCode();
-            
+
             var result = await response.Content.ReadFromJsonAsync<CryptoCloudBaseResponse>(jsonOptions);
-            
+
             if (result?.Status != "success")
-            {
                 throw new Exception($"Failed to get wallet address: {result?.Message ?? "Unknown error"}");
-            }
-            
+
             // Extract address from response
             var addressResponse = await JsonSerializer.DeserializeAsync<JsonElement>(
                 await response.Content.ReadAsStreamAsync(), jsonOptions);
-            
-            if (addressResponse.TryGetProperty("data", out var data) && 
+
+            if (addressResponse.TryGetProperty("data", out var data) &&
                 data.TryGetProperty("address", out var address))
-            {
                 return address.GetString() ?? string.Empty;
-            }
-            
+
             throw new Exception("Failed to extract wallet address from response");
         }
         catch (Exception ex)
@@ -128,7 +121,7 @@ public class CryptoCloudApiClient
     }
 
     /// <summary>
-    /// Gets wallet balance
+    ///     Gets wallet balance
     /// </summary>
     public async Task<string> GetWalletBalanceAsync(string walletId)
     {
@@ -136,24 +129,20 @@ public class CryptoCloudApiClient
         {
             var response = await httpClient.GetAsync($"/api/v2/wallet/balance/{walletId}/");
             response.EnsureSuccessStatusCode();
-            
+
             var result = await response.Content.ReadFromJsonAsync<CryptoCloudBaseResponse>(jsonOptions);
-            
+
             if (result?.Status != "success")
-            {
                 throw new Exception($"Failed to get wallet balance: {result?.Message ?? "Unknown error"}");
-            }
-            
+
             // Extract balance from response
             var balanceResponse = await JsonSerializer.DeserializeAsync<JsonElement>(
                 await response.Content.ReadAsStreamAsync(), jsonOptions);
-            
-            if (balanceResponse.TryGetProperty("data", out var data) && 
+
+            if (balanceResponse.TryGetProperty("data", out var data) &&
                 data.TryGetProperty("balance", out var balance))
-            {
                 return balance.GetString() ?? "0";
-            }
-            
+
             throw new Exception("Failed to extract wallet balance from response");
         }
         catch (Exception ex)
@@ -164,7 +153,7 @@ public class CryptoCloudApiClient
     }
 
     /// <summary>
-    /// Gets list of wallets
+    ///     Gets list of wallets
     /// </summary>
     public async Task<List<CryptoCloudWalletData>> GetWalletsAsync()
     {
@@ -172,14 +161,12 @@ public class CryptoCloudApiClient
         {
             var response = await httpClient.GetAsync("/api/v2/wallet/list/");
             response.EnsureSuccessStatusCode();
-            
+
             var result = await response.Content.ReadFromJsonAsync<CryptoCloudWalletListResponse>(jsonOptions);
-            
+
             if (result?.Status != "success" || result.Data == null)
-            {
                 throw new Exception($"Failed to get wallets: {result?.Message ?? "Unknown error"}");
-            }
-            
+
             return result.Data;
         }
         catch (Exception ex)

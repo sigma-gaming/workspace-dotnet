@@ -138,7 +138,7 @@ public class PlisioApiClient
     private async Task<T> SendRequestAsync<T>(string endpoint, Dictionary<string, string> queryParams)
     {
         var queryString = string.Join("&", queryParams.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"));
-        var url = $"{options.ApiUrl}/{endpoint}?{queryString}";
+        var url = $"https://plisio.net/api/v1/{endpoint}?{queryString}";
 
         try
         {

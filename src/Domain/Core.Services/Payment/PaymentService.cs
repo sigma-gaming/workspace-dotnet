@@ -29,6 +29,8 @@ public class PaymentService(
     CoreCacheRegistry cache,
     CorePubSubRegistry pubSub,
     BalanceMapper balanceMapper,
+    DepositMapper depositMapper,
+    WithdrawalMapper withdrawalMapper,
     IDepositConfigProvider depositConfigProvider,
     IWithdrawalConfigProvider withdrawalConfigProvider,
     ILogger<PaymentService>? logger = null) : IPaymentService
@@ -106,7 +108,7 @@ public class PaymentService(
                 return new DepositOutput
                 {
                     Outcome = PaymentOutcome.Success,
-                    Deposit = deposit,
+                    Deposit = depositMapper.ToData(deposit),
                 };
             });
         }
@@ -353,7 +355,7 @@ public class PaymentService(
                 return new WithdrawalOutput
                 {
                     Outcome = PaymentOutcome.Success,
-                    Withdrawal = withdrawal,
+                    Withdrawal = withdrawalMapper.ToData(withdrawal),
                     UpdatedBalance = updatedBalance.Available,
                 };
             });
@@ -524,17 +526,18 @@ public class PaymentService(
                 };
 
                 db.Transactions.Add(refundTransaction);
-                
+
                 // Debug logs
-                logger?.LogInformation("Cancelling withdrawal - GemAmount: {GemAmount}, Refund Amount: {RefundAmount}", 
+                logger?.LogInformation("Cancelling withdrawal - GemAmount: {GemAmount}, Refund Amount: {RefundAmount}",
                     withdrawal.GemAmount, refundTransaction.Amount);
 
                 // Update user balance
                 var balance = await balanceService.GetBalanceForUpdateAsync(withdrawal.UserId);
                 logger?.LogInformation("Before update - Balance Available: {BalanceAvailable}", balance.Available);
-                
+
                 var updatedBalance = await balanceService.UpdateBalanceAsync(balance, refundTransaction);
-                logger?.LogInformation("After update - Balance Available: {BalanceAvailable}", updatedBalance.Available);
+                logger?.LogInformation("After update - Balance Available: {BalanceAvailable}",
+                    updatedBalance.Available);
 
                 await db.SaveChangesAsync();
 

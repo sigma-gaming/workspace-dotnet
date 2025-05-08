@@ -17,7 +17,7 @@ public static class WithdrawalMethodConfigs
         [
             new WithdrawalMethodConfig
             {
-                Method = WithdrawalMethod.Plisio,
+                Method = WithdrawalMethod.Crypto,
                 Currency = Currency.Ton,
                 Provider = PaymentProvider.Plisio,
                 MinAmount = 1000,
@@ -28,7 +28,7 @@ public static class WithdrawalMethodConfigs
             // Adding CryptoCloud provider for testing
             new WithdrawalMethodConfig
             {
-                Method = WithdrawalMethod.CryptoCloud,
+                Method = WithdrawalMethod.Crypto,
                 Currency = Currency.Ton,
                 Provider = PaymentProvider.CryptoCloud,
                 MinAmount = 1000,

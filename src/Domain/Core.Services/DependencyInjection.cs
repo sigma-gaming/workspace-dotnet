@@ -12,10 +12,11 @@ using Core.Services.Gaming;
 using Core.Services.Gaming.Runners;
 using Core.Services.Notifications;
 using Core.Services.Payment;
+using Core.Services.Payment.Configuration;
 using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Providers;
-using Core.Services.Payment.Providers.Plisio;
 using Core.Services.Payment.Providers.CryptoCloud;
+using Core.Services.Payment.Providers.Plisio;
 using Core.Services.Promotions;
 using Core.Services.Promotions.TaskCheckers;
 using Core.Services.PubSub;
@@ -148,6 +149,8 @@ public static class DependencyInjection
         builder.Services.AddScoped<IStaticWalletProvider>(sp => sp.GetRequiredService<CryptoCloudPaymentProvider>());
 
         // Register common payment services
+        builder.Services.AddScoped<IDepositConfigProvider, DefaultDepositConfigProvider>();
+        builder.Services.AddScoped<IWithdrawalConfigProvider, DefaultWithdrawalConfigProvider>();
         builder.Services.AddScoped<PaymentProviderFactory>();
         builder.Services.AddScoped<WalletService>();
         builder.Services.AddScoped<PaymentService>();

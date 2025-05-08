@@ -1,50 +1,50 @@
-using Core.Contracts.Entities;
+using Core.Contracts.Data;
 using Core.Contracts.Enums;
 
 namespace Core.Services.Payment.Models;
 
 /// <summary>
-/// Output model for deposit operations
+///     Output model for deposit operations
 /// </summary>
 public class DepositOutput
 {
     /// <summary>
-    /// Outcome of the deposit operation
+    ///     Outcome of the deposit operation
     /// </summary>
     public required PaymentOutcome Outcome { get; init; }
-    
+
     /// <summary>
-    /// Deposit entity (only for successful operations)
+    ///     Deposit entity (only for successful operations)
     /// </summary>
-    public DepositEntity? Deposit { get; init; }
-    
+    public Deposit? Deposit { get; init; }
+
     /// <summary>
-    /// Minimum amount (for InvalidAmount outcome)
+    ///     Minimum amount (for InvalidAmount outcome)
     /// </summary>
     public long? MinAmount { get; init; }
-    
+
     /// <summary>
-    /// Maximum amount (for InvalidAmount outcome)
+    ///     Maximum amount (for InvalidAmount outcome)
     /// </summary>
     public long? MaxAmount { get; init; }
-    
+
     /// <summary>
-    /// Currency (for InvalidAmount or UnsupportedCurrency outcomes)
+    ///     Currency (for InvalidAmount or UnsupportedCurrency outcomes)
     /// </summary>
     public Currency? Currency { get; init; }
-    
+
     /// <summary>
-    /// Method (for UnsupportedMethod outcome)
+    ///     Method (for UnsupportedMethod outcome)
     /// </summary>
     public DepositMethod? Method { get; init; }
-    
+
     /// <summary>
-    /// Provider (for UnsupportedMethod outcome)
+    ///     Provider (for UnsupportedMethod outcome)
     /// </summary>
     public PaymentProvider? Provider { get; init; }
-    
+
     /// <summary>
-    /// Error message (for ProviderError or Failed outcomes)
+    ///     Error message (for ProviderError or Failed outcomes)
     /// </summary>
     public string? Error { get; init; }
 }

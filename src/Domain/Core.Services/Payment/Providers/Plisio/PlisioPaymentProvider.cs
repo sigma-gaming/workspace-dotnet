@@ -35,12 +35,12 @@ public class PlisioPaymentProvider(
             var createInvoiceRequest = new PlisioCreateInvoiceRequest
             {
                 Currency = MapCurrency(input.Currency),
-                SourceCurrency = options.DefaultFiatCurrency,
+                SourceCurrency = "USD",
                 SourceAmount = input.GemAmount.ToString(CultureInfo.InvariantCulture),
                 OrderName = $"Deposit {input.GemAmount} gems",
                 OrderNumber = Guid.NewGuid().ToString("N"),
                 Description = $"Deposit {input.GemAmount} gems",
-                CallbackUrl = options.CallbackUrl,
+                CallbackUrl = "https://app.sigma.local:5173",
                 ExpireMin = options.InvoiceExpirationMinutes.ToString(),
             };
 
@@ -186,7 +186,7 @@ public class PlisioPaymentProvider(
             Currency.Eth => "ETH",
             Currency.UsdtTrc20 => "USDT",
             Currency.UsdtErc20 => "USDC",
-            _ => options.DefaultCurrency,
+            _ => "TON",
         };
     }
 }

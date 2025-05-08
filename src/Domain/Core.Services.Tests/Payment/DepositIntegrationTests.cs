@@ -85,7 +85,7 @@ public class DepositIntegrationTests(
         var user = await CreateTestUserAsync();
         var userId = user.Id;
         var gemAmount = 1000L;
-        var method = DepositMethod.Plisio;
+        var method = DepositMethod.Crypto;
         var currency = Currency.Ton;
         var provider = PaymentProvider.Plisio;
 
@@ -175,7 +175,7 @@ public class DepositIntegrationTests(
         var user = await CreateTestUserAsync();
         var userId = user.Id;
         var gemAmount = 1000L;
-        var method = DepositMethod.Plisio;
+        var method = DepositMethod.Crypto;
         var currency = Currency.Ton;
         var provider = PaymentProvider.Plisio;
 
@@ -240,7 +240,7 @@ public class DepositIntegrationTests(
         var user = await CreateTestUserAsync();
         var userId = user.Id;
         var gemAmount = 1000L;
-        var method = DepositMethod.Plisio;
+        var method = DepositMethod.Crypto;
         var currency = Currency.Ton;
         var provider = PaymentProvider.Plisio;
 

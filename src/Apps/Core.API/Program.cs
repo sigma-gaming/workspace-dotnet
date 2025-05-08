@@ -61,7 +61,8 @@ builder.Services.Core()
     .AddChat()
     .AddNotifications()
     .AddTelegram(builder.Configuration)
-    .AddGlobalTasks();
+    .AddGlobalTasks()
+    .AddPayment(builder.Configuration);
 
 builder.Services.AddSessionAuth();
 

@@ -1,26 +1,26 @@
 using System.Globalization;
 using Core.Contracts.Enums;
 using Core.Contracts.Jsonb;
+using Core.Services.Finance;
 using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Models;
 using Core.Services.Payment.Providers.CryptoCloud.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Core.Services.Finance;
 
 namespace Core.Services.Payment.Providers.CryptoCloud;
 
 /// <summary>
-/// CryptoCloud payment provider implementation
+///     CryptoCloud payment provider implementation
 /// </summary>
 public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvider, IStaticWalletProvider
 {
     private readonly CryptoCloudApiClient apiClient;
-    private readonly CryptoCloudOptions options;
     private readonly CurrencyRatesService currencyRatesService;
+    private readonly CryptoCloudOptions options;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CryptoCloudPaymentProvider"/> class
+    ///     Initializes a new instance of the <see cref="CryptoCloudPaymentProvider" /> class
     /// </summary>
     public CryptoCloudPaymentProvider(
         CryptoCloudApiClient apiClient,
@@ -34,12 +34,12 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
     }
 
     /// <summary>
-    /// Gets the payment provider type
+    ///     Gets the payment provider type
     /// </summary>
     public override PaymentProvider Provider => PaymentProvider.CryptoCloud;
 
     /// <summary>
-    /// Creates a deposit request with the payment provider
+    ///     Creates a deposit request with the payment provider
     /// </summary>
     public async Task<DepositResponse> CreateDepositAsync(DepositInput input)
     {
@@ -48,8 +48,8 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
             var walletRequest = new CryptoCloudCreateWalletRequest
             {
                 Currency = MapCurrency(input.Currency),
-                CallbackUrl = options.CallbackUrl,
-                Label = $"Deposit {input.GemAmount} gems"
+                CallbackUrl = "https://app.sigma.local:5173",
+                Label = $"Deposit {input.GemAmount} gems",
             };
 
             var wallet = await apiClient.CreateWalletAsync(walletRequest);
@@ -72,9 +72,9 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
                     {
                         Address = wallet.Address,
                         Amount = currencyAmount,
-                        Currency = input.Currency
-                    }
-                }
+                        Currency = input.Currency,
+                    },
+                },
             };
         }
         catch (Exception ex)
@@ -85,7 +85,7 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
     }
 
     /// <summary>
-    /// Gets the status of a deposit from the payment provider
+    ///     Gets the status of a deposit from the payment provider
     /// </summary>
     public async Task<PaymentStatus> GetDepositStatusAsync(string providerTransactionId)
     {
@@ -102,17 +102,18 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
     }
 
     /// <summary>
-    /// Cancels a deposit with the payment provider
+    ///     Cancels a deposit with the payment provider
     /// </summary>
     public Task CancelDepositAsync(string providerTransactionId)
     {
         // CryptoCloud doesn't have an API to cancel deposits
-        Logger.LogInformation("Cancelling deposit {TransactionId} (not supported by CryptoCloud)", providerTransactionId);
+        Logger.LogInformation("Cancelling deposit {TransactionId} (not supported by CryptoCloud)",
+            providerTransactionId);
         return Task.CompletedTask;
     }
 
     /// <summary>
-    /// Gets the transaction status from the payment provider
+    ///     Gets the transaction status from the payment provider
     /// </summary>
     public override async Task<PaymentStatus> GetTransactionStatusAsync(string transactionId)
     {
@@ -129,7 +130,7 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
     }
 
     /// <summary>
-    /// Checks if the provider supports static wallets for the specified currency
+    ///     Checks if the provider supports static wallets for the specified currency
     /// </summary>
     public bool SupportsStaticWallets(Currency currency)
     {
@@ -138,7 +139,7 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
     }
 
     /// <summary>
-    /// Generates a new static wallet address for the user
+    ///     Generates a new static wallet address for the user
     /// </summary>
     public async Task<string> GenerateWalletAddressAsync(Currency currency, Guid userId)
     {
@@ -147,8 +148,8 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
             var walletRequest = new CryptoCloudCreateWalletRequest
             {
                 Currency = MapCurrency(currency),
-                CallbackUrl = options.CallbackUrl,
-                Label = $"User {userId} wallet for {currency}"
+                CallbackUrl = "https://app.sigma.local:5173",
+                Label = $"User {userId} wallet for {currency}",
             };
 
             var wallet = await apiClient.CreateWalletAsync(walletRequest);
@@ -162,7 +163,7 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
     }
 
     /// <summary>
-    /// Maps Currency enum to CryptoCloud currency code
+    ///     Maps Currency enum to CryptoCloud currency code
     /// </summary>
     private string MapCurrency(Currency currency)
     {
@@ -172,7 +173,7 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
             Currency.Btc => "BTC",
             Currency.Eth => "ETH",
             Currency.UsdtTrc20 => "USDT",
-            _ => throw new NotSupportedException($"Currency {currency} is not supported by CryptoCloud")
+            _ => throw new NotSupportedException($"Currency {currency} is not supported by CryptoCloud"),
         };
     }
 }

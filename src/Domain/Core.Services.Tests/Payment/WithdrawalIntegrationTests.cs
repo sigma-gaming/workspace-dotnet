@@ -1,19 +1,12 @@
-using Core.Contracts.Data;
-using Core.Contracts.Entities;
+using System.Diagnostics;
 using Core.Contracts.Enums;
 using Core.Db.Context;
 using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Models;
-using Core.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
-using Common.Db.Extensions;
-using System.Diagnostics;
 
 namespace Core.Services.Tests.Payment;
 
@@ -35,46 +28,44 @@ public class WithdrawalIntegrationTests : PaymentIntegrationTestBase
         : base(dbFixture, cacheFixture, natsFixture)
     {
     }
-    
+
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        
+
         // Initialize setup
         db = DbContext;
         logger = ServiceProvider.GetRequiredService<ILogger<WithdrawalIntegrationTests>>();
         paymentService = ServiceProvider.GetRequiredService<IPaymentService>();
-        
+
         // Ensure all services are initialized
         Debug.Assert(db != null);
         Debug.Assert(logger != null);
         Debug.Assert(paymentService != null);
-        
+
         // Add debug logging of payment providers
         var factory = ServiceProvider.GetService<TestPaymentProviderFactory>();
         logger?.LogInformation($"Factory Type: {factory?.GetType().Name}");
-        
+
         var testWithdrawalProvider = ServiceProvider.GetService<TestWithdrawalProvider>();
         logger?.LogInformation($"TestWithdrawalProvider: {testWithdrawalProvider != null}");
-        
+
         if (testWithdrawalProvider != null)
-        {
-            logger?.LogInformation($"Provider Type: {testWithdrawalProvider.GetType().Name}, Provider Value: {testWithdrawalProvider.Provider}");
-        }
-        
+            logger?.LogInformation(
+                $"Provider Type: {testWithdrawalProvider.GetType().Name}, Provider Value: {testWithdrawalProvider.Provider}");
+
         // Log all payment providers
         var providers = ServiceProvider.GetServices<IPaymentProviderService>().ToList();
         logger?.LogInformation($"Total Providers: {providers.Count}");
         foreach (var provider in providers)
-        {
             logger?.LogInformation($"Provider: {provider.GetType().Name}, For: {provider.Provider}");
-        }
-        
+
         // Try to get withdrawal provider directly from factory
         if (factory != null)
         {
             var withdrawalProvider = factory.GetWithdrawalProvider(PaymentProvider.Plisio);
-            logger?.LogInformation($"Factory result for Plisio: {(withdrawalProvider == null ? "null" : withdrawalProvider.GetType().Name)}");
+            logger?.LogInformation(
+                $"Factory result for Plisio: {(withdrawalProvider == null ? "null" : withdrawalProvider.GetType().Name)}");
         }
     }
 
@@ -84,7 +75,7 @@ public class WithdrawalIntegrationTests : PaymentIntegrationTestBase
         // Ensure services are initialized
         Assert.NotNull(db);
         Assert.NotNull(paymentService);
-        
+
         // Arrange
         var user = await CreateTestUserAsync();
         const long amount = 1000;
@@ -93,20 +84,21 @@ public class WithdrawalIntegrationTests : PaymentIntegrationTestBase
         // Verify provider factory is working
         var factory = ServiceProvider.GetService<TestPaymentProviderFactory>();
         var testWithdrawalProvider = factory?.GetWithdrawalProvider(PaymentProvider.Plisio);
-        logger?.LogInformation($"Test - Provider found: {testWithdrawalProvider != null}, Type: {testWithdrawalProvider?.GetType().Name}");
-        
+        logger?.LogInformation(
+            $"Test - Provider found: {testWithdrawalProvider != null}, Type: {testWithdrawalProvider?.GetType().Name}");
+
         // Act - use PaymentService directly
         var withdrawalInput = new WithdrawalInput(
             user.Id,
             amount,
-            WithdrawalMethod.Plisio, // Use the method from our test config
+            WithdrawalMethod.Crypto, // Use the method from our test config
             Currency.Ton,
             PaymentProvider.Plisio, // Use the provider that our TestWithdrawalProvider supports
             "test-wallet-address"
         );
-        
+
         var result = await paymentService.CreateWithdrawalAsync(withdrawalInput);
-        
+
         // Log result
         logger?.LogInformation($"Withdrawal result: {result.Outcome}, Error: {result.Error}");
 
@@ -141,12 +133,12 @@ public class WithdrawalIntegrationTests : PaymentIntegrationTestBase
         var withdrawalInput = new WithdrawalInput(
             user.Id,
             amount,
-            WithdrawalMethod.Plisio,
+            WithdrawalMethod.Crypto,
             Currency.Ton,
             PaymentProvider.Plisio,
             "test-wallet-address"
         );
-        
+
         var createResult = await paymentService.CreateWithdrawalAsync(withdrawalInput);
         Assert.Equal(PaymentOutcome.Success, createResult.Outcome);
         Assert.NotNull(createResult.Withdrawal);
@@ -177,12 +169,12 @@ public class WithdrawalIntegrationTests : PaymentIntegrationTestBase
         var withdrawalInput = new WithdrawalInput(
             user.Id,
             amount,
-            WithdrawalMethod.Plisio,
+            WithdrawalMethod.Crypto,
             Currency.Ton,
             PaymentProvider.Plisio,
             "test-wallet-address"
         );
-        
+
         var createResult = await paymentService.CreateWithdrawalAsync(withdrawalInput);
         Assert.Equal(PaymentOutcome.Success, createResult.Outcome);
         Assert.NotNull(createResult.Withdrawal);
@@ -217,12 +209,12 @@ public class WithdrawalIntegrationTests : PaymentIntegrationTestBase
         var withdrawalInput = new WithdrawalInput(
             user.Id,
             amount,
-            WithdrawalMethod.Plisio,
+            WithdrawalMethod.Crypto,
             Currency.Ton,
             PaymentProvider.Plisio,
             "test-wallet-address"
         );
-        
+
         var createResult = await paymentService.CreateWithdrawalAsync(withdrawalInput);
         Assert.Equal(PaymentOutcome.Success, createResult.Outcome);
         Assert.NotNull(createResult.Withdrawal);
@@ -245,7 +237,7 @@ public class WithdrawalIntegrationTests : PaymentIntegrationTestBase
         // Get the actual balance directly from DB 
         var updatedBalance = await db.Balances.FirstOrDefaultAsync(b => b.UserId == user.Id);
         Assert.NotNull(updatedBalance);
-        
+
         // Check that it's been restored to the full amount
         Assert.Equal(amount, updatedBalance.Available);
 
@@ -266,47 +258,45 @@ public class WithdrawalIntegrationTests : PaymentIntegrationTestBase
 
         try
         {
-            // Act - использовать ExecuteWithRollbackAsync вместо собственной логики транзакций
-            // Это позволит использовать один и тот же DbContext во всех сервисах
-            await ExecuteWithRollbackAsync(async (context) =>
+            await ExecuteWithRollbackAsync(async context =>
             {
                 // Create withdrawal
                 var withdrawalInput = new WithdrawalInput(
                     user.Id,
                     amount,
-                    WithdrawalMethod.Plisio,
+                    WithdrawalMethod.Crypto,
                     Currency.Ton,
                     PaymentProvider.Plisio,
                     "test-wallet-address"
                 );
-                
+
                 var createResult = await paymentService.CreateWithdrawalAsync(withdrawalInput);
-                
+
                 // Check the returned balance value directly
                 Assert.Equal(0, createResult.UpdatedBalance);
-                
+
                 // Verify there is a pending withdrawal
                 Assert.NotNull(createResult.Withdrawal);
                 Assert.Equal(PaymentStatus.Pending, createResult.Withdrawal.Status);
-                
+
                 // Транзакция будет автоматически откачена в ExecuteWithRollbackAsync
             });
-            
+
             // Create a fresh DbContext to ensure we're not looking at cached data
             using var freshDb = await DbFixture.CreateDbContextAsync();
 
             // After the exception, check that the database was rolled back:
-            
+
             // 1. Verify the balance is still the original amount (1000)
             var balance = await freshDb.Balances.FirstOrDefaultAsync(b => b.UserId == user.Id);
             Assert.NotNull(balance);
             Assert.Equal(amount, balance.Available);
-            
+
             // 2. Verify no withdrawals were created
             var withdrawals = await freshDb.Withdrawals
                 .Where(w => w.UserId == user.Id)
                 .ToListAsync();
-                
+
             Assert.Empty(withdrawals);
         }
         catch (Exception ex)

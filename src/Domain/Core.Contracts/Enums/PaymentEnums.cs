@@ -46,15 +46,13 @@ public enum DepositType
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum DepositMethod
 {
-    Plisio,
-    CryptoCloud,
+    Crypto,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum WithdrawalMethod
 {
-    Plisio,
-    CryptoCloud,
+    Crypto,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

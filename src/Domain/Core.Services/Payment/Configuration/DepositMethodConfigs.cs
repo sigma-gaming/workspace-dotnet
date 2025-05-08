@@ -18,7 +18,7 @@ public static class DepositMethodConfigs
             // Plisio deposit methods
             new DepositMethodConfig
             {
-                Method = DepositMethod.Plisio,
+                Method = DepositMethod.Crypto,
                 Currency = Currency.Ton,
                 Provider = PaymentProvider.Plisio,
                 MinAmount = 100,
@@ -29,7 +29,7 @@ public static class DepositMethodConfigs
             // CryptoCloud deposit methods
             new DepositMethodConfig
             {
-                Method = DepositMethod.CryptoCloud,
+                Method = DepositMethod.Crypto,
                 Currency = Currency.Ton,
                 Provider = PaymentProvider.CryptoCloud,
                 MinAmount = 100,
@@ -38,7 +38,7 @@ public static class DepositMethodConfigs
             },
             new DepositMethodConfig
             {
-                Method = DepositMethod.CryptoCloud,
+                Method = DepositMethod.Crypto,
                 Currency = Currency.Btc,
                 Provider = PaymentProvider.CryptoCloud,
                 MinAmount = 100,
@@ -47,7 +47,7 @@ public static class DepositMethodConfigs
             },
             new DepositMethodConfig
             {
-                Method = DepositMethod.CryptoCloud,
+                Method = DepositMethod.Crypto,
                 Currency = Currency.Eth,
                 Provider = PaymentProvider.CryptoCloud,
                 MinAmount = 100,
@@ -56,7 +56,7 @@ public static class DepositMethodConfigs
             },
             new DepositMethodConfig
             {
-                Method = DepositMethod.CryptoCloud,
+                Method = DepositMethod.Crypto,
                 Currency = Currency.UsdtTrc20,
                 Provider = PaymentProvider.CryptoCloud,
                 MinAmount = 100,

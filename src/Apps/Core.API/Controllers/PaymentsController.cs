@@ -1,3 +1,4 @@
+using Common.Api.Responses;
 using Core.Contracts.Compounds;
 using Core.Contracts.Data;
 using Core.Contracts.Enums;
@@ -6,7 +7,6 @@ using Core.Services.Finance;
 using Core.Services.Payment;
 using Core.Services.Payment.Configuration;
 using Core.Services.Payment.Models;
-using Core.Services.Payment.Providers.CryptoCloud;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -79,7 +79,7 @@ public class PaymentsController(
             request.Currency,
             request.Provider,
             request.DestinationAddress
-            );
+        );
 
         var result = await paymentService.CreateWithdrawalAsync(input);
 
@@ -100,20 +100,21 @@ public class PaymentsController(
     [HttpPost("/payments/wallets")]
     [ProducesResponseType<UserWallet>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateWallet([FromBody] CreateWalletRequest request)
+    public async Task<Results<Ok<UserWallet>, BadRequest<ErrorResponse>>> CreateWallet(
+        [FromBody] CreateWalletRequest request)
     {
         var userId = HttpContext.GetUserId();
 
         try
         {
             var wallet = await walletService.GetOrCreateWalletAsync(userId, request.Currency, request.Provider);
-            if (wallet == null) return BadRequest("Failed to create wallet");
+            if (wallet == null) return TypedResults.BadRequest(new ErrorResponse("Не удалось создать кошелёк"));
 
-            return Ok(wallet);
+            return TypedResults.Ok(wallet);
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(ex.Message);
+            return TypedResults.BadRequest(new ErrorResponse(ex.Message));
         }
     }
 }
@@ -135,22 +136,8 @@ public class CreateWithdrawalRequest
     public required string DestinationAddress { get; init; }
 }
 
-public class WebhookRequest
-{
-    public required string Type { get; init; } // "deposit" or "withdrawal"
-    public required string TransactionId { get; init; }
-    public required PaymentStatus Status { get; init; }
-}
-
 public class CreateWalletRequest
 {
-    public required Currency Currency { get; init; }
-    public required PaymentProvider Provider { get; init; }
-}
-
-public class CreateDepositWithWalletRequest
-{
-    public required long GemAmount { get; init; }
     public required Currency Currency { get; init; }
     public required PaymentProvider Provider { get; init; }
 }

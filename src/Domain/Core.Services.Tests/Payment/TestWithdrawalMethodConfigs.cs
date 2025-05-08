@@ -4,20 +4,20 @@ using Core.Services.Payment.Configuration;
 namespace Core.Services.Tests.Payment;
 
 /// <summary>
-/// Test provider for withdrawal method configurations 
+///     Test provider for withdrawal method configurations
 /// </summary>
 public static class TestWithdrawalMethodConfigs
 {
     /// <summary>
-    /// Get test configurations for withdrawal methods
+    ///     Get test configurations for withdrawal methods
     /// </summary>
     public static List<WithdrawalMethodConfig> GetTestConfigs()
     {
-        return 
+        return
         [
             new WithdrawalMethodConfig
             {
-                Method = WithdrawalMethod.Plisio,
+                Method = WithdrawalMethod.Crypto,
                 Currency = Currency.Ton,
                 Provider = PaymentProvider.Plisio,
                 MinAmount = 100,
@@ -27,7 +27,7 @@ public static class TestWithdrawalMethodConfigs
             },
             new WithdrawalMethodConfig
             {
-                Method = WithdrawalMethod.Plisio,
+                Method = WithdrawalMethod.Crypto,
                 Currency = Currency.Btc,
                 Provider = PaymentProvider.Plisio,
                 MinAmount = 100,
@@ -37,14 +37,14 @@ public static class TestWithdrawalMethodConfigs
             },
             new WithdrawalMethodConfig
             {
-                Method = WithdrawalMethod.CryptoCloud,
+                Method = WithdrawalMethod.Crypto,
                 Currency = Currency.Ton,
                 Provider = PaymentProvider.CryptoCloud,
                 MinAmount = 100,
                 MaxAmount = 1000000,
                 CommissionRate = 200,
                 ProcessingTimeHours = 24,
-            }
+            },
         ];
     }
-} 
+}

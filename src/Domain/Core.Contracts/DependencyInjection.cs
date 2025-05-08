@@ -29,6 +29,9 @@ public static class DependencyInjection
         builder.Services.AddSingleton<NotificationMapper>();
         builder.Services.AddSingleton<ChatMessageMapper>();
         builder.Services.AddSingleton<DomainMapper>();
+        builder.Services.AddSingleton<DepositMapper>();
+        builder.Services.AddSingleton<WithdrawalMapper>();
+        builder.Services.AddSingleton<UserWalletMapper>();
 
         return builder;
     }

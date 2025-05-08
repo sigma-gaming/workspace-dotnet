@@ -37,7 +37,7 @@ public class ExceptionHandlingTests(
         var input = new DepositInput(
             userId,
             100L,
-            DepositMethod.CryptoCloud,
+            DepositMethod.Crypto,
             Currency.UsdtTrc20,
             PaymentProvider.CryptoCloud
         );
