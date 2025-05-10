@@ -134,7 +134,7 @@ public class DepositIntegrationTests(
         Assert.NotNull(providerResponse);
 
         // Create a valid payload of type DepositPayload
-        var payload = new DepositPayloadRedirect { RedirectUrl = "https://example.com/redirect" };
+        var payload = new DepositFlowDetailsRedirect { RedirectUrl = "https://example.com/redirect" };
 
         var depositEntity = new DepositEntity
         {
@@ -148,7 +148,7 @@ public class DepositIntegrationTests(
             ProviderAmount = providerResponse.ProviderAmount,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            Payload = payload,
+            FlowDetails = payload,
         };
 
         // Directly save the deposit to the database
@@ -195,7 +195,7 @@ public class DepositIntegrationTests(
         Assert.NotNull(providerResponse);
 
         // Create a valid payload of type DepositPayload
-        var payload = new DepositPayloadRedirect { RedirectUrl = "https://example.com/redirect" };
+        var payload = new DepositFlowDetailsRedirect { RedirectUrl = "https://example.com/redirect" };
 
         var depositEntity = new DepositEntity
         {
@@ -209,7 +209,7 @@ public class DepositIntegrationTests(
             ProviderAmount = providerResponse.ProviderAmount,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            Payload = payload,
+            FlowDetails = payload,
         };
 
         // Directly save the deposit to the database
@@ -260,7 +260,7 @@ public class DepositIntegrationTests(
         Assert.NotNull(providerResponse);
 
         // Create a valid payload of type DepositPayload
-        var payload = new DepositPayloadRedirect { RedirectUrl = "https://example.com/redirect" };
+        var payload = new DepositFlowDetailsRedirect { RedirectUrl = "https://example.com/redirect" };
 
         var depositEntity = new DepositEntity
         {
@@ -274,7 +274,7 @@ public class DepositIntegrationTests(
             ProviderAmount = providerResponse.ProviderAmount,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            Payload = payload,
+            FlowDetails = payload,
         };
 
         // Directly save the deposit to the database

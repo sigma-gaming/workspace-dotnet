@@ -9,7 +9,7 @@ public sealed record Deposit
     public required DateTime UpdatedAt { get; init; }
     public required long GemAmount { get; init; }
     public required decimal CurrencyAmount { get; init; }
-    public required DepositPayload Payload { get; init; }
+    public required DepositFlowDetails FlowDetails { get; init; }
     public required Guid UserId { get; init; }
     public Guid? TransactionId { get; init; }
     public required Guid Id { get; init; }
@@ -19,5 +19,5 @@ public sealed record Deposit
     public required Currency Currency { get; init; }
     public required DepositMethod Method { get; init; }
     public required PaymentProvider Provider { get; init; }
-    public required DepositType Type { get; init; }
+    public required DepositFlow Flow { get; init; }
 }

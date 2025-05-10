@@ -26,7 +26,7 @@ public class DepositConfiguration : IEntityTypeConfiguration<DepositEntity>
         entity.Property(e => e.Method)
             .HasColumnType("smallint")
             .HasColumnName("method");
-        entity.Property(e => e.Payload)
+        entity.Property(e => e.FlowDetails)
             .HasColumnType("jsonb")
             .HasColumnName("payload")
             .HasJsonbConversion();
@@ -36,7 +36,7 @@ public class DepositConfiguration : IEntityTypeConfiguration<DepositEntity>
             .HasColumnType("smallint")
             .HasColumnName("status");
         entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
-        entity.Property(e => e.Type)
+        entity.Property(e => e.Flow)
             .HasColumnType("smallint")
             .HasColumnName("type");
         entity.Property(e => e.Provider)

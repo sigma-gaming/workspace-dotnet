@@ -8,4 +8,5 @@ namespace Core.Services.Payment.Configuration;
 public class DepositMethodConfig : PaymentMethodConfig
 {
     public required DepositMethod Method { get; init; }
+    public required DepositFlow Flow { get; init; }
 }

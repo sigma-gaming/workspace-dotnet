@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NATS.Net" Version="2.5.9"/>
-    <PackageReference Include="StackExchange.Redis" Version="2.8.24"/>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2"/>
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.2"/>
+    <PackageReference Include="NATS.Net" Version="2.6.0"/>
+    <PackageReference Include="StackExchange.Redis" Version="2.8.37"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4"/>
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.4"/>
   </ItemGroup>
 
 </Project>

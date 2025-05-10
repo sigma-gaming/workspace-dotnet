@@ -54,8 +54,8 @@ public class PlisioPaymentProvider(
                 Currency = input.Currency,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                Type = DepositType.Redirect,
-                Payload = new DepositPayloadRedirect
+                Flow = DepositFlow.Redirect,
+                FlowDetails = new DepositFlowDetailsRedirect
                 {
                     RedirectUrl = invoice.InvoiceUrl,
                 },

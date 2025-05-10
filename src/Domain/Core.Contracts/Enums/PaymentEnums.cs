@@ -37,7 +37,7 @@ public enum Currency
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum DepositType
+public enum DepositFlow
 {
     Redirect,
     WhiteLabel,

@@ -24,6 +24,7 @@ public static class DepositMethodConfigs
                 MinAmount = 100,
                 MaxAmount = 1000000,
                 CommissionRate = 100,
+                Flow = DepositFlow.Redirect,
             },
 
             // CryptoCloud deposit methods
@@ -35,6 +36,7 @@ public static class DepositMethodConfigs
                 MinAmount = 100,
                 MaxAmount = 1000000,
                 CommissionRate = 100,
+                Flow = DepositFlow.WhiteLabel,
             },
             new DepositMethodConfig
             {
@@ -44,6 +46,7 @@ public static class DepositMethodConfigs
                 MinAmount = 100,
                 MaxAmount = 1000000,
                 CommissionRate = 100,
+                Flow = DepositFlow.WhiteLabel,
             },
             new DepositMethodConfig
             {
@@ -53,6 +56,7 @@ public static class DepositMethodConfigs
                 MinAmount = 100,
                 MaxAmount = 1000000,
                 CommissionRate = 100,
+                Flow = DepositFlow.WhiteLabel,
             },
             new DepositMethodConfig
             {
@@ -62,6 +66,7 @@ public static class DepositMethodConfigs
                 MinAmount = 100,
                 MaxAmount = 1000000,
                 CommissionRate = 100,
+                Flow = DepositFlow.WhiteLabel,
             },
         ];
     }

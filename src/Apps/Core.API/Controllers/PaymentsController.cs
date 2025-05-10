@@ -46,8 +46,10 @@ public class PaymentsController(
 
     [Authorize]
     [HttpPost("/payments/deposit")]
-    [ProducesResponseType<DepositOutput>(StatusCodes.Status200OK)]
-    public async Task<Ok<DepositOutput>> CreateDeposit([FromBody] CreateDepositRequest request)
+    [ProducesResponseType<Deposit>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<Results<Ok<Deposit>, BadRequest<ErrorResponse>, StatusCodeHttpResult>> CreateDeposit([FromBody] CreateDepositRequest request)
     {
         var userId = HttpContext.GetUserId();
         var userIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -61,13 +63,32 @@ public class PaymentsController(
 
         var result = await paymentService.CreateDepositAsync(input);
 
-        return TypedResults.Ok(result);
+        return result.Outcome switch
+        {
+            PaymentOutcome.Success => TypedResults.Ok(result.Deposit!),
+            
+            PaymentOutcome.InvalidAmount => TypedResults.BadRequest(new ErrorResponse(
+                $"Неверная сумма. Минимум: {result.MinAmount}, максимум: {result.MaxAmount} {result.Currency}")),
+                
+            PaymentOutcome.UnsupportedMethod => TypedResults.BadRequest(new ErrorResponse(
+                $"Неподдерживаемый метод пополнения: {result.Method} с валютой {result.Currency} через {result.Provider}")),
+                
+            PaymentOutcome.UnsupportedCurrency => TypedResults.BadRequest(new ErrorResponse(
+                $"Неподдерживаемая валюта: {result.Currency}")),
+                
+            PaymentOutcome.ProviderError => TypedResults.BadRequest(new ErrorResponse(
+                $"Ошибка платежного провайдера: {result.Error}")),
+                
+            _ => TypedResults.StatusCode(StatusCodes.Status500InternalServerError)
+        };
     }
 
     [Authorize]
     [HttpPost("/payments/withdrawal")]
-    [ProducesResponseType<WithdrawalOutput>(StatusCodes.Status200OK)]
-    public async Task<Ok<WithdrawalOutput>> CreateWithdrawal([FromBody] CreateWithdrawalRequest request)
+    [ProducesResponseType<Withdrawal>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<Results<Ok<Withdrawal>, BadRequest<ErrorResponse>, StatusCodeHttpResult>> CreateWithdrawal([FromBody] CreateWithdrawalRequest request)
     {
         var userId = HttpContext.GetUserId();
         var userIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -83,7 +104,27 @@ public class PaymentsController(
 
         var result = await paymentService.CreateWithdrawalAsync(input);
 
-        return TypedResults.Ok(result);
+        return result.Outcome switch
+        {
+            PaymentOutcome.Success => TypedResults.Ok(result.Withdrawal!),
+            
+            PaymentOutcome.InsufficientFunds => TypedResults.BadRequest(new ErrorResponse(
+                $"Недостаточно средств. Доступно: {result.Available}")),
+                
+            PaymentOutcome.InvalidAmount => TypedResults.BadRequest(new ErrorResponse(
+                $"Неверная сумма. Минимум: {result.MinAmount}, максимум: {result.MaxAmount} {result.Currency}")),
+                
+            PaymentOutcome.UnsupportedMethod => TypedResults.BadRequest(new ErrorResponse(
+                $"Неподдерживаемый метод вывода: {result.Method} с валютой {result.Currency} через {result.Provider}")),
+                
+            PaymentOutcome.UnsupportedCurrency => TypedResults.BadRequest(new ErrorResponse(
+                $"Неподдерживаемая валюта: {result.Currency}")),
+                
+            PaymentOutcome.ProviderError => TypedResults.BadRequest(new ErrorResponse(
+                $"Ошибка платежного провайдера: {result.Error}")),
+                
+            _ => TypedResults.StatusCode(StatusCodes.Status500InternalServerError)
+        };
     }
 
     [Authorize]

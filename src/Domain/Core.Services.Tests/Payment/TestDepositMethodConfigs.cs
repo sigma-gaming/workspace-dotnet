@@ -23,6 +23,7 @@ public static class TestDepositMethodConfigs
                 MinAmount = 100,
                 MaxAmount = 10000,
                 CommissionRate = 100,
+                Flow = DepositFlow.Redirect,
             },
             new DepositMethodConfig
             {
@@ -32,6 +33,7 @@ public static class TestDepositMethodConfigs
                 MinAmount = 100,
                 MaxAmount = 1000000,
                 CommissionRate = 100,
+                Flow = DepositFlow.Redirect,
             },
             new DepositMethodConfig
             {
@@ -41,6 +43,7 @@ public static class TestDepositMethodConfigs
                 MinAmount = 100,
                 MaxAmount = 1000000,
                 CommissionRate = 100,
+                Flow = DepositFlow.Redirect,
             },
         ];
     }

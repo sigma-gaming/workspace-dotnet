@@ -65,8 +65,8 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
                 Currency = input.Currency,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                Type = DepositType.WhiteLabel,
-                Payload = new DepositPayloadWhiteLabel
+                Flow = DepositFlow.WhiteLabel,
+                FlowDetails = new DepositFlowDetailsWhiteLabel
                 {
                     Instructions = new DepositInstructionsCryptoWallet
                     {

@@ -26,8 +26,8 @@ public class TestDepositProvider(ILogger<TestDepositProvider>? logger = null) : 
             Currency = input.Currency,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            Type = DepositType.Redirect,
-            Payload = new DepositPayloadRedirect { RedirectUrl = "https://example.com" },
+            Flow = DepositFlow.Redirect,
+            FlowDetails = new DepositFlowDetailsRedirect { RedirectUrl = "https://example.com" },
         });
     }
 
@@ -52,25 +52,25 @@ public class TestDepositProvider(ILogger<TestDepositProvider>? logger = null) : 
 /// <summary>
 ///     Test withdrawal provider implementation for tests
 /// </summary>
-public class TestWithdrawalProvider(ILogger<TestWithdrawalProvider>? logger = null) : IWithdrawalProvider, ITestPaymentProvider
+public class TestWithdrawalProvider(ILogger<TestWithdrawalProvider>? logger = null)
+    : IWithdrawalProvider, ITestPaymentProvider
 {
-    public string TestIdentifier => "WithdrawalTest";
-    
     // Override Provider behavior to accept any provider
     // Note: Using private field to store the actual provider used by the last request
-    private PaymentProvider _provider = PaymentProvider.Plisio;
-    
-    public PaymentProvider Provider => _provider;
+    public string TestIdentifier => "WithdrawalTest";
+
+    public PaymentProvider Provider { get; private set; } = PaymentProvider.Plisio;
 
     public Task<WithdrawalResponse> CreateWithdrawalAsync(WithdrawalInput input)
     {
-        logger?.LogInformation("TestWithdrawalProvider.CreateWithdrawalAsync called for {Provider} with amount {Amount}", 
+        logger?.LogInformation(
+            "TestWithdrawalProvider.CreateWithdrawalAsync called for {Provider} with amount {Amount}",
             input.Provider, input.GemAmount);
-            
+
         // Store the requested provider for future reference
-        _provider = input.Provider;
-        
-        logger?.LogInformation("Now supporting provider: {Provider}", _provider);
+        Provider = input.Provider;
+
+        logger?.LogInformation("Now supporting provider: {Provider}", Provider);
 
         // Always return a successful response for testing but use a reasonable string value
         // for the provider amount to avoid numeric overflow in the database
@@ -87,21 +87,21 @@ public class TestWithdrawalProvider(ILogger<TestWithdrawalProvider>? logger = nu
 
     public Task<PaymentStatus> GetWithdrawalStatusAsync(string providerTransactionId)
     {
-        logger?.LogInformation("TestWithdrawalProvider.GetWithdrawalStatusAsync called for {ProviderTransactionId}", 
+        logger?.LogInformation("TestWithdrawalProvider.GetWithdrawalStatusAsync called for {ProviderTransactionId}",
             providerTransactionId);
         return Task.FromResult(PaymentStatus.Pending);
     }
 
     public Task CancelWithdrawalAsync(string providerTransactionId)
     {
-        logger?.LogInformation("TestWithdrawalProvider.CancelWithdrawalAsync called for {ProviderTransactionId}", 
+        logger?.LogInformation("TestWithdrawalProvider.CancelWithdrawalAsync called for {ProviderTransactionId}",
             providerTransactionId);
         return Task.CompletedTask;
     }
 
     public Task<PaymentStatus> GetTransactionStatusAsync(string transactionId)
     {
-        logger?.LogInformation("TestWithdrawalProvider.GetTransactionStatusAsync called for {TransactionId}", 
+        logger?.LogInformation("TestWithdrawalProvider.GetTransactionStatusAsync called for {TransactionId}",
             transactionId);
         return Task.FromResult(PaymentStatus.Pending);
     }

@@ -91,7 +91,7 @@ public class PaymentService(
                     UpdatedAt = response.UpdatedAt,
                     GemAmount = input.GemAmount,
                     CurrencyAmount = decimal.TryParse(response.ProviderAmount, out var ca) ? ca : 0,
-                    Payload = response.Payload,
+                    FlowDetails = response.FlowDetails,
                     UserId = input.UserId,
                     ProviderTransactionId = response.ProviderTransactionId,
                     ProviderAmount = response.ProviderAmount,
@@ -99,7 +99,7 @@ public class PaymentService(
                     Currency = input.Currency,
                     Method = input.Method,
                     Provider = input.Provider,
-                    Type = response.Type,
+                    Flow = response.Flow,
                 };
 
                 db.Deposits.Add(deposit);
