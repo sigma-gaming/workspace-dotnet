@@ -8,8 +8,6 @@ namespace Core.Tasks.Services;
 ///     Service that handles the registration of recurring Hangfire jobs
 /// </summary>
 public class JobsService(
-    DataCleanupJob dataCleanupJob,
-    HealthCheckJob healthCheckJob,
     InitializeChatMessagesJob initializeChatMessagesJob,
     ProcessReferrerPayoutsJob processReferrerPayoutsJob,
     ProcessStaleDepositsJob processStaleDepositsJob,
@@ -26,26 +24,6 @@ public class JobsService(
     public void RegisterJobs()
     {
         logger?.LogInformation("Registering recurring background jobs");
-
-        // Register data cleanup job to run daily at 3:00 AM
-        RecurringJob.AddOrUpdate(
-            "data-cleanup-job",
-            () => dataCleanupJob.ExecuteAsync(CancellationToken.None),
-            Cron.Daily(3, 0),
-            new RecurringJobOptions
-            {
-                TimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Moscow"),
-            });
-
-        // Register health check job to run every 5 minutes
-        RecurringJob.AddOrUpdate(
-            "health-check-job",
-            () => healthCheckJob.ExecuteAsync(CancellationToken.None),
-            "*/5 * * * *",
-            new RecurringJobOptions
-            {
-                TimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Moscow"),
-            });
 
         // Register chat messages initialization job to run every 10 minutes
         RecurringJob.AddOrUpdate(
@@ -118,5 +96,21 @@ public class JobsService(
             });
 
         logger?.LogInformation("Registered all recurring background jobs");
+    }
+
+    /// <summary>
+    ///     Triggers specified jobs to run immediately on application startup
+    /// </summary>
+    public void RunJobsOnStartup()
+    {
+        logger?.LogInformation("Running specified jobs on startup");
+
+        // Enqueue jobs to run immediately on startup
+        // You can add or remove jobs from this list based on your requirements
+        BackgroundJob.Enqueue(() => syncBudgetJob.ExecuteAsync(CancellationToken.None));
+        BackgroundJob.Enqueue(() => updateCurrencyRatesJob.ExecuteAsync(CancellationToken.None));
+        BackgroundJob.Enqueue(() => sendAdvancedGamesMetricsJob.ExecuteAsync(CancellationToken.None));
+
+        logger?.LogInformation("Enqueued startup jobs for immediate execution");
     }
 }

@@ -1,3 +1,7 @@
+using Core.Builder;
+using Core.Cache;
+using Core.Db;
+using Core.Services;
 using Core.Tasks.Configuration;
 using Core.Tasks.Jobs;
 using Core.Tasks.Services;
@@ -27,6 +31,7 @@ try
     var host = Host.CreateDefaultBuilder(args)
         .ConfigureAppConfiguration((hostContext, config) =>
         {
+            Console.WriteLine(hostContext.HostingEnvironment.EnvironmentName);
             config.AddJsonFile("appsettings.json", false);
             config.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true);
             config.AddEnvironmentVariables();
@@ -65,12 +70,14 @@ try
 
             // Register services
             services.AddSingleton<IJobsService, JobsService>();
-            
-            // Register existing jobs
-            services.AddTransient<DataCleanupJob>();
-            services.AddTransient<HealthCheckJob>();
-            
-            // Register new jobs ported from Node.js
+
+            services.Core()
+                .AddCoreDb(configuration)
+                .AddCoreCache(configuration)
+                .AddCommonServices(configuration)
+                .AddChat()
+                .AddPayment(configuration);
+
             services.AddTransient<InitializeChatMessagesJob>();
             services.AddTransient<ProcessReferrerPayoutsJob>();
             services.AddTransient<ProcessStaleDepositsJob>();
@@ -86,6 +93,9 @@ try
     // Get the jobs service and register jobs
     var jobsService = host.Services.GetRequiredService<IJobsService>();
     jobsService.RegisterJobs();
+
+    // Run specified jobs immediately on startup
+    jobsService.RunJobsOnStartup();
 
     // Run the host
     await host.RunAsync();

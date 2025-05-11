@@ -9,4 +9,9 @@ public interface IJobsService
     /// Registers all background jobs with the scheduler
     /// </summary>
     void RegisterJobs();
+
+    /// <summary>
+    /// Triggers specified jobs to run immediately on application startup
+    /// </summary>
+    void RunJobsOnStartup();
 }

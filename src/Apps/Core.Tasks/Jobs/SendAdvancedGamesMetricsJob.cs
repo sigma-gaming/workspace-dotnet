@@ -33,7 +33,7 @@ public class SendAdvancedGamesMetricsJob(
 
         try
         {
-            var cacheLock = cache.LastMetricsTransactionId.AcquireLockAsync(cancellationToken: ct);
+            await using var cacheLock = await cache.LastMetricsTransactionId.AcquireLockAsync(cancellationToken: ct);
 
             var lastProcessedTransactionId = await cache.LastMetricsTransactionId.GetAsync();
             var budget = await budgetService.GetAvailableAsync(ct);
