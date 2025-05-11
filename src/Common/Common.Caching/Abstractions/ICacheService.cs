@@ -41,4 +41,11 @@ public interface ICacheService
     IKeyedBooleanCacheEntity<TKey> CreateKeyedBoolean<TKey>(
         Func<TKey, string> keyGenerator,
         TimeSpan? ttl = null);
+        
+    /// <summary>
+    /// Creates a cache lock manager for the specified resource key.
+    /// </summary>
+    /// <param name="resourceKey">The resource key to create a lock manager for.</param>
+    /// <returns>A cache lock manager instance.</returns>
+    ICacheLockManager CreateLockManager(string resourceKey);
 }

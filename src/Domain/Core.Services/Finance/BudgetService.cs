@@ -25,43 +25,43 @@ public class BudgetService(
         return budgetMapper.ToData(budgetEntity);
     }
 
-    public async Task<Budget> GetBudgetAsync()
+    public async Task<Budget> GetBudgetAsync(CancellationToken ct = default)
     {
         var cached = await cache.Budget.TryGetAsync();
         if (cached is not null) return cached;
 
-        var budget = await QueryBudgetAsync();
+        var budget = await QueryBudgetAsync(ct);
 
         await cache.Budget.TrySetAsync(budget);
 
         return budget;
     }
 
-    public async Task<long> GetAvailableAsync()
+    public async Task<long> GetAvailableAsync(CancellationToken ct = default)
     {
         var cached = await cache.BudgetAvailable.TryGetAsync();
         if (cached is not null) return cached.Value;
 
-        var budget = await GetBudgetAsync();
+        var budget = await GetBudgetAsync(ct);
 
         await cache.BudgetAvailable.TrySetAsync(budget.Available);
 
         return budget.Available;
     }
 
-    private async Task SetBudgetAsync(long amount)
+    private async Task SetBudgetAsync(long amount, CancellationToken ct = default)
     {
-        var available = await GetAvailableAsync();
+        var available = await GetAvailableAsync(ct);
 
         await db.Budget.ExecuteUpdateAsync(setters =>
             setters.SetProperty(b => b.Available, available)
-                .SetProperty(b => b.LastSyncAt, DateTime.UtcNow));
+                .SetProperty(b => b.LastSyncAt, DateTime.UtcNow), ct);
     }
 
-    public async Task SyncBudgetAsync()
+    public async Task SyncBudgetAsync(CancellationToken ct = default)
     {
-        var available = await GetAvailableAsync();
-        await SetBudgetAsync(available);
+        var available = await GetAvailableAsync(ct);
+        await SetBudgetAsync(available, ct);
     }
 
     public async Task<DateTime> GetSyncedAtAsync()

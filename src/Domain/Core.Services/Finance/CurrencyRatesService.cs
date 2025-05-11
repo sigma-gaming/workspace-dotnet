@@ -24,15 +24,15 @@ public class CurrencyRatesService(
         [BinanceSymbol.DogeUsdt] = Currency.Doge,
     };
 
-    private async Task<CurrencyExchangeRates> GetLatestRatesAsync()
+    private async Task<CurrencyExchangeRates> GetLatestRatesAsync(CancellationToken ct = default)
     {
         var rates = new CurrencyExchangeRates();
         var map = rates.Map;
 
         try
         {
-            var fiatRatesTask = coincapApi.GetRates();
-            var cryptoRatesTask = binanceApi.GetTickerPrice(SymbolCurrencyMap.Keys.ToArray());
+            var fiatRatesTask = coincapApi.GetRates(ct);
+            var cryptoRatesTask = binanceApi.GetTickerPrice(SymbolCurrencyMap.Keys.ToArray(), ct);
 
             await Task.WhenAll(fiatRatesTask, cryptoRatesTask);
             var fiatRates = fiatRatesTask.Result;
@@ -88,9 +88,9 @@ public class CurrencyRatesService(
         return await cache.CurrencyExchangeRates.GetAsync();
     }
 
-    public async Task UpdateRatesAsync()
+    public async Task UpdateRatesAsync(CancellationToken ct = default)
     {
-        var rates = await GetLatestRatesAsync();
+        var rates = await GetLatestRatesAsync(ct);
         await cache.CurrencyExchangeRates.SetAsync(rates);
     }
 

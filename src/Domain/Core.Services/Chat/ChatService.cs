@@ -20,7 +20,7 @@ public class ChatService(
     ChatMessageMapper mapper,
     ILogger<ChatService> logger)
 {
-    public async Task InitializeMessagesAsync()
+    public async Task InitializeMessagesAsync(CancellationToken ct = default)
     {
         if (!cache.IsReady())
         {
@@ -34,7 +34,7 @@ public class ChatService(
         var messages = await db.ChatMessages
             .OrderByDescending(m => m.Id)
             .Take(50)
-            .ToListAsync();
+            .ToListAsync(ct);
 
         await cache.LastChatMessages.SetAllAsync(messages.Select(mapper.ToData).ToList());
     }

@@ -240,7 +240,7 @@ public class CoreDbFixture : IAsyncLifetime, IDisposable
                 options = new RespawnerOptions
                 {
                     DbAdapter = DbAdapter.Postgres,
-                    SchemasToInclude = new[] { schemaName },
+                    SchemasToInclude = [schemaName],
                 };
             else
                 options = new RespawnerOptions

@@ -5,7 +5,7 @@ namespace Common.Caching;
 
 public abstract class BaseCacheOperations(IConnectionMultiplexer redis, ILogger logger)
 {
-    protected bool IsReady()
+    private bool IsReady()
     {
         return redis.IsConnected;
     }
@@ -39,5 +39,10 @@ public abstract class BaseCacheOperations(IConnectionMultiplexer redis, ILogger 
         {
             logger.LogError(ex, "Error while executing cache operation");
         }
+    }
+
+    protected CacheLockManager CreateLockManager(string resourceKey)
+    {
+        return new CacheLockManager(redis, $"lock:{resourceKey}", logger);
     }
 }

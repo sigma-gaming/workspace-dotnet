@@ -1,3 +1,4 @@
+using Core.Tasks.Configuration;
 using Core.Tasks.Jobs;
 using Core.Tasks.Services;
 using Hangfire;
@@ -59,9 +60,24 @@ try
             var workerCount = configuration.GetSection("Hangfire:WorkerCount").Get<int?>() ?? 5;
             services.AddHangfireServer(options => options.WorkerCount = workerCount);
 
+            // Add metrics configuration
+            services.AddMetricsConfiguration(configuration);
+
+            // Register services
             services.AddSingleton<IJobsService, JobsService>();
+            
+            // Register existing jobs
             services.AddTransient<DataCleanupJob>();
             services.AddTransient<HealthCheckJob>();
+            
+            // Register new jobs ported from Node.js
+            services.AddTransient<InitializeChatMessagesJob>();
+            services.AddTransient<ProcessReferrerPayoutsJob>();
+            services.AddTransient<ProcessStaleDepositsJob>();
+            services.AddTransient<ProcessStaleWithdrawalsJob>();
+            services.AddTransient<SendAdvancedGamesMetricsJob>();
+            services.AddTransient<SyncBudgetJob>();
+            services.AddTransient<UpdateCurrencyRatesJob>();
 
             services.AddLogging(builder => { builder.AddSerilog(dispose: false); });
         })

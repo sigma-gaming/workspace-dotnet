@@ -1,6 +1,6 @@
 namespace Common.Caching.Abstractions;
 
-public interface IIntegerCacheEntity : ICacheOperations
+public interface IIntegerCacheEntity : ICacheOperations, ILockableCacheEntity
 {
     Task<long?> GetAsync();
     Task<long?> TryGetAsync();
@@ -12,7 +12,7 @@ public interface IIntegerCacheEntity : ICacheOperations
     Task TryDecrementByAsync(long value);
 }
 
-public interface IKeyedIntegerCacheEntity<in TKey> : IKeyedCacheOperations<TKey>
+public interface IKeyedIntegerCacheEntity<in TKey> : IKeyedCacheOperations<TKey>, ILockableKeyedCacheEntity<TKey>
 {
     Task<long?> GetAsync(TKey key);
     Task<long?> TryGetAsync(TKey key);
@@ -24,7 +24,7 @@ public interface IKeyedIntegerCacheEntity<in TKey> : IKeyedCacheOperations<TKey>
     Task TryDecrementByAsync(TKey key, long value);
 }
 
-public interface IStringCacheEntity : ICacheOperations
+public interface IStringCacheEntity : ICacheOperations, ILockableCacheEntity
 {
     Task<string?> GetAsync();
     Task<string?> TryGetAsync();
@@ -32,7 +32,7 @@ public interface IStringCacheEntity : ICacheOperations
     Task TrySetAsync(string value);
 }
 
-public interface IKeyedStringCacheEntity<in TKey> : IKeyedCacheOperations<TKey>
+public interface IKeyedStringCacheEntity<in TKey> : IKeyedCacheOperations<TKey>, ILockableKeyedCacheEntity<TKey>
 {
     Task<string?> GetAsync(TKey key);
     Task<string?> TryGetAsync(TKey key);
@@ -40,7 +40,7 @@ public interface IKeyedStringCacheEntity<in TKey> : IKeyedCacheOperations<TKey>
     Task TrySetAsync(TKey key, string value);
 }
 
-public interface IBooleanCacheEntity : ICacheOperations
+public interface IBooleanCacheEntity : ICacheOperations, ILockableCacheEntity
 {
     Task<bool?> GetAsync();
     Task<bool?> TryGetAsync();
@@ -50,7 +50,7 @@ public interface IBooleanCacheEntity : ICacheOperations
     Task TryToggleAsync();
 }
 
-public interface IKeyedBooleanCacheEntity<in TKey> : IKeyedCacheOperations<TKey>
+public interface IKeyedBooleanCacheEntity<in TKey> : IKeyedCacheOperations<TKey>, ILockableKeyedCacheEntity<TKey>
 {
     Task<bool?> GetAsync(TKey key);
     Task<bool?> TryGetAsync(TKey key);

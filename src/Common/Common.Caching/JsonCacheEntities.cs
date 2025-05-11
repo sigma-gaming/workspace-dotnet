@@ -57,6 +57,21 @@ public class JsonCacheEntity<T>(
     {
         await ExecuteWithSafetyAsync(DeleteAsync);
     }
+
+    public Task<ICacheLock> AcquireLockAsync(
+        TimeSpan? expiryTime = null,
+        TimeSpan? waitTime = null,
+        TimeSpan? retryTime = null,
+        CancellationToken cancellationToken = default)
+    {
+        var lockManager = CreateLockManager(key);
+
+        return lockManager.AcquireLockAsync(
+            expiryTime ?? TimeSpan.FromSeconds(30),
+            waitTime ?? TimeSpan.FromSeconds(10),
+            retryTime ?? TimeSpan.FromMilliseconds(200),
+            cancellationToken);
+    }
 }
 
 public class KeyedJsonCacheEntity<TKey, TValue>(
@@ -64,7 +79,8 @@ public class KeyedJsonCacheEntity<TKey, TValue>(
     ILogger logger,
     Func<TKey, string> keyGenerator,
     TimeSpan? ttl = null
-) : BaseCacheOperations(redis, logger), IKeyedJsonCacheEntity<TKey, TValue> where TValue : class
+) : BaseCacheOperations(redis, logger), IKeyedJsonCacheEntity<TKey, TValue>
+    where TValue : class
 {
     private readonly IDatabase db = redis.GetDatabase();
 
@@ -110,6 +126,22 @@ public class KeyedJsonCacheEntity<TKey, TValue>(
     public async Task TryDeleteAsync(TKey key)
     {
         await ExecuteWithSafetyAsync(() => DeleteAsync(key));
+    }
+
+    public Task<ICacheLock> AcquireLockAsync(
+        TKey key,
+        TimeSpan? expiryTime = null,
+        TimeSpan? waitTime = null,
+        TimeSpan? retryTime = null,
+        CancellationToken cancellationToken = default)
+    {
+        var lockManager = CreateLockManager(keyGenerator(key));
+
+        return lockManager.AcquireLockAsync(
+            expiryTime ?? TimeSpan.FromSeconds(30),
+            waitTime ?? TimeSpan.FromSeconds(10),
+            retryTime ?? TimeSpan.FromMilliseconds(200),
+            cancellationToken);
     }
 }
 
@@ -231,15 +263,31 @@ public class JsonListCacheEntity<T>(
     {
         await ExecuteWithSafetyAsync(DeleteAsync);
     }
+
+    public Task<ICacheLock> AcquireLockAsync(
+        TimeSpan? expiryTime = null,
+        TimeSpan? waitTime = null,
+        TimeSpan? retryTime = null,
+        CancellationToken cancellationToken = default)
+    {
+        var lockManager = CreateLockManager(key);
+
+        return lockManager.AcquireLockAsync(
+            expiryTime ?? TimeSpan.FromSeconds(30),
+            waitTime ?? TimeSpan.FromSeconds(10),
+            retryTime ?? TimeSpan.FromMilliseconds(200),
+            cancellationToken);
+    }
 }
 
-public class KeyedJsonListCacheEntity<TKey, T>(
+public class KeyedJsonListCacheEntity<TKey, TValue>(
     IConnectionMultiplexer redis,
     ILogger logger,
     Func<TKey, string> keyGenerator,
     int maxItems = 100,
     TimeSpan? ttl = null
-) : BaseCacheOperations(redis, logger), IKeyedListCacheEntity<TKey, T> where T : class
+) : BaseCacheOperations(redis, logger), IKeyedListCacheEntity<TKey, TValue>
+    where TValue : class
 {
     private readonly IDatabase db = redis.GetDatabase();
 
@@ -248,14 +296,74 @@ public class KeyedJsonListCacheEntity<TKey, T>(
         return await db.KeyExistsAsync(keyGenerator(key));
     }
 
-    public async Task<bool> TryExistsAsync(TKey key)
-    {
-        return await ExecuteWithSafetyAsync(() => ExistsAsync(key), false);
-    }
-
     public async Task DeleteAsync(TKey key)
     {
         await db.KeyDeleteAsync(keyGenerator(key));
+    }
+
+    public async Task<List<TValue>> GetAllAsync(TKey key)
+    {
+        var values = await db.ListRangeAsync(keyGenerator(key));
+
+        return values
+            .Select(x => JsonSerializer.Deserialize<TValue>(x!))
+            .Where(x => x is not null)
+            .ToList()!;
+    }
+
+    public async Task SetAllAsync(TKey key, List<TValue> items)
+    {
+        var cacheKey = keyGenerator(key);
+        var serialized = items.Select(x => (RedisValue)JsonSerializer.Serialize(x)).ToArray();
+        var transaction = db.CreateTransaction();
+
+#pragma warning disable CS4014
+        transaction.KeyDeleteAsync(cacheKey);
+        transaction.ListRightPushAsync(cacheKey, serialized);
+        if (ttl.HasValue)
+            transaction.KeyExpireAsync(cacheKey, ttl);
+#pragma warning restore CS4014
+
+        var succeed = await transaction.ExecuteAsync();
+        if (!succeed)
+            throw new Exception("Failed to set all items");
+    }
+
+    public async Task LeftPushAsync(TKey key, TValue item)
+    {
+        var cacheKey = keyGenerator(key);
+        var json = JsonSerializer.Serialize(item);
+        await db.ListLeftPushAsync(cacheKey, json);
+        await db.ListTrimAsync(cacheKey, 0, maxItems - 1);
+
+        if (ttl.HasValue)
+            await db.KeyExpireAsync(cacheKey, ttl);
+    }
+
+    public async Task RightPushAsync(TKey key, TValue item)
+    {
+        var cacheKey = keyGenerator(key);
+        var json = JsonSerializer.Serialize(item);
+        await db.ListRightPushAsync(cacheKey, json);
+        await db.ListTrimAsync(cacheKey, -maxItems, -1);
+
+        if (ttl.HasValue)
+            await db.KeyExpireAsync(cacheKey, ttl);
+    }
+
+    public async Task<int> GetCountAsync(TKey key)
+    {
+        return (int)await db.ListLengthAsync(keyGenerator(key));
+    }
+
+    public async Task ClearAsync(TKey key)
+    {
+        await db.KeyDeleteAsync(keyGenerator(key));
+    }
+
+    public async Task<bool> TryExistsAsync(TKey key)
+    {
+        return await ExecuteWithSafetyAsync(() => ExistsAsync(key), false);
     }
 
     public async Task TryDeleteAsync(TKey key)
@@ -263,82 +371,25 @@ public class KeyedJsonListCacheEntity<TKey, T>(
         await ExecuteWithSafetyAsync(() => DeleteAsync(key));
     }
 
-    public async Task<List<T>> GetAllAsync(TKey key)
-    {
-        var values = await db.ListRangeAsync(keyGenerator(key));
-
-        return values
-            .Select(x => JsonSerializer.Deserialize<T>(x!))
-            .Where(x => x is not null)
-            .ToList()!;
-    }
-
-    public async Task<(List<T> list, bool succeed)> TryGetAllAsync(TKey key)
+    public async Task<(List<TValue> list, bool succeed)> TryGetAllAsync(TKey key)
     {
         var list = await ExecuteWithSafetyAsync(() => GetAllAsync(key), null);
         return (list ?? [], list is not null);
     }
 
-    public async Task SetAllAsync(TKey key, List<T> items)
-    {
-        var serialized = items
-            .Select(x => (RedisValue)JsonSerializer.Serialize(x))
-            .ToArray();
-
-        var transaction = db.CreateTransaction();
-
-#pragma warning disable CS4014
-        transaction.KeyDeleteAsync(keyGenerator(key));
-        transaction.ListRightPushAsync(keyGenerator(key), serialized);
-        if (ttl.HasValue)
-            transaction.KeyExpireAsync(keyGenerator(key), ttl);
-#pragma warning restore CS4014
-
-        var succeed = await transaction.ExecuteAsync();
-        if (!succeed)
-            throw new Exception($"Failed to set all items for key {key}");
-    }
-
-    public async Task TrySetAllAsync(TKey key, List<T> items)
+    public async Task TrySetAllAsync(TKey key, List<TValue> items)
     {
         await ExecuteWithSafetyAsync(() => SetAllAsync(key, items));
     }
 
-    public async Task LeftPushAsync(TKey key, T item)
-    {
-        var json = JsonSerializer.Serialize(item);
-
-        await db.ListLeftPushAsync(keyGenerator(key), json);
-        await db.ListTrimAsync(keyGenerator(key), 0, maxItems - 1);
-
-        if (ttl.HasValue)
-            await db.KeyExpireAsync(keyGenerator(key), ttl);
-    }
-
-    public async Task TryLeftPushAsync(TKey key, T item)
+    public async Task TryLeftPushAsync(TKey key, TValue item)
     {
         await ExecuteWithSafetyAsync(() => LeftPushAsync(key, item));
     }
 
-    public async Task RightPushAsync(TKey key, T item)
-    {
-        var json = JsonSerializer.Serialize(item);
-
-        await db.ListRightPushAsync(keyGenerator(key), json);
-        await db.ListTrimAsync(keyGenerator(key), -maxItems, -1);
-
-        if (ttl.HasValue)
-            await db.KeyExpireAsync(keyGenerator(key), ttl);
-    }
-
-    public async Task TryRightPushAsync(TKey key, T item)
+    public async Task TryRightPushAsync(TKey key, TValue item)
     {
         await ExecuteWithSafetyAsync(() => RightPushAsync(key, item));
-    }
-
-    public async Task<int> GetCountAsync(TKey key)
-    {
-        return (int)await db.ListLengthAsync(keyGenerator(key));
     }
 
     public async Task<(int count, bool succeed)> TryGetCountAsync(TKey key)
@@ -347,13 +398,24 @@ public class KeyedJsonListCacheEntity<TKey, T>(
         return (Math.Max(0, count), count != -1);
     }
 
-    public async Task ClearAsync(TKey key)
-    {
-        await db.KeyDeleteAsync(keyGenerator(key));
-    }
-
     public async Task TryClearAsync(TKey key)
     {
         await ExecuteWithSafetyAsync(() => ClearAsync(key));
+    }
+
+    public Task<ICacheLock> AcquireLockAsync(
+        TKey key,
+        TimeSpan? expiryTime = null,
+        TimeSpan? waitTime = null,
+        TimeSpan? retryTime = null,
+        CancellationToken cancellationToken = default)
+    {
+        var lockManager = CreateLockManager(keyGenerator(key));
+
+        return lockManager.AcquireLockAsync(
+            expiryTime ?? TimeSpan.FromSeconds(30),
+            waitTime ?? TimeSpan.FromSeconds(10),
+            retryTime ?? TimeSpan.FromMilliseconds(200),
+            cancellationToken);
     }
 }

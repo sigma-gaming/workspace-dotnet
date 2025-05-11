@@ -1,6 +1,6 @@
 namespace Common.Caching.Abstractions;
 
-public interface IJsonCacheEntity<T> : ICacheOperations where T : class
+public interface IJsonCacheEntity<T> : ICacheOperations, ILockableCacheEntity where T : class
 {
     Task<T?> GetAsync();
     Task<T?> TryGetAsync();
@@ -8,7 +8,8 @@ public interface IJsonCacheEntity<T> : ICacheOperations where T : class
     Task TrySetAsync(T value);
 }
 
-public interface IKeyedJsonCacheEntity<in TKey, T> : IKeyedCacheOperations<TKey> where T : class
+public interface IKeyedJsonCacheEntity<in TKey, T> : IKeyedCacheOperations<TKey>, ILockableKeyedCacheEntity<TKey>
+    where T : class
 {
     Task<T?> GetAsync(TKey key);
     Task<T?> TryGetAsync(TKey key);
@@ -16,7 +17,7 @@ public interface IKeyedJsonCacheEntity<in TKey, T> : IKeyedCacheOperations<TKey>
     Task TrySetAsync(TKey key, T value);
 }
 
-public interface IListCacheEntity<T> : ICacheOperations where T : class
+public interface IListCacheEntity<T> : ICacheOperations, ILockableCacheEntity where T : class
 {
     Task<List<T>> GetAllAsync();
     Task<(List<T> list, bool succeed)> TryGetAllAsync();
@@ -32,7 +33,8 @@ public interface IListCacheEntity<T> : ICacheOperations where T : class
     Task TryClearAsync();
 }
 
-public interface IKeyedListCacheEntity<in TKey, T> : IKeyedCacheOperations<TKey> where T : class
+public interface IKeyedListCacheEntity<in TKey, T> : IKeyedCacheOperations<TKey>, ILockableKeyedCacheEntity<TKey>
+    where T : class
 {
     Task<List<T>> GetAllAsync(TKey key);
     Task<(List<T> list, bool succeed)> TryGetAllAsync(TKey key);

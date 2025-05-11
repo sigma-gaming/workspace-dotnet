@@ -69,4 +69,9 @@ public class CacheService(IConnectionMultiplexer redis, ILogger<CacheService> lo
     {
         return new KeyedBooleanCacheEntity<TKey>(redis, logger, keyGenerator, ttl);
     }
+
+    public ICacheLockManager CreateLockManager(string resourceKey)
+    {
+        return new CacheLockManager(redis, resourceKey, logger);
+    }
 }
