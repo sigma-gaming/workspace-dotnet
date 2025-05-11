@@ -62,11 +62,11 @@ public class MaintenanceService(
         return state;
     }
 
-    private async Task<bool> QueryBackgroundJobsEnabledAsync()
+    private async Task<bool> QueryBackgroundJobsEnabledAsync(CancellationToken ct = default)
     {
         var config = await db.Config
             .AsNoTracking()
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(ct);
 
         if (config is null)
             throw new InvalidOperationException("Config not found");
@@ -74,13 +74,13 @@ public class MaintenanceService(
         return config.BackgroundJobsEnabled;
     }
 
-    public async Task<bool> AreBackgroundJobsEnabledAsync()
+    public async Task<bool> AreBackgroundJobsEnabledAsync(CancellationToken ct = default)
     {
         var cached = await cache.BackgroundJobsEnabled.TryGetAsync();
         if (cached is not null)
             return cached.Value;
 
-        var enabled = await QueryBackgroundJobsEnabledAsync();
+        var enabled = await QueryBackgroundJobsEnabledAsync(ct);
         await cache.BackgroundJobsEnabled.TrySetAsync(enabled);
         return enabled;
     }

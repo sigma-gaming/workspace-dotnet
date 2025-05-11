@@ -5,13 +5,12 @@ namespace Core.Db.HealthChecks;
 
 public static class HealthChecksExtensions
 {
-    public static IHealthChecksBuilder AddCoreDbHealthCheck(
-        this IHealthChecksBuilder builder,
-        bool isCritical = false)
+    public static IHealthChecksBuilder RequireCoreDb(
+        this IHealthChecksBuilder builder)
     {
         return builder.AddHealthChecker<CoreDbHealthChecker>(
             nameof(CoreDbHealthChecker),
             ServiceLifetime.Scoped,
-            isCritical);
+            true);
     }
 }

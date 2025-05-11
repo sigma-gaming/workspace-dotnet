@@ -65,7 +65,7 @@ builder.Services.AddHostedService<GameHistoryBroadcastService>();
 builder.Services.AddSessionAuth();
 builder.Services.AddAuthorization();
 
-builder.Services.AddHealthChecks().AddMaintenanceHealthCheck(true);
+builder.Services.AddHealthChecks().RequireDisabledMaintenance();
 
 var app = builder.Build();
 

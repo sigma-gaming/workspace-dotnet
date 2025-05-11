@@ -1,113 +1,74 @@
+using Common.Api.Extensions;
+using Common.Monitoring.HealthChecks;
+using Common.Monitoring.Logging;
 using Core.Builder;
 using Core.Cache;
+using Core.Contracts;
 using Core.Db;
+using Core.Db.HealthChecks;
+using Core.Nats;
 using Core.Services;
-using Core.Tasks.Configuration;
+using Core.Services.System;
 using Core.Tasks.Jobs;
 using Core.Tasks.Services;
 using Hangfire;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Serilog;
-using Serilog.Events;
-using Serilog.Formatting.Compact;
+using Hangfire.Redis.StackExchange;
+using StackExchange.Redis;
 
-const string appName = "Core Tasks";
+const string apiName = "Core Tasks";
+var builder = WebApplication.CreateSlimBuilder(args);
 
-// Configure Serilog
-Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .Enrich.WithProperty("App", appName)
-    .MinimumLevel.Information()
-    .WriteTo.Async(c => c.Console())
-    .CreateLogger();
+builder.AddCommonHttpConfiguration().AddCommonMvcConfiguration();
+builder.AddLogging(apiName);
 
-try
+builder.Services.AddHttpClient();
+
+builder.Services.Core()
+    .AddCoreDb(builder.Configuration)
+    .AddCoreCache(builder.Configuration)
+    .AddCoreNats(builder.Configuration)
+    .AddMappers()
+    .AddCommonServices(builder.Configuration)
+    .AddChat()
+    .AddPayment(builder.Configuration);
+
+builder.Services.AddScoped<InitializeChatMessagesJob>();
+builder.Services.AddScoped<ProcessReferrerPayoutsJob>();
+builder.Services.AddScoped<ProcessStaleDepositsJob>();
+builder.Services.AddScoped<ProcessStaleWithdrawalsJob>();
+builder.Services.AddScoped<SendAdvancedGamesMetricsJob>();
+builder.Services.AddScoped<SyncBudgetJob>();
+builder.Services.AddScoped<UpdateCurrencyRatesJob>();
+
+builder.Services.AddScoped<IJobsService, JobsService>();
+
+builder.Services.AddHangfire((provider, config) =>
 {
-    Log.Information("Starting {AppName}", appName);
+    var redis = provider.GetRequiredService<IConnectionMultiplexer>();
+    config.UseRedisStorage(redis);
+});
 
-    // Create and configure the host builder
-    var host = Host.CreateDefaultBuilder(args)
-        .ConfigureAppConfiguration((hostContext, config) =>
-        {
-            Console.WriteLine(hostContext.HostingEnvironment.EnvironmentName);
-            config.AddJsonFile("appsettings.json", false);
-            config.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true);
-            config.AddEnvironmentVariables();
-        })
-        .UseSerilog((hostContext, loggerConfiguration) =>
-        {
-            loggerConfiguration.Enrich.FromLogContext();
-            loggerConfiguration.Enrich.WithProperty("App", appName);
-            loggerConfiguration.MinimumLevel.Information();
+builder.Services.AddHangfireServer();
 
-            if (hostContext.HostingEnvironment.IsProduction())
-                loggerConfiguration
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                    .MinimumLevel.Override("Hangfire", LogEventLevel.Information)
-                    .WriteTo.Async(c => c.Console(new CompactJsonFormatter()));
-            else
-                loggerConfiguration
-                    .WriteTo.Async(c => c.Console());
-        })
-        .ConfigureServices((hostContext, services) =>
-        {
-            var configuration = hostContext.Configuration;
+builder.Services.AddHealthChecks()
+    .RequireCoreDb()
+    .RequireEnabledBackgroundJobs();
 
-            services.AddHangfire(config =>
-            {
-                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                    .UseSimpleAssemblyNameTypeSerializer()
-                    .UseRecommendedSerializerSettings();
-            });
+var app = builder.Build();
 
-            var workerCount = configuration.GetSection("Hangfire:WorkerCount").Get<int?>() ?? 5;
-            services.AddHangfireServer(options => options.WorkerCount = workerCount);
+app.MapPublicPort(appBuilder => { appBuilder.UseHangfireDashboard(); });
 
-            // Add metrics configuration
-            services.AddMetricsConfiguration(configuration);
-
-            // Register services
-            services.AddSingleton<IJobsService, JobsService>();
-
-            services.Core()
-                .AddCoreDb(configuration)
-                .AddCoreCache(configuration)
-                .AddCommonServices(configuration)
-                .AddChat()
-                .AddPayment(configuration);
-
-            services.AddTransient<InitializeChatMessagesJob>();
-            services.AddTransient<ProcessReferrerPayoutsJob>();
-            services.AddTransient<ProcessStaleDepositsJob>();
-            services.AddTransient<ProcessStaleWithdrawalsJob>();
-            services.AddTransient<SendAdvancedGamesMetricsJob>();
-            services.AddTransient<SyncBudgetJob>();
-            services.AddTransient<UpdateCurrencyRatesJob>();
-
-            services.AddLogging(builder => { builder.AddSerilog(dispose: false); });
-        })
-        .Build();
-
-    // Get the jobs service and register jobs
-    var jobsService = host.Services.GetRequiredService<IJobsService>();
-    jobsService.RegisterJobs();
-
-    // Run specified jobs immediately on startup
-    jobsService.RunJobsOnStartup();
-
-    // Run the host
-    await host.RunAsync();
-
-    return 0;
-}
-catch (Exception ex)
+app.MapInternalPort(appBuilder =>
 {
-    Log.Fatal(ex, "Host terminated unexpectedly");
-    return 1;
-}
-finally
-{
-    Log.CloseAndFlush();
-}
+    appBuilder.UseEndpoints(endpoints =>
+    {
+        endpoints.MapLivenessHealthCheck();
+        endpoints.MapReadinessHealthCheck();
+    });
+});
+
+var jobsService = app.Services.GetRequiredService<IJobsService>();
+jobsService.RegisterJobs();
+jobsService.RunJobsOnStartup();
+
+await app.RunAsync();

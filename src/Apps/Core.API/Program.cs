@@ -8,7 +8,6 @@ using Core.API.Configuration;
 using Core.API.Infrastructure.RateLimiting;
 using Core.Builder;
 using Core.Cache;
-using Core.Cache.HealthChecks;
 using Core.Contracts;
 using Core.Contracts.Enums;
 using Core.Db;
@@ -89,10 +88,8 @@ builder.Services.AddRateLimiting(options => options
         new TokenBucketRateLimitSettings(3, 1, TimeSpan.FromMinutes(1))));
 
 builder.Services.AddHealthChecks()
-    .AddCoreDbHealthCheck(true)
-    .AddCoreCacheHealthCheck()
-    .AddCoreNatsHealthCheck()
-    .AddMaintenanceHealthCheck(true);
+    .RequireCoreDb()
+    .RequireDisabledMaintenance();
 
 builder.Services.AddMetrics();
 

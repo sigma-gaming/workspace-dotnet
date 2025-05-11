@@ -4,7 +4,6 @@ using Common.Monitoring.HealthChecks;
 using Common.Monitoring.Logging;
 using Core.Builder;
 using Core.Cache;
-using Core.Cache.HealthChecks;
 using Core.Contracts;
 using Core.Contracts.Enums;
 using Core.Db;
@@ -44,9 +43,8 @@ builder.Services.AddRateLimiting(options => options
 );
 
 builder.Services.AddHealthChecks()
-    .AddCoreDbHealthCheck(true)
-    .AddCoreCacheHealthCheck()
-    .AddMaintenanceHealthCheck(true);
+    .RequireCoreDb()
+    .RequireDisabledMaintenance();
 
 var app = builder.Build();
 

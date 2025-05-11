@@ -1,7 +1,3 @@
-using Core.Tasks.Jobs;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Core.Tasks.Configuration;
 
 /// <summary>

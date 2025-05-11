@@ -70,9 +70,8 @@ builder.Services.AddRateLimiting(options => options
 );
 
 builder.Services.AddHealthChecks()
-    .AddCoreDbHealthCheck(true)
-    .AddCoreCacheHealthCheck()
-    .AddMaintenanceHealthCheck(true);
+    .RequireCoreDb()
+    .RequireDisabledMaintenance();
 
 var app = builder.Build();
 

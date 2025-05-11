@@ -1,5 +1,4 @@
 using Core.Services.Promotions;
-using Microsoft.Extensions.Logging;
 
 namespace Core.Tasks.Jobs;
 
@@ -22,7 +21,7 @@ public class ProcessReferrerPayoutsJob(
         try
         {
             await affiliateService.ProcessReferrerPayoutsAsync(cancellationToken);
-            
+
             logger?.LogInformation("Referrer payouts processing job completed successfully");
         }
         catch (Exception ex)

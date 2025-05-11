@@ -4,7 +4,6 @@ using Common.Monitoring.Logging;
 using Common.OpenApi.Extensions;
 using Core.Builder;
 using Core.Cache;
-using Core.Cache.HealthChecks;
 using Core.Contracts;
 using Core.Db;
 using Core.Db.HealthChecks;
@@ -42,8 +41,7 @@ builder.Services.Core()
 builder.Services.AddSessionAuth();
 
 builder.Services.AddHealthChecks()
-    .AddCoreDbHealthCheck(true)
-    .AddCoreCacheHealthCheck();
+    .RequireCoreDb();
 
 var app = builder.Build();
 

@@ -44,10 +44,10 @@ builder.Services.Core()
     .AddSystem();
 
 builder.Services.AddHealthChecks()
-    .AddCoreDbHealthCheck()
-    .AddCoreCacheHealthCheck()
-    .AddCoreNatsHealthCheck()
-    .AddMaintenanceHealthCheck();
+    .RequireCoreDb()
+    .RequireCoreCache()
+    .RequireCoreNats()
+    .RequireDisabledMaintenance();
 
 var app = builder.Build();
 

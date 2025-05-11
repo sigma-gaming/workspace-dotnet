@@ -1,6 +1,5 @@
 using Core.Tasks.Jobs;
 using Hangfire;
-using Microsoft.Extensions.Logging;
 
 namespace Core.Tasks.Services;
 

@@ -1,5 +1,4 @@
 using Core.Services.Finance;
-using Microsoft.Extensions.Logging;
 
 namespace Core.Tasks.Jobs;
 

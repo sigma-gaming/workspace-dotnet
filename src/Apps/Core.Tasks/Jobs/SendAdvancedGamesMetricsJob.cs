@@ -4,7 +4,6 @@ using Core.Services.Caching;
 using Core.Services.Finance;
 using Core.Tasks.Configuration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Prometheus;
 

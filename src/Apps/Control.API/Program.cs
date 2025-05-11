@@ -5,13 +5,11 @@ using Common.OpenApi.Extensions;
 using Control.API.Configuration;
 using Core.Builder;
 using Core.Cache;
-using Core.Cache.HealthChecks;
 using Core.Contracts;
 using Core.Contracts.Enums;
 using Core.Db;
 using Core.Db.HealthChecks;
 using Core.Nats;
-using Core.Nats.HealthChecks;
 using Core.Services;
 using Core.Services.Auth;
 using Core.Services.System;
@@ -56,9 +54,7 @@ builder.Services.Core()
 builder.Services.AddSessionAuth();
 
 builder.Services.AddHealthChecks()
-    .AddCoreDbHealthCheck(true)
-    .AddCoreCacheHealthCheck()
-    .AddCoreNatsHealthCheck();
+    .RequireCoreDb();
 
 var app = builder.Build();
 
