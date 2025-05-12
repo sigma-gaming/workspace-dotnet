@@ -13,7 +13,6 @@ using Core.Contracts.Enums;
 using Core.Db;
 using Core.Db.HealthChecks;
 using Core.Nats;
-using Core.Nats.HealthChecks;
 using Core.Services;
 using Core.Services.Auth;
 using Core.Services.System;
@@ -61,6 +60,7 @@ builder.Services.Core()
     .AddNotifications()
     .AddTelegram(builder.Configuration)
     .AddGlobalTasks()
+    .AddCurrencyRates(builder.Configuration)
     .AddPayment(builder.Configuration);
 
 builder.Services.AddSessionAuth();

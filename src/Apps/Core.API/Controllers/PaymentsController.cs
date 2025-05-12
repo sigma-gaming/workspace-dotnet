@@ -3,9 +3,10 @@ using Core.Contracts.Compounds;
 using Core.Contracts.Data;
 using Core.Contracts.Enums;
 using Core.Services.Auth;
-using Core.Services.Finance;
+using Core.Services.CurrencyRates;
 using Core.Services.Payment;
 using Core.Services.Payment.Configuration;
+using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -15,7 +16,7 @@ namespace Core.API.Controllers;
 
 [ApiController]
 public class PaymentsController(
-    PaymentService paymentService,
+    IPaymentService paymentService,
     CurrencyRatesService currencyRatesService,
     WalletService walletService)
     : ControllerBase
@@ -49,7 +50,8 @@ public class PaymentsController(
     [ProducesResponseType<Deposit>(StatusCodes.Status200OK)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status500InternalServerError)]
-    public async Task<Results<Ok<Deposit>, BadRequest<ErrorResponse>, StatusCodeHttpResult>> CreateDeposit([FromBody] CreateDepositRequest request)
+    public async Task<Results<Ok<Deposit>, BadRequest<ErrorResponse>, StatusCodeHttpResult>> CreateDeposit(
+        [FromBody] CreateDepositRequest request)
     {
         var userId = HttpContext.GetUserId();
         var userIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -66,20 +68,20 @@ public class PaymentsController(
         return result.Outcome switch
         {
             PaymentOutcome.Success => TypedResults.Ok(result.Deposit!),
-            
+
             PaymentOutcome.InvalidAmount => TypedResults.BadRequest(new ErrorResponse(
                 $"Неверная сумма. Минимум: {result.MinAmount}, максимум: {result.MaxAmount} {result.Currency}")),
-                
+
             PaymentOutcome.UnsupportedMethod => TypedResults.BadRequest(new ErrorResponse(
                 $"Неподдерживаемый метод пополнения: {result.Method} с валютой {result.Currency} через {result.Provider}")),
-                
+
             PaymentOutcome.UnsupportedCurrency => TypedResults.BadRequest(new ErrorResponse(
                 $"Неподдерживаемая валюта: {result.Currency}")),
-                
+
             PaymentOutcome.ProviderError => TypedResults.BadRequest(new ErrorResponse(
                 $"Ошибка платежного провайдера: {result.Error}")),
-                
-            _ => TypedResults.StatusCode(StatusCodes.Status500InternalServerError)
+
+            _ => TypedResults.StatusCode(StatusCodes.Status500InternalServerError),
         };
     }
 
@@ -88,7 +90,8 @@ public class PaymentsController(
     [ProducesResponseType<Withdrawal>(StatusCodes.Status200OK)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status500InternalServerError)]
-    public async Task<Results<Ok<Withdrawal>, BadRequest<ErrorResponse>, StatusCodeHttpResult>> CreateWithdrawal([FromBody] CreateWithdrawalRequest request)
+    public async Task<Results<Ok<Withdrawal>, BadRequest<ErrorResponse>, StatusCodeHttpResult>> CreateWithdrawal(
+        [FromBody] CreateWithdrawalRequest request)
     {
         var userId = HttpContext.GetUserId();
         var userIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -107,23 +110,23 @@ public class PaymentsController(
         return result.Outcome switch
         {
             PaymentOutcome.Success => TypedResults.Ok(result.Withdrawal!),
-            
+
             PaymentOutcome.InsufficientFunds => TypedResults.BadRequest(new ErrorResponse(
                 $"Недостаточно средств. Доступно: {result.Available}")),
-                
+
             PaymentOutcome.InvalidAmount => TypedResults.BadRequest(new ErrorResponse(
                 $"Неверная сумма. Минимум: {result.MinAmount}, максимум: {result.MaxAmount} {result.Currency}")),
-                
+
             PaymentOutcome.UnsupportedMethod => TypedResults.BadRequest(new ErrorResponse(
                 $"Неподдерживаемый метод вывода: {result.Method} с валютой {result.Currency} через {result.Provider}")),
-                
+
             PaymentOutcome.UnsupportedCurrency => TypedResults.BadRequest(new ErrorResponse(
                 $"Неподдерживаемая валюта: {result.Currency}")),
-                
+
             PaymentOutcome.ProviderError => TypedResults.BadRequest(new ErrorResponse(
                 $"Ошибка платежного провайдера: {result.Error}")),
-                
-            _ => TypedResults.StatusCode(StatusCodes.Status500InternalServerError)
+
+            _ => TypedResults.StatusCode(StatusCodes.Status500InternalServerError),
         };
     }
 

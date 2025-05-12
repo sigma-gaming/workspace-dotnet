@@ -1,6 +1,7 @@
 using Core.Contracts.Enums;
 using Core.Services.Payment;
 using Core.Services.Payment.Exceptions;
+using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -17,13 +18,13 @@ public class ExceptionHandlingTests(
     PaymentNatsFixture natsFixture)
     : PaymentIntegrationTestBase(dbFixture, cacheFixture, natsFixture)
 {
-    private PaymentService? paymentService;
+    private IPaymentService? paymentService;
     private WalletService? walletService;
 
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        paymentService = ServiceProvider.GetRequiredService<PaymentService>();
+        paymentService = ServiceProvider.GetRequiredService<IPaymentService>();
         walletService = ServiceProvider.GetRequiredService<WalletService>();
     }
 

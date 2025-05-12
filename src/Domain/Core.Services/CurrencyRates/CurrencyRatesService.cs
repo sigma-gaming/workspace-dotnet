@@ -1,10 +1,11 @@
+using System.Globalization;
 using Core.Contracts.Compounds;
 using Core.Contracts.Enums;
 using Core.Services.Caching;
-using Core.Services.Finance.Api;
+using Core.Services.CurrencyRates.Api;
 using Microsoft.Extensions.Logging;
 
-namespace Core.Services.Finance;
+namespace Core.Services.CurrencyRates;
 
 public class CurrencyRatesService(
     ILogger<CurrencyRatesService> logger,
@@ -38,9 +39,11 @@ public class CurrencyRatesService(
             var fiatRates = fiatRatesTask.Result;
             var cryptoRates = cryptoRatesTask.Result;
 
-            var fiatRawRatesMap = fiatRates.ToDictionary(
-                rate => rate.Symbol,
-                rate => double.Parse(rate.RateUsd));
+            var fiatRawRatesMap = fiatRates
+                .GroupBy(rate => rate.Symbol)
+                .ToDictionary(
+                    group => group.Key,
+                    group => (double)decimal.Parse(group.First().RateUsd, CultureInfo.InvariantCulture));
 
             if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Rub, out var rub) &&
                 fiatRawRatesMap.TryGetValue(CoincapSymbol.Usd, out var usd))
@@ -72,12 +75,14 @@ public class CurrencyRatesService(
                 if (map[Currency.UsdtTrc20].HasValue)
                     foreach (var ticker in cryptoRates)
                         if (SymbolCurrencyMap.TryGetValue(ticker.Symbol, out var currency))
-                            map[currency] = double.Parse(ticker.Price) * map[Currency.UsdtTrc20]!.Value;
+                            map[currency] = double.Parse(ticker.Price, CultureInfo.InvariantCulture) *
+                                            map[Currency.UsdtTrc20]!.Value;
             }
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to get currency rates");
+            throw;
         }
 
         return rates;

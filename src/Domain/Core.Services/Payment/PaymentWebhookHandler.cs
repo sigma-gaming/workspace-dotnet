@@ -1,18 +1,19 @@
 using Core.Contracts.Enums;
 using Core.Services.Payment.Exceptions;
+using Core.Services.Payment.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Services.Payment;
 
 /// <summary>
-/// Handler for payment provider webhooks
+///     Handler for payment provider webhooks
 /// </summary>
 public class PaymentWebhookHandler(
-    PaymentService paymentService,
+    IPaymentService paymentService,
     ILogger<PaymentWebhookHandler> logger)
 {
     /// <summary>
-    /// Handles a deposit webhook notification
+    ///     Handles a deposit webhook notification
     /// </summary>
     /// <param name="providerTransactionId">Provider's transaction ID</param>
     /// <param name="status">Payment status</param>
@@ -71,7 +72,7 @@ public class PaymentWebhookHandler(
     }
 
     /// <summary>
-    /// Handles a withdrawal webhook notification
+    ///     Handles a withdrawal webhook notification
     /// </summary>
     /// <param name="providerTransactionId">Provider's transaction ID</param>
     /// <param name="status">Payment status</param>

@@ -15,6 +15,7 @@ using Core.Services.Payment.Providers;
 using Core.Services.PubSub;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Core.Services.Payment;
 
@@ -33,6 +34,7 @@ public class PaymentService(
     WithdrawalMapper withdrawalMapper,
     IDepositConfigProvider depositConfigProvider,
     IWithdrawalConfigProvider withdrawalConfigProvider,
+    IOptions<PaymentOptions> paymentOptions,
     ILogger<PaymentService>? logger = null) : IPaymentService
 {
     private List<DepositMethodConfig> DepositConfigs { get; } = depositConfigProvider.GetConfigs();
@@ -594,6 +596,189 @@ public class PaymentService(
         return await db.Withdrawals
             .AsNoTracking()
             .FirstOrDefaultAsync(w => w.ProviderTransactionId == providerTransactionId);
+    }
+
+    /// <summary>
+    ///     Process deposits that have been pending or processing for too long
+    /// </summary>
+    /// <returns>Number of processed deposits</returns>
+    public virtual async Task<int> ProcessStaleDepositsAsync(CancellationToken ct = default)
+    {
+        // Get timeout values from configuration
+        var cryptoCloudTimeout = paymentOptions.Value.CryptoCloud.StaleDepositTimeoutMinutes;
+        var plisioTimeout = paymentOptions.Value.Plisio.StaleDepositTimeoutMinutes;
+
+        // Supported providers and their timeouts
+        var depositStaleTimeouts = new Dictionary<PaymentProvider, int>
+        {
+            { PaymentProvider.CryptoCloud, cryptoCloudTimeout },
+            { PaymentProvider.Plisio, plisioTimeout },
+        };
+
+        var processedCount = 0;
+
+        foreach (var (provider, timeoutMinutes) in depositStaleTimeouts)
+            try
+            {
+                var providerService = providerFactory.GetDepositProvider(provider);
+                if (providerService == null)
+                {
+                    logger?.LogWarning("Provider service not available for {Provider}", provider);
+                    continue;
+                }
+
+                // Get stale deposits
+                var staleDeposits = await db.Deposits
+                    .Where(d =>
+                        d.Provider == provider &&
+                        (d.Status == PaymentStatus.Pending || d.Status == PaymentStatus.Processing) &&
+                        d.CreatedAt < DateTime.UtcNow.AddMinutes(-timeoutMinutes))
+                    .ToListAsync(ct);
+
+                logger?.LogInformation("Found {Count} stale deposits for provider {Provider}",
+                    staleDeposits.Count, provider);
+
+                foreach (var deposit in staleDeposits)
+                    try
+                    {
+                        // Get current status from the provider
+                        var currentStatus = await providerService.GetDepositStatusAsync(deposit.ProviderTransactionId);
+
+                        // Update the deposit status
+                        if (currentStatus != deposit.Status)
+                        {
+                            var success = false;
+
+                            // Handle specific status transitions based on the current status
+                            if (currentStatus == PaymentStatus.Completed)
+                            {
+                                success = await ConfirmDepositAsync(deposit.Id);
+                                if (success) logger?.LogInformation("Confirmed stale deposit {DepositId}", deposit.Id);
+                            }
+                            else if (currentStatus == PaymentStatus.Cancelled || currentStatus == PaymentStatus.Failed)
+                            {
+                                success = await CancelDepositAsync(deposit.Id);
+                                if (success) logger?.LogInformation("Cancelled stale deposit {DepositId}", deposit.Id);
+                            }
+                            else
+                            {
+                                // If status is still Pending or Processing but from provider it's something else
+                                // Just update the status in the database
+                                deposit.Status = currentStatus;
+                                deposit.UpdatedAt = DateTime.UtcNow;
+                                await db.SaveChangesAsync(ct);
+                                success = true;
+                                logger?.LogInformation("Updated stale deposit {DepositId} status to {Status}",
+                                    deposit.Id, currentStatus);
+                            }
+
+                            if (success) processedCount++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.LogError(ex, "Error processing stale deposit {DepositId}", deposit.Id);
+                    }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Error processing stale deposits for provider {Provider}", provider);
+            }
+
+        return processedCount;
+    }
+
+    /// <summary>
+    ///     Process withdrawals that have been pending or processing for too long
+    /// </summary>
+    /// <returns>Number of processed withdrawals</returns>
+    public virtual async Task<int> ProcessStaleWithdrawalsAsync(CancellationToken ct = default)
+    {
+        // Get timeout values from configuration
+        var cryptoCloudTimeout = paymentOptions.Value.CryptoCloud.StaleWithdrawalTimeoutMinutes;
+        var plisioTimeout = paymentOptions.Value.Plisio.StaleWithdrawalTimeoutMinutes;
+
+        // Supported providers and their timeouts
+        var withdrawalStaleTimeouts = new Dictionary<PaymentProvider, int>
+        {
+            { PaymentProvider.CryptoCloud, cryptoCloudTimeout },
+            { PaymentProvider.Plisio, plisioTimeout },
+        };
+
+        var processedCount = 0;
+
+        foreach (var (provider, timeoutMinutes) in withdrawalStaleTimeouts)
+            try
+            {
+                var providerService = GetWithdrawalProvider(provider);
+                if (providerService == null)
+                {
+                    logger?.LogWarning("Withdrawal provider service not available for {Provider}", provider);
+                    continue;
+                }
+
+                // Get stale withdrawals
+                var staleWithdrawals = await db.Withdrawals
+                    .Where(w =>
+                        w.Provider == provider &&
+                        (w.Status == PaymentStatus.Pending || w.Status == PaymentStatus.Processing) &&
+                        w.CreatedAt < DateTime.UtcNow.AddMinutes(-timeoutMinutes))
+                    .ToListAsync(ct);
+
+                logger?.LogInformation("Found {Count} stale withdrawals for provider {Provider}",
+                    staleWithdrawals.Count, provider);
+
+                foreach (var withdrawal in staleWithdrawals)
+                    try
+                    {
+                        // Get current status from the provider
+                        var currentStatus =
+                            await providerService.GetWithdrawalStatusAsync(withdrawal.ProviderTransactionId);
+
+                        // Update the withdrawal status
+                        if (currentStatus != withdrawal.Status)
+                        {
+                            var success = false;
+
+                            // Handle specific status transitions based on the current status
+                            if (currentStatus == PaymentStatus.Completed)
+                            {
+                                success = await ConfirmWithdrawalPaymentAsync(withdrawal.Id);
+                                if (success)
+                                    logger?.LogInformation("Confirmed stale withdrawal {WithdrawalId}", withdrawal.Id);
+                            }
+                            else if (currentStatus == PaymentStatus.Cancelled || currentStatus == PaymentStatus.Failed)
+                            {
+                                success = await CancelWithdrawalAsync(withdrawal.Id);
+                                if (success)
+                                    logger?.LogInformation("Cancelled stale withdrawal {WithdrawalId}", withdrawal.Id);
+                            }
+                            else
+                            {
+                                // If status is still Pending or Processing but from provider it's something else
+                                // Just update the status in the database
+                                withdrawal.Status = currentStatus;
+                                withdrawal.UpdatedAt = DateTime.UtcNow;
+                                await db.SaveChangesAsync(ct);
+                                success = true;
+                                logger?.LogInformation("Updated stale withdrawal {WithdrawalId} status to {Status}",
+                                    withdrawal.Id, currentStatus);
+                            }
+
+                            if (success) processedCount++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.LogError(ex, "Error processing stale withdrawal {WithdrawalId}", withdrawal.Id);
+                    }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Error processing stale withdrawals for provider {Provider}", provider);
+            }
+
+        return processedCount;
     }
 
     /// <summary>

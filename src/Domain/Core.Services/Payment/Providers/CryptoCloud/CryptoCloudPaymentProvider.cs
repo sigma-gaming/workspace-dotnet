@@ -1,7 +1,7 @@
 using System.Globalization;
 using Core.Contracts.Enums;
 using Core.Contracts.Jsonb;
-using Core.Services.Finance;
+using Core.Services.CurrencyRates;
 using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Models;
 using Core.Services.Payment.Providers.CryptoCloud.Models;

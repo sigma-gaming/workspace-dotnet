@@ -1,8 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Core.Services.Finance.Api;
+namespace Core.Services.CurrencyRates.Api;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum BinanceSymbol
 {
     [JsonStringEnumMemberName("BTCUSDT")] BtcUsdt,
@@ -27,8 +28,8 @@ public sealed class BinanceApi(HttpClient httpClient)
 
     public async Task<List<BinanceTickerPrice>> GetTickerPrice(BinanceSymbol[] symbols, CancellationToken ct = default)
     {
-        var symbolsParam = string.Join(",", symbols);
-        var response = await httpClient.GetAsync($"{BASE_URL}/ticker/price?symbols=[{symbolsParam}]", ct);
+        var url = $"{BASE_URL}/ticker/price?symbols={JsonSerializer.Serialize(symbols)}";
+        var response = await httpClient.GetAsync(url, ct);
         response.EnsureSuccessStatusCode();
 
         var content = await response.Content.ReadAsStringAsync(ct);

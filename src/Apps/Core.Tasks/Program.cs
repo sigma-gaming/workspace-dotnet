@@ -29,6 +29,9 @@ builder.Services.Core()
     .AddCoreNats(builder.Configuration)
     .AddMappers()
     .AddCommonServices(builder.Configuration)
+    .AddCurrencyRates(builder.Configuration)
+    .AddSystem()
+    .AddPubSub()
     .AddChat()
     .AddPayment(builder.Configuration);
 
@@ -67,8 +70,11 @@ app.MapInternalPort(appBuilder =>
     });
 });
 
-var jobsService = app.Services.GetRequiredService<IJobsService>();
-jobsService.RegisterJobs();
-jobsService.RunJobsOnStartup();
+using (var scope = app.Services.CreateScope())
+{
+    var jobsService = scope.ServiceProvider.GetRequiredService<IJobsService>();
+    jobsService.RegisterJobs();
+    jobsService.RunJobsOnStartup();
+}
 
 await app.RunAsync();

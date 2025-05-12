@@ -14,4 +14,14 @@ public class PaymentOptions
     ///     Withdrawal method configurations
     /// </summary>
     public List<WithdrawalMethodConfig> WithdrawalConfigs { get; set; } = [];
+    
+    /// <summary>
+    ///     CryptoCloud provider configuration
+    /// </summary>
+    public ProviderConfig CryptoCloud { get; set; } = new();
+    
+    /// <summary>
+    ///     Plisio provider configuration
+    /// </summary>
+    public ProviderConfig Plisio { get; set; } = new();
 }

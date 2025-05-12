@@ -1,4 +1,4 @@
-using Core.Services.Payment;
+using Core.Services.Payment.Interfaces;
 
 namespace Core.Tasks.Jobs;
 
@@ -6,7 +6,7 @@ namespace Core.Tasks.Jobs;
 ///     A background job that processes stale withdrawals
 /// </summary>
 public class ProcessStaleWithdrawalsJob(
-    PaymentService paymentService,
+    IPaymentService paymentService,
     ILogger<ProcessStaleWithdrawalsJob>? logger = null)
 {
     /// <summary>
@@ -20,8 +20,7 @@ public class ProcessStaleWithdrawalsJob(
 
         try
         {
-            // TODO: Implement
-            // await paymentService.ProcessStaleWithdrawalsAsync(cancellationToken);
+            await paymentService.ProcessStaleWithdrawalsAsync(cancellationToken);
 
             logger?.LogInformation("Stale withdrawals processing job completed successfully");
         }

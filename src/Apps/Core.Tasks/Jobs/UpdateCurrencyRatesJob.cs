@@ -1,4 +1,4 @@
-using Core.Services.Finance;
+using Core.Services.CurrencyRates;
 
 namespace Core.Tasks.Jobs;
 

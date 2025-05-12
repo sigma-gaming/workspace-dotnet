@@ -2,5 +2,6 @@
   <PropertyGroup>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <NoWarn>CS9107</NoWarn>
+    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 </Project>

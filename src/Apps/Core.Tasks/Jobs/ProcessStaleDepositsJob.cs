@@ -1,4 +1,4 @@
-using Core.Services.Payment;
+using Core.Services.Payment.Interfaces;
 
 namespace Core.Tasks.Jobs;
 
@@ -6,22 +6,21 @@ namespace Core.Tasks.Jobs;
 ///     A background job that processes stale deposits
 /// </summary>
 public class ProcessStaleDepositsJob(
-    PaymentService paymentService,
+    IPaymentService paymentService,
     ILogger<ProcessStaleDepositsJob>? logger = null)
 {
     /// <summary>
     ///     Executes the stale deposits processing job
     /// </summary>
-    /// <param name="cancellationToken">Cancellation token</param>
+    /// <param name="ct">Cancellation token</param>
     /// <returns>A task representing the asynchronous operation</returns>
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(CancellationToken ct)
     {
         logger?.LogInformation("Starting stale deposits processing job at: {Time}", DateTimeOffset.Now);
 
         try
         {
-            // TODO: Implement
-            // await paymentService.ProcessStaleDepositsAsync(cancellationToken);
+            await paymentService.ProcessStaleDepositsAsync(ct);
 
             logger?.LogInformation("Stale deposits processing job completed successfully");
         }

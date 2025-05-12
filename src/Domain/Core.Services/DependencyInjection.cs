@@ -6,8 +6,9 @@ using Core.Builder;
 using Core.Services.Auth;
 using Core.Services.Caching;
 using Core.Services.Chat;
+using Core.Services.CurrencyRates;
+using Core.Services.CurrencyRates.Api;
 using Core.Services.Finance;
-using Core.Services.Finance.Api;
 using Core.Services.Gaming;
 using Core.Services.Gaming.Runners;
 using Core.Services.Notifications;
@@ -38,9 +39,6 @@ public static class DependencyInjection
         builder.Services.AddSingleton<ICacheService, CacheService>();
         builder.Services.AddSingleton<CoreCacheRegistry>();
 
-        builder.Services.AddHttpClient<BinanceApi>();
-        builder.Services.AddHttpClient<CoincapApi>();
-
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<ProfileService>();
         builder.Services.AddScoped<UserStatsService>();
@@ -54,7 +52,6 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<BalanceService>();
         builder.Services.AddScoped<BudgetService>();
-        builder.Services.AddScoped<CurrencyRatesService>();
 
         builder.Services.AddScoped<GameService>();
         builder.Services.AddScoped<GameHistoryService>();
@@ -126,8 +123,21 @@ public static class DependencyInjection
         return builder;
     }
 
+    public static CoreBuilder AddCurrencyRates(this CoreBuilder builder, IConfiguration configuration)
+    {
+        builder.Services.Configure<CoincapOptions>(configuration.GetSection("Payment:Coincap"));
+        builder.Services.AddHttpClient<BinanceApi>();
+        builder.Services.AddHttpClient<CoincapApi>();
+        builder.Services.AddScoped<CurrencyRatesService>();
+
+        return builder;
+    }
+
     public static CoreBuilder AddPayment(this CoreBuilder builder, IConfiguration configuration)
     {
+        // Register payment options
+        builder.Services.Configure<PaymentOptions>(configuration.GetSection("Payment"));
+
         // Register Plisio services
         builder.Services.Configure<PlisioOptions>(configuration.GetSection("Payment:Plisio"));
         builder.Services.AddHttpClient<PlisioApiClient>();
@@ -153,7 +163,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<IWithdrawalConfigProvider, DefaultWithdrawalConfigProvider>();
         builder.Services.AddScoped<PaymentProviderFactory>();
         builder.Services.AddScoped<WalletService>();
-        builder.Services.AddScoped<PaymentService>();
+        builder.Services.AddScoped<IPaymentService, PaymentService>();
         builder.Services.AddScoped<PaymentWebhookHandler>();
 
         return builder;

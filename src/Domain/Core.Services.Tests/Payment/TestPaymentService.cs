@@ -6,11 +6,13 @@ using Core.Db.Context;
 using Core.Services.Caching;
 using Core.Services.Finance;
 using Core.Services.Payment;
+using Core.Services.Payment.Configuration;
 using Core.Services.Payment.Exceptions;
 using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Models;
 using Core.Services.PubSub;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Core.Services.Tests.Payment;
 
@@ -30,10 +32,11 @@ public class TestPaymentService(
     WithdrawalMapper withdrawalMapper,
     IDepositConfigProvider depositConfigProvider,
     IWithdrawalConfigProvider withdrawalConfigProvider,
+    IOptions<PaymentOptions> paymentOptions,
     ILogger<TestPaymentService>? logger = null)
     : PaymentService(db, balanceService, providerFactory, walletService, cache, pubSub, balanceMapper, depositMapper,
         withdrawalMapper,
-        depositConfigProvider, withdrawalConfigProvider, logger)
+        depositConfigProvider, withdrawalConfigProvider, paymentOptions, logger)
 {
     private readonly BalanceMapper _balanceMapper = balanceMapper;
     private readonly BalanceService _balanceService = balanceService;

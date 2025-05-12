@@ -166,7 +166,7 @@ public class SendAdvancedGamesMetricsJob(
                 MinAmount = g.Min(t => t.Amount),
                 TotalAmount = g.Sum(t => t.Amount),
                 Count = g.Count(),
-                MaxId = g.Max(t => t.Id).ToString(),
+                MaxId = g.OrderByDescending(t => t.CreatedAt).First().Id.ToString(),
             })
             .ToListAsync(cancellationToken);
 
