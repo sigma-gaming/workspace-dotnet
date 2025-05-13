@@ -22,6 +22,7 @@ COPY src/Domain/Core.Services/Core.Services.csproj src/Domain/Core.Services/
 COPY src/Apps/Core.Migrations/Core.Migrations.csproj src/Apps/Core.Migrations/
 COPY src/Apps/Core.API/Core.API.csproj src/Apps/Core.API/
 COPY src/Apps/Core.WS/Core.WS.csproj src/Apps/Core.WS/
+COPY src/Apps/Core.Tasks/Core.Tasks.csproj src/Apps/Core.Tasks/
 COPY src/Apps/Access.API/Access.API.csproj src/Apps/Access.API/
 COPY src/Apps/LetsAuth.API/LetsAuth.API.csproj src/Apps/LetsAuth.API/
 COPY src/Apps/Redirect.API/Redirect.API.csproj src/Apps/Redirect.API/
