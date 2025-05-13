@@ -15,9 +15,11 @@ COPY src/Infrastructure/Core.Builder/Core.Builder.csproj src/Infrastructure/Core
 COPY src/Infrastructure/Core.Cache/Core.Cache.csproj src/Infrastructure/Core.Cache/
 COPY src/Infrastructure/Core.Nats/Core.Nats.csproj src/Infrastructure/Core.Nats/
 COPY src/Infrastructure/Core.Db/Core.Db.csproj src/Infrastructure/Core.Db/
+COPY src/Infrastructure/Core.Tests.Fixtures/Core.Tests.Fixtures.csproj src/Infrastructure/Core.Tests.Fixtures/
 
 COPY src/Domain/Core.Contracts/Core.Contracts.csproj src/Domain/Core.Contracts/
 COPY src/Domain/Core.Services/Core.Services.csproj src/Domain/Core.Services/
+COPY src/Domain/Core.Services.Tests/Core.Services.Tests.csproj src/Domain/Core.Services.Tests/
 
 COPY src/Apps/Core.Migrations/Core.Migrations.csproj src/Apps/Core.Migrations/
 COPY src/Apps/Core.API/Core.API.csproj src/Apps/Core.API/
@@ -29,6 +31,7 @@ COPY src/Apps/Redirect.API/Redirect.API.csproj src/Apps/Redirect.API/
 COPY src/Apps/Affiliate.API/Affiliate.API.csproj src/Apps/Affiliate.API/
 COPY src/Apps/Domain.API/Domain.API.csproj src/Apps/Domain.API/
 COPY src/Apps/Control.API/Control.API.csproj src/Apps/Control.API/
+COPY src/Apps/Payment.API/Payment.API.csproj src/Apps/Payment.API/
 
 RUN dotnet restore
 
