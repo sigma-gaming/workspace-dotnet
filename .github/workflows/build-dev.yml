@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       from:
-        description: SHA for base commit to find affected apps
+        description: From commit (SHA)
       to:
-        description: SHA for head commit to find affected apps
+        description: To commit (SHA)
 
 env:
   DOCKER_REGISTRY: europe-west4-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker

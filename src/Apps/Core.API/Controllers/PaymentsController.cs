@@ -21,12 +21,12 @@ public class PaymentsController(
     WalletService walletService)
     : ControllerBase
 {
-    [ProducesResponseType<CurrencyExchangeRates>(StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType<List<CurrencyExchangeRate>>(StatusCodes.Status200OK, "application/json")]
     [HttpGet("/payments/currency-rates")]
-    public async Task<Ok<CurrencyExchangeRates>> GetCurrencyRates()
+    public async Task<Ok<List<CurrencyExchangeRate>>> GetCurrencyRates()
     {
         var rates = await currencyRatesService.GetRatesAsync();
-        return TypedResults.Ok(rates ?? new CurrencyExchangeRates());
+        return TypedResults.Ok(rates);
     }
 
     [HttpGet("/payments/deposit-methods")]

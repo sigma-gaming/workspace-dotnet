@@ -1,4 +1,3 @@
-using System.Globalization;
 using Core.Contracts.Compounds;
 using Core.Contracts.Enums;
 using Core.Services.Caching;
@@ -25,10 +24,9 @@ public class CurrencyRatesService(
         [BinanceSymbol.DogeUsdt] = Currency.Doge,
     };
 
-    private async Task<CurrencyExchangeRates> GetLatestRatesAsync(CancellationToken ct = default)
+    private async Task<List<CurrencyExchangeRate>> GetLatestRatesAsync(CancellationToken ct = default)
     {
-        var rates = new CurrencyExchangeRates();
-        var map = rates.Map;
+        List<CurrencyExchangeRate> rates = [];
 
         try
         {
@@ -43,40 +41,46 @@ public class CurrencyRatesService(
                 .GroupBy(rate => rate.Symbol)
                 .ToDictionary(
                     group => group.Key,
-                    group => (double)decimal.Parse(group.First().RateUsd, CultureInfo.InvariantCulture));
+                    group => (double)decimal.Parse(group.First().RateUsd));
 
             if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Rub, out var rub) &&
                 fiatRawRatesMap.TryGetValue(CoincapSymbol.Usd, out var usd))
             {
-                map[Currency.Rub] = 100;
-                map[Currency.Usd] = map[Currency.Rub] / rub;
+                rates.Add(new CurrencyExchangeRate { Currency = Currency.Rub, Gems = 100 });
+
+                var usdRate = usd / rub * 100;
+                logger.LogInformation("USD rate: {UsdRate}", usdRate);
+                rates.Add(new CurrencyExchangeRate { Currency = Currency.Usd, Gems = usdRate });
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Eur, out var eur))
-                    map[Currency.Eur] = eur * map[Currency.Usd];
+                    rates.Add(new CurrencyExchangeRate { Currency = Currency.Eur, Gems = eur * usdRate });
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Kzt, out var kzt))
-                    map[Currency.Kzt] = kzt * map[Currency.Usd];
+                    rates.Add(new CurrencyExchangeRate { Currency = Currency.Kzt, Gems = kzt * usdRate });
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Kgs, out var kgs))
-                    map[Currency.Kgs] = kgs * map[Currency.Usd];
+                    rates.Add(new CurrencyExchangeRate { Currency = Currency.Kgs, Gems = kgs * usdRate });
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Uzs, out var uzs))
-                    map[Currency.Uzs] = uzs * map[Currency.Usd];
+                    rates.Add(new CurrencyExchangeRate { Currency = Currency.Uzs, Gems = uzs * usdRate });
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Uah, out var uah))
-                    map[Currency.Uah] = uah * map[Currency.Usd];
+                    rates.Add(new CurrencyExchangeRate { Currency = Currency.Uah, Gems = uah * usdRate });
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Usdt, out var usdt))
                 {
-                    map[Currency.UsdtErc20] = usdt * map[Currency.Usd];
-                    map[Currency.UsdtTrc20] = usdt * map[Currency.Usd];
+                    rates.Add(new CurrencyExchangeRate { Currency = Currency.UsdtErc20, Gems = usdt * usdRate });
+                    rates.Add(new CurrencyExchangeRate { Currency = Currency.UsdtTrc20, Gems = usdt * usdRate });
                 }
 
-                if (map[Currency.UsdtTrc20].HasValue)
+                if (rates.Any(r => r.Currency == Currency.UsdtTrc20))
                     foreach (var ticker in cryptoRates)
                         if (SymbolCurrencyMap.TryGetValue(ticker.Symbol, out var currency))
-                            map[currency] = double.Parse(ticker.Price, CultureInfo.InvariantCulture) *
-                                            map[Currency.UsdtTrc20]!.Value;
+                            rates.Add(new CurrencyExchangeRate
+                            {
+                                Currency = currency,
+                                Gems = double.Parse(ticker.Price) * usdRate,
+                            });
             }
         }
         catch (Exception ex)
@@ -88,9 +92,9 @@ public class CurrencyRatesService(
         return rates;
     }
 
-    public async Task<CurrencyExchangeRates?> GetRatesAsync()
+    public async Task<List<CurrencyExchangeRate>> GetRatesAsync()
     {
-        return await cache.CurrencyExchangeRates.GetAsync();
+        return await cache.CurrencyExchangeRates.GetAsync() ?? [];
     }
 
     public async Task UpdateRatesAsync(CancellationToken ct = default)
@@ -105,11 +109,15 @@ public class CurrencyRatesService(
         if (rates is null)
             throw new InvalidOperationException("Currency rates not available");
 
-        if (!rates.Map.TryGetValue(from, out var fromRate) || !fromRate.HasValue ||
-            !rates.Map.TryGetValue(to, out var toRate) || !toRate.HasValue)
+        var fromRate = rates.FirstOrDefault(r => r.Currency == from);
+        if (fromRate is null)
             throw new InvalidOperationException("Specified currency rates not available");
 
-        return amount * fromRate.Value / toRate.Value;
+        var toRate = rates.FirstOrDefault(r => r.Currency == to);
+        if (toRate is null)
+            throw new InvalidOperationException("Specified currency rates not available");
+
+        return amount * fromRate.Gems / toRate.Gems;
     }
 
     public async Task<double> ConvertGemsAsync(double amount, Currency to)
@@ -118,9 +126,10 @@ public class CurrencyRatesService(
         if (rates is null)
             throw new InvalidOperationException("Currency rates not available");
 
-        if (!rates.Map.TryGetValue(to, out var toRate) || !toRate.HasValue)
+        var toRate = rates.FirstOrDefault(r => r.Currency == to);
+        if (toRate is null)
             throw new InvalidOperationException("Specified currency rates not available");
 
-        return amount / toRate.Value;
+        return amount / toRate.Gems;
     }
 }

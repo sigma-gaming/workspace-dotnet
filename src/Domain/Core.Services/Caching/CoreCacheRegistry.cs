@@ -29,8 +29,8 @@ public class CoreCacheRegistry(IConnectionMultiplexer connection, ICacheService 
             $"{options.Version}:global:notifications",
             TimeSpan.FromHours(1));
 
-    public IJsonCacheEntity<CurrencyExchangeRates> CurrencyExchangeRates { get; } =
-        cacheService.CreateJson<CurrencyExchangeRates>(
+    public IJsonCacheEntity<List<CurrencyExchangeRate>> CurrencyExchangeRates { get; } =
+        cacheService.CreateJson<List<CurrencyExchangeRate>>(
             "global:currencyRates",
             TimeSpan.FromMinutes(15));
 
