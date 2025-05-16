@@ -12,12 +12,14 @@ using Core.Services.Finance;
 using Core.Services.Gaming;
 using Core.Services.Gaming.Runners;
 using Core.Services.Notifications;
+using Core.Services.Outbox;
 using Core.Services.Payment;
 using Core.Services.Payment.Configuration;
 using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Providers;
 using Core.Services.Payment.Providers.CryptoCloud;
 using Core.Services.Payment.Providers.Plisio;
+using Core.Services.Payment.Webhooks;
 using Core.Services.Promotions;
 using Core.Services.Promotions.TaskCheckers;
 using Core.Services.PubSub;
@@ -128,7 +130,7 @@ public static class DependencyInjection
         builder.Services.Configure<CoincapOptions>(configuration.GetSection("Payment:Coincap"));
         builder.Services.AddHttpClient<BinanceApi>();
         builder.Services.AddHttpClient<CoincapApi>();
-        builder.Services.AddScoped<CurrencyRatesService>();
+        builder.Services.AddScoped<ICurrencyRatesService, CurrencyRatesService>();
 
         return builder;
     }
@@ -165,6 +167,28 @@ public static class DependencyInjection
         builder.Services.AddScoped<WalletService>();
         builder.Services.AddScoped<IPaymentService, PaymentService>();
         builder.Services.AddScoped<PaymentWebhookHandler>();
+        builder.Services.AddScoped<PaymentWebhookProcessor>();
+
+        return builder;
+    }
+
+    public static CoreBuilder AddPaymentWebhooks(this CoreBuilder builder, IConfiguration configuration)
+    {
+        builder.Services.Configure<PlisioOptions>(configuration.GetSection("Payment:Plisio"));
+        builder.Services.Configure<CryptoCloudOptions>(configuration.GetSection("Payment:CryptoCloud"));
+        builder.Services.AddScoped<PlisioWebhookVerifier>();
+        builder.Services.AddScoped<CryptoCloudWebhookVerifier>();
+        builder.Services.AddScoped<PaymentWebhookOutbox>();
+
+        return builder;
+    }
+
+    public static CoreBuilder AddOutbox(this CoreBuilder builder, IConfiguration configuration)
+    {
+        builder.Services.Configure<OutboxOptions>(configuration.GetSection("Outbox"));
+        builder.Services.AddSingleton<OutboxSignal>();
+        builder.Services.AddScoped<OutboxService>();
+        builder.Services.AddHostedService<OutboxPublisherService>();
 
         return builder;
     }

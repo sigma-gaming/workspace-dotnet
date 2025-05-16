@@ -88,6 +88,20 @@ services:
       - ./compose/nats.conf:/etc/nats/nats.conf
       - jetstream:/data/jetstream
 
+  rabbitmq:
+    image: rabbitmq:4.1.0-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    networks:
+      - sigma
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: sigma
+      RABBITMQ_DEFAULT_PASS: SECRET_REMOVED
+
   auth-proxy:
     image: traefik:v3.2
     command:
@@ -108,6 +122,7 @@ volumes:
   pgdata:
   dragonflydata:
   jetstream:
+  rabbitmqdata:
 
 networks:
   sigma:

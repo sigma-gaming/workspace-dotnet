@@ -1,4 +1,5 @@
 using System.Data;
+using Common.Db.Interceptors;
 using Core.Db.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -148,6 +149,9 @@ public class CoreDbFixture : IAsyncLifetime, IDisposable
 
                 npgsqlOptions.MigrationsAssembly("Core.Migrations");
             });
+
+            // Same as AddCoreDb, otherwise ForUpdate queries do not lock rows
+            options.AddInterceptors(new ForUpdateInterceptor());
 
             // Disable EF Core database command logging in tests
             options.UseLoggerFactory(CreateQuietLoggerFactory());

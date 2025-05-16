@@ -84,6 +84,10 @@ public class PaymentService(
             // Создать депозит у провайдера
             var response = await provider.CreateDepositAsync(input);
 
+            logger?.LogInformation("Currency amount: {CurrencyAmount}",
+                decimal.TryParse(response.ProviderAmount, out var ca) ? ca : 0);
+            logger?.LogInformation("Provider amount: {ProviderAmount}", response.ProviderAmount);
+
             return await db.ExecuteInTransactionAsync(async () =>
             {
                 var deposit = new DepositEntity
@@ -169,6 +173,10 @@ public class PaymentService(
 
             return await db.ExecuteInTransactionAsync(async () =>
             {
+                var status = await LockDepositStatusAsync(depositId);
+                if (status != PaymentStatus.Pending)
+                    throw ExceptionFactory.InvalidStatusTransition("deposit", status, "confirm");
+
                 deposit.Status = PaymentStatus.Completed;
                 deposit.UpdatedAt = DateTime.UtcNow;
 
@@ -230,6 +238,10 @@ public class PaymentService(
 
             return await db.ExecuteInTransactionAsync(async () =>
             {
+                var status = await LockDepositStatusAsync(depositId);
+                if (status != PaymentStatus.Pending)
+                    throw ExceptionFactory.InvalidStatusTransition("deposit", status, "cancel");
+
                 deposit.Status = PaymentStatus.Cancelled;
                 deposit.UpdatedAt = DateTime.UtcNow;
                 await db.SaveChangesAsync();
@@ -455,6 +467,10 @@ public class PaymentService(
 
             return await db.ExecuteInTransactionAsync(async () =>
             {
+                var status = await LockWithdrawalStatusAsync(withdrawalId);
+                if (status != PaymentStatus.Processing)
+                    throw ExceptionFactory.InvalidStatusTransition("withdrawal", status, "confirm payment");
+
                 withdrawal.Status = PaymentStatus.Completed;
                 withdrawal.UpdatedAt = DateTime.UtcNow;
 
@@ -513,6 +529,10 @@ public class PaymentService(
 
             return await db.ExecuteInTransactionAsync(async () =>
             {
+                var status = await LockWithdrawalStatusAsync(withdrawalId);
+                if (status is PaymentStatus.Completed or PaymentStatus.Cancelled)
+                    throw ExceptionFactory.InvalidStatusTransition("withdrawal", status, "cancel");
+
                 withdrawal.Status = PaymentStatus.Cancelled;
                 withdrawal.UpdatedAt = DateTime.UtcNow;
 
@@ -570,6 +590,26 @@ public class PaymentService(
             logger?.LogError(ex, "Unexpected error cancelling withdrawal {WithdrawalId}", withdrawalId);
             return false;
         }
+    }
+
+    // Locks the row until the transaction ends and reads the status committed by a concurrent confirmation,
+    // the tracked entity may still hold the status loaded before the lock
+    private async Task<PaymentStatus> LockDepositStatusAsync(Guid depositId)
+    {
+        return await db.Deposits
+            .ForUpdate()
+            .Where(d => d.Id == depositId)
+            .Select(d => d.Status)
+            .FirstAsync();
+    }
+
+    private async Task<PaymentStatus> LockWithdrawalStatusAsync(Guid withdrawalId)
+    {
+        return await db.Withdrawals
+            .ForUpdate()
+            .Where(w => w.Id == withdrawalId)
+            .Select(w => w.Status)
+            .FirstAsync();
     }
 
     public async Task<PaymentStatus> GetTransactionStatusAsync(PaymentProvider provider, string transactionId)

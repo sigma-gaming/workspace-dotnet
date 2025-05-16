@@ -8,35 +8,22 @@ namespace Core.Services.Payment.Providers.Plisio;
 /// <summary>
 ///     Client for Plisio API
 /// </summary>
-public class PlisioApiClient
+public class PlisioApiClient(
+    HttpClient httpClient,
+    IOptions<PlisioOptions> optionsRef,
+    ILogger<PlisioApiClient>? logger = null)
 {
-    private readonly HttpClient httpClient;
-    private readonly JsonSerializerOptions jsonOptions;
-    private readonly ILogger<PlisioApiClient> logger;
-    private readonly PlisioOptions options;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PlisioApiClient" /> class
-    /// </summary>
-    public PlisioApiClient(
-        HttpClient httpClient,
-        IOptions<PlisioOptions> options,
-        ILogger<PlisioApiClient> logger)
+    private readonly JsonSerializerOptions jsonOptions = new()
     {
-        this.httpClient = httpClient;
-        this.options = options.Value;
-        this.logger = logger;
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
 
-        jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        };
-    }
+    private readonly PlisioOptions options = optionsRef.Value;
 
     /// <summary>
     ///     Creates a new invoice
     /// </summary>
-    public async Task<PlisioInvoiceResponse> CreateInvoiceAsync(PlisioCreateInvoiceRequest request)
+    public async Task<PlisioCreateInvoiceResponse> CreateInvoiceAsync(PlisioCreateInvoiceRequest request)
     {
         var queryParams = new Dictionary<string, string>
         {
@@ -67,7 +54,7 @@ public class PlisioApiClient
         if (!string.IsNullOrEmpty(request.ExpireMin))
             queryParams["expire_min"] = request.ExpireMin;
 
-        var response = await SendRequestAsync<PlisioInvoiceResponse>("invoices/new", queryParams);
+        var response = await SendRequestAsync<PlisioCreateInvoiceResponse>("invoices/new", queryParams);
         return response;
     }
 
@@ -139,6 +126,7 @@ public class PlisioApiClient
     {
         var queryString = string.Join("&", queryParams.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"));
         var url = $"https://plisio.net/api/v1/{endpoint}?{queryString}";
+        logger?.LogInformation("Calling Plisio API: {Endpoint}", url);
 
         try
         {
@@ -158,7 +146,7 @@ public class PlisioApiClient
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error calling Plisio API: {Endpoint}", endpoint);
+            logger?.LogError(ex, "Error calling Plisio API: {Endpoint}", endpoint);
             throw;
         }
     }

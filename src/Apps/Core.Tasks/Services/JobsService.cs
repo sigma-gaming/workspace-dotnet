@@ -7,6 +7,7 @@ namespace Core.Tasks.Services;
 ///     Service that handles the registration of recurring Hangfire jobs
 /// </summary>
 public class JobsService(
+    CleanupOutboxJob cleanupOutboxJob,
     InitializeChatMessagesJob initializeChatMessagesJob,
     ProcessReferrerPayoutsJob processReferrerPayoutsJob,
     ProcessStaleDepositsJob processStaleDepositsJob,
@@ -89,6 +90,16 @@ public class JobsService(
             "update-currency-rates-job",
             () => updateCurrencyRatesJob.ExecuteAsync(CancellationToken.None),
             "*/5 * * * *",
+            new RecurringJobOptions
+            {
+                TimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Moscow"),
+            });
+
+        // Register published outbox messages cleanup job to run every day
+        RecurringJob.AddOrUpdate(
+            "cleanup-outbox-job",
+            () => cleanupOutboxJob.ExecuteAsync(CancellationToken.None),
+            "0 4 * * *",
             new RecurringJobOptions
             {
                 TimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Moscow"),

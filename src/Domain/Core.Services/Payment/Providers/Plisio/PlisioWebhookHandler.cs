@@ -1,8 +1,5 @@
-using System.Security.Cryptography;
-using System.Text;
 using Core.Contracts.Enums;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Core.Services.Payment.Providers.Plisio;
 
@@ -11,25 +8,15 @@ namespace Core.Services.Payment.Providers.Plisio;
 /// </summary>
 public class PlisioWebhookHandler(
     PaymentWebhookHandler webhookHandler,
-    IOptions<PlisioOptions> options,
     ILogger<PlisioWebhookHandler> logger)
 {
-    private readonly PlisioOptions options = options.Value;
-
     /// <summary>
-    ///     Handles a webhook notification from Plisio
+    ///     Handles a webhook notification from Plisio, the signature is verified by <see cref="PlisioWebhookVerifier" />
     /// </summary>
-    public async Task<bool> HandleWebhookAsync(PlisioWebhookRequest request, string signature)
+    public async Task<bool> HandleWebhookAsync(PlisioWebhookRequest request)
     {
         try
         {
-            // Verify the signature
-            if (!VerifySignature(request, signature))
-            {
-                logger.LogWarning("Invalid signature for Plisio webhook");
-                return false;
-            }
-
             // Map the status
             var status = PlisioStatusMapper.MapInvoiceStatus(request.Status);
 
@@ -52,31 +39,6 @@ public class PlisioWebhookHandler(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to handle Plisio webhook");
-            return false;
-        }
-    }
-
-    /// <summary>
-    ///     Verifies the signature of a webhook request
-    /// </summary>
-    private bool VerifySignature(PlisioWebhookRequest request, string signature)
-    {
-        try
-        {
-            // Create a string with all the request parameters
-            var dataString = $"{request.TxnId}:{request.Status}:{request.Amount}:{options.ApiKey}";
-
-            // Calculate the hash
-            using var sha256 = SHA256.Create();
-            var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(dataString));
-            var calculatedSignature = BitConverter.ToString(hash).Replace("-", "").ToLower();
-
-            // Compare the signatures
-            return string.Equals(calculatedSignature, signature, StringComparison.OrdinalIgnoreCase);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to verify Plisio webhook signature");
             return false;
         }
     }

@@ -37,6 +37,8 @@ public class CoreDbContext : DbContext
 
     public virtual DbSet<NotificationEntity> Notifications { get; set; }
 
+    public virtual DbSet<OutboxMessageEntity> OutboxMessages { get; set; }
+
     public virtual DbSet<ProfileEntity> Profiles { get; set; }
 
     public virtual DbSet<PromocodeEntity> Promocodes { get; set; }

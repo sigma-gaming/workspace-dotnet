@@ -5,6 +5,7 @@ using Core.Db.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Npgsql;
 
 namespace Core.Db;
@@ -18,6 +19,10 @@ public static class DependencyInjection
     {
         var dbOptions = new CoreDbOptions();
         configuration.Bind("CoreDb", dbOptions);
+
+        // Get the current environment from CoreBuilder
+        var environment = builder.Environment;
+        var isDevelopment = environment?.IsDevelopment() ?? false;
 
         var connectionString = new NpgsqlConnectionStringBuilder
         {
@@ -33,6 +38,7 @@ public static class DependencyInjection
             Enlist = false,
             SslMode = SslMode.Disable,
             KeepAlive = 10,
+            IncludeErrorDetail = builder.Environment?.IsDevelopment() ?? false,
         }.ToString();
 
         Action<DbContextOptionsBuilder> action = options =>

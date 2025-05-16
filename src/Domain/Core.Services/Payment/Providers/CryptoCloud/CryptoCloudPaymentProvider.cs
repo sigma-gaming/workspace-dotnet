@@ -16,7 +16,7 @@ namespace Core.Services.Payment.Providers.CryptoCloud;
 public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvider, IStaticWalletProvider
 {
     private readonly CryptoCloudApiClient apiClient;
-    private readonly CurrencyRatesService currencyRatesService;
+    private readonly ICurrencyRatesService currencyRatesService;
     private readonly CryptoCloudOptions options;
 
     /// <summary>
@@ -26,7 +26,7 @@ public class CryptoCloudPaymentProvider : PaymentProviderService, IDepositProvid
         CryptoCloudApiClient apiClient,
         IOptions<CryptoCloudOptions> options,
         ILogger<CryptoCloudPaymentProvider> logger,
-        CurrencyRatesService currencyRatesService) : base(logger)
+        ICurrencyRatesService currencyRatesService) : base(logger)
     {
         this.apiClient = apiClient;
         this.options = options.Value;

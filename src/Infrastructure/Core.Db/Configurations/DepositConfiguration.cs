@@ -13,6 +13,8 @@ public class DepositConfiguration : IEntityTypeConfiguration<DepositEntity>
 
         entity.ToTable("deposit");
 
+        entity.HasIndex(e => e.ProviderTransactionId);
+
         entity.Property(e => e.Id)
             .HasDefaultValueSql("uuid_generate_v7()")
             .HasColumnName("id");
@@ -20,7 +22,7 @@ public class DepositConfiguration : IEntityTypeConfiguration<DepositEntity>
             .HasDefaultValueSql("now()")
             .HasColumnName("created_at");
         entity.Property(e => e.CurrencyAmount)
-            .HasPrecision(20, 18)
+            .HasPrecision(38, 18)
             .HasColumnName("currency_amount");
         entity.Property(e => e.GemAmount).HasColumnName("gem_amount");
         entity.Property(e => e.Method)

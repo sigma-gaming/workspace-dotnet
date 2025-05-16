@@ -17,7 +17,7 @@ namespace Core.API.Controllers;
 [ApiController]
 public class PaymentsController(
     IPaymentService paymentService,
-    CurrencyRatesService currencyRatesService,
+    ICurrencyRatesService currencyRatesService,
     WalletService walletService)
     : ControllerBase
 {

@@ -18,7 +18,7 @@ namespace Core.Migrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.2")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -346,9 +346,18 @@ namespace Core.Migrations.Migrations
                         .HasColumnName("currency");
 
                     b.Property<decimal>("CurrencyAmount")
-                        .HasPrecision(20, 18)
-                        .HasColumnType("numeric(20,18)")
+                        .HasPrecision(38, 18)
+                        .HasColumnType("numeric(38,18)")
                         .HasColumnName("currency_amount");
+
+                    b.Property<short>("Flow")
+                        .HasColumnType("smallint")
+                        .HasColumnName("type");
+
+                    b.Property<string>("FlowDetails")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
 
                     b.Property<long>("GemAmount")
                         .HasColumnType("bigint")
@@ -357,11 +366,6 @@ namespace Core.Migrations.Migrations
                     b.Property<short>("Method")
                         .HasColumnType("smallint")
                         .HasColumnName("method");
-
-                    b.Property<string>("Payload")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("payload");
 
                     b.Property<short>("Provider")
                         .HasColumnType("smallint")
@@ -385,10 +389,6 @@ namespace Core.Migrations.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("transaction_id");
 
-                    b.Property<short>("Type")
-                        .HasColumnType("smallint")
-                        .HasColumnName("type");
-
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -400,6 +400,8 @@ namespace Core.Migrations.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProviderTransactionId");
 
                     b.HasIndex("TransactionId");
 
@@ -600,6 +602,47 @@ namespace Core.Migrations.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("notification", (string)null);
+                });
+
+            modelBuilder.Entity("Core.Contracts.Entities.OutboxMessageEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v7()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("exchange");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("published_at");
+
+                    b.Property<string>("RoutingKey")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("routing_key");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt")
+                        .HasFilter("(\"published_at\" IS NULL)");
+
+                    b.ToTable("outbox_message", (string)null);
                 });
 
             modelBuilder.Entity("Core.Contracts.Entities.ProfileEntity", b =>
@@ -1336,8 +1379,8 @@ namespace Core.Migrations.Migrations
                         .HasColumnName("currency");
 
                     b.Property<decimal>("CurrencyAmount")
-                        .HasPrecision(20, 18)
-                        .HasColumnType("numeric(20,18)")
+                        .HasPrecision(38, 18)
+                        .HasColumnType("numeric(38,18)")
                         .HasColumnName("currency_amount");
 
                     b.Property<long>("GemAmount")
@@ -1381,6 +1424,8 @@ namespace Core.Migrations.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProviderTransactionId");
 
                     b.HasIndex("TransactionId");
 

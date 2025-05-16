@@ -10,7 +10,7 @@ public class CurrencyRatesService(
     ILogger<CurrencyRatesService> logger,
     CoreCacheRegistry cache,
     BinanceApi binanceApi,
-    CoincapApi coincapApi)
+    CoincapApi coincapApi) : ICurrencyRatesService
 {
     private static readonly Dictionary<BinanceSymbol, Currency> SymbolCurrencyMap = new()
     {
@@ -49,7 +49,6 @@ public class CurrencyRatesService(
                 rates.Add(new CurrencyExchangeRate { Currency = Currency.Rub, Gems = 100 });
 
                 var usdRate = usd / rub * 100;
-                logger.LogInformation("USD rate: {UsdRate}", usdRate);
                 rates.Add(new CurrencyExchangeRate { Currency = Currency.Usd, Gems = usdRate });
 
                 if (fiatRawRatesMap.TryGetValue(CoincapSymbol.Eur, out var eur))

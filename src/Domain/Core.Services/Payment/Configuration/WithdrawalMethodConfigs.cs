@@ -19,17 +19,6 @@ public static class WithdrawalMethodConfigs
             {
                 Method = WithdrawalMethod.Crypto,
                 Currency = Currency.Ton,
-                Provider = PaymentProvider.Plisio,
-                MinAmount = 1000,
-                MaxAmount = 100000,
-                CommissionRate = 200,
-                ProcessingTimeHours = 24,
-            },
-            // Adding CryptoCloud provider for testing
-            new WithdrawalMethodConfig
-            {
-                Method = WithdrawalMethod.Crypto,
-                Currency = Currency.Ton,
                 Provider = PaymentProvider.CryptoCloud,
                 MinAmount = 1000,
                 MaxAmount = 100000,

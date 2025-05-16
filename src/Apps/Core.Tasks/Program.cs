@@ -7,12 +7,16 @@ using Core.Contracts;
 using Core.Db;
 using Core.Db.HealthChecks;
 using Core.Nats;
+using Core.RabbitMq;
+using Core.RabbitMq.HealthChecks;
 using Core.Services;
+using Core.Services.Payment.Webhooks;
 using Core.Services.System;
 using Core.Tasks.Jobs;
 using Core.Tasks.Services;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
+using Prometheus;
 using StackExchange.Redis;
 
 const string apiName = "Core Tasks";
@@ -27,6 +31,7 @@ builder.Services.Core()
     .AddCoreDb(builder.Configuration)
     .AddCoreCache(builder.Configuration)
     .AddCoreNats(builder.Configuration)
+    .AddCoreRabbitMq(builder.Configuration)
     .AddMappers()
     .AddCommonServices(builder.Configuration)
     .AddCurrencyRates(builder.Configuration)
@@ -35,6 +40,7 @@ builder.Services.Core()
     .AddChat()
     .AddPayment(builder.Configuration);
 
+builder.Services.AddScoped<CleanupOutboxJob>();
 builder.Services.AddScoped<InitializeChatMessagesJob>();
 builder.Services.AddScoped<ProcessReferrerPayoutsJob>();
 builder.Services.AddScoped<ProcessStaleDepositsJob>();
@@ -53,8 +59,11 @@ builder.Services.AddHangfire((provider, config) =>
 
 builder.Services.AddHangfireServer();
 
+builder.Services.AddHostedService<PaymentWebhookConsumer>();
+
 builder.Services.AddHealthChecks()
     .RequireCoreDb()
+    .RequireCoreRabbitMq()
     .RequireEnabledBackgroundJobs();
 
 var app = builder.Build();
@@ -67,6 +76,7 @@ app.MapInternalPort(appBuilder =>
     {
         endpoints.MapLivenessHealthCheck();
         endpoints.MapReadinessHealthCheck();
+        endpoints.MapMetrics();
     });
 });
 

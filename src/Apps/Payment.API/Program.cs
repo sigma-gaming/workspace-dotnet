@@ -11,9 +11,11 @@ using Core.Db;
 using Core.Db.HealthChecks;
 using Core.Nats;
 using Core.Nats.HealthChecks;
+using Core.RabbitMq;
 using Core.Services;
 using Core.Services.System;
 using Microsoft.OpenApi.Models;
+using Prometheus;
 using Scalar.AspNetCore;
 
 const string apiName = "Payment API";
@@ -38,11 +40,15 @@ builder.Services.Core()
     .AddCoreDb(builder.Configuration)
     .AddCoreCache(builder.Configuration)
     .AddCoreNats(builder.Configuration)
+    .AddCoreRabbitMq(builder.Configuration)
     .AddMappers()
     .AddCommonServices(builder.Configuration)
     .AddPubSub()
-    .AddSystem();
+    .AddSystem()
+    .AddOutbox(builder.Configuration)
+    .AddPaymentWebhooks(builder.Configuration);
 
+// RabbitMQ is not required, webhooks are kept in the outbox while it is unavailable
 builder.Services.AddHealthChecks()
     .RequireCoreDb()
     .RequireCoreCache()
@@ -67,6 +73,7 @@ app.MapInternalPort(appBuilder =>
     {
         endpoints.MapLivenessHealthCheck();
         endpoints.MapReadinessHealthCheck();
+        endpoints.MapMetrics();
     });
 });
 

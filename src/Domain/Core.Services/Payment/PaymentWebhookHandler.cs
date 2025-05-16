@@ -39,6 +39,14 @@ public class PaymentWebhookHandler(
             // Handle the notification based on the status
             switch (status)
             {
+                case PaymentStatus.Completed when deposit.Status == PaymentStatus.Completed:
+                case PaymentStatus.Failed or PaymentStatus.Cancelled or PaymentStatus.Rejected or PaymentStatus.Expired
+                    when deposit.Status == PaymentStatus.Cancelled:
+                    // Providers and the queue deliver at least once, a repeated webhook is not an error
+                    logger.LogInformation("Deposit {DepositId} is already {Status}, skipping duplicate webhook",
+                        deposit.Id, deposit.Status);
+                    return true;
+
                 case PaymentStatus.Completed:
                     return await paymentService.ConfirmDepositAsync(deposit.Id);
 
@@ -98,6 +106,13 @@ public class PaymentWebhookHandler(
             // Handle the notification based on the status
             switch (status)
             {
+                case PaymentStatus.Completed when withdrawal.Status == PaymentStatus.Completed:
+                case PaymentStatus.Failed or PaymentStatus.Cancelled or PaymentStatus.Rejected or PaymentStatus.Expired
+                    when withdrawal.Status == PaymentStatus.Cancelled:
+                    logger.LogInformation("Withdrawal {WithdrawalId} is already {Status}, skipping duplicate webhook",
+                        withdrawal.Id, withdrawal.Status);
+                    return true;
+
                 case PaymentStatus.Completed:
                     return await paymentService.ConfirmWithdrawalPaymentAsync(withdrawal.Id);
 

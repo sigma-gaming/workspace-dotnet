@@ -1,11 +1,14 @@
 using System.Globalization;
 using Core.Contracts.Enums;
 using Core.Contracts.Jsonb;
+using Core.Services.CurrencyRates;
+using Core.Services.Payment.Exceptions;
 using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Models;
 using Core.Services.Payment.Providers.Plisio.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using InvalidOperationException = System.InvalidOperationException;
 
 namespace Core.Services.Payment.Providers.Plisio;
 
@@ -15,6 +18,7 @@ namespace Core.Services.Payment.Providers.Plisio;
 public class PlisioPaymentProvider(
     PlisioApiClient apiClient,
     IOptions<PlisioOptions> options,
+    ICurrencyRatesService currencyRatesService,
     ILogger<PlisioPaymentProvider> logger)
     : PaymentProviderService(logger), IDepositProvider, IWithdrawalProvider
 {
@@ -32,11 +36,23 @@ public class PlisioPaymentProvider(
     {
         try
         {
+            // Convert gems to USD for deposit
+            decimal usdAmount;
+            try
+            {
+                usdAmount = (decimal)await currencyRatesService.ConvertGemsAsync(input.GemAmount, Currency.Usd);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.LogError(ex, "Failed to convert gems to USD: currency rates not available");
+                throw new PaymentException("Deposits are unavailable at the moment. Please try again later.", ex);
+            }
+
             var createInvoiceRequest = new PlisioCreateInvoiceRequest
             {
                 Currency = MapCurrency(input.Currency),
                 SourceCurrency = "USD",
-                SourceAmount = input.GemAmount.ToString(CultureInfo.InvariantCulture),
+                SourceAmount = usdAmount.ToString(CultureInfo.InvariantCulture),
                 OrderName = $"Deposit {input.GemAmount} gems",
                 OrderNumber = Guid.NewGuid().ToString("N"),
                 Description = $"Deposit {input.GemAmount} gems",
@@ -44,11 +60,15 @@ public class PlisioPaymentProvider(
                 ExpireMin = options.InvoiceExpirationMinutes.ToString(),
             };
 
-            var invoice = await apiClient.CreateInvoiceAsync(createInvoiceRequest);
+            // Get the minimal invoice creation response
+            var createInvoiceResponse = await apiClient.CreateInvoiceAsync(createInvoiceRequest);
+
+            // Fetch the full invoice details using the transaction ID
+            var invoice = await apiClient.GetInvoiceAsync(createInvoiceResponse.TransactionId);
 
             return new DepositResponse
             {
-                ProviderTransactionId = invoice.TransactionId,
+                ProviderTransactionId = createInvoiceResponse.TransactionId,
                 Status = PlisioStatusMapper.MapInvoiceStatus(invoice.Status),
                 ProviderAmount = invoice.Amount,
                 Currency = input.Currency,
@@ -57,9 +77,13 @@ public class PlisioPaymentProvider(
                 Flow = DepositFlow.Redirect,
                 FlowDetails = new DepositFlowDetailsRedirect
                 {
-                    RedirectUrl = invoice.InvoiceUrl,
+                    RedirectUrl = createInvoiceResponse.InvoiceUrl,
                 },
             };
+        }
+        catch (PaymentException)
+        {
+            throw;
         }
         catch (Exception ex)
         {
@@ -119,11 +143,24 @@ public class PlisioPaymentProvider(
     {
         try
         {
+            // Convert gems to target currency for withdrawal
+            decimal currencyAmount;
+            try
+            {
+                currencyAmount = (decimal)await currencyRatesService.ConvertGemsAsync(input.GemAmount, input.Currency);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.LogError(ex, "Failed to convert gems to {Currency}: currency rates not available",
+                    input.Currency);
+                throw new PaymentException("Withdrawals are unavailable at the moment. Please try again later.", ex);
+            }
+
             var createWithdrawalRequest = new PlisioCreateWithdrawalRequest
             {
                 PsysCid = MapCurrency(input.Currency),
                 To = input.DestinationAddress,
-                Amount = input.GemAmount.ToString(),
+                Amount = currencyAmount.ToString(CultureInfo.InvariantCulture),
                 Type = "cash_out",
                 FeePlan = "normal",
             };
@@ -139,6 +176,10 @@ public class PlisioPaymentProvider(
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
+        }
+        catch (PaymentException)
+        {
+            throw;
         }
         catch (Exception ex)
         {

@@ -8,7 +8,8 @@ namespace Core.Services.Tests.Payment;
 [CollectionDefinition("PaymentTestCollection")]
 public class PaymentFixtureCollection : ICollectionFixture<PaymentDbFixture>, 
                                        ICollectionFixture<PaymentCacheFixture>,
-                                       ICollectionFixture<PaymentNatsFixture>
+                                       ICollectionFixture<PaymentNatsFixture>,
+                                       ICollectionFixture<PaymentRabbitMqFixture>
 {
     // This class has no code, and is never created.
     // Its purpose is to be the place to apply [CollectionDefinition] and all the

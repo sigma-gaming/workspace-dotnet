@@ -148,6 +148,30 @@ public class PlisioInvoiceDetailsResponse
 }
 
 /// <summary>
+/// Minimal response for create invoice operations
+/// </summary>
+public class PlisioCreateInvoiceResponse
+{
+    /// <summary>
+    /// Plisio's internal ID
+    /// </summary>
+    [JsonPropertyName("txn_id")]
+    public string TransactionId { get; set; } = null!;
+    
+    /// <summary>
+    /// Invoice URL
+    /// </summary>
+    [JsonPropertyName("invoice_url")]
+    public string InvoiceUrl { get; set; } = null!;
+    
+    /// <summary>
+    /// Total sum of the invoice
+    /// </summary>
+    [JsonPropertyName("invoice_total_sum")]
+    public string InvoiceTotalSum { get; set; } = null!;
+}
+
+/// <summary>
 /// Withdrawal response data
 /// </summary>
 public class PlisioWithdrawalResponse

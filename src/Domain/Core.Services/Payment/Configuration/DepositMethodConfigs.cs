@@ -15,19 +15,16 @@ public static class DepositMethodConfigs
     {
         return
         [
-            // Plisio deposit methods
             new DepositMethodConfig
             {
                 Method = DepositMethod.Crypto,
-                Currency = Currency.Ton,
+                Currency = Currency.UsdtTrc20,
                 Provider = PaymentProvider.Plisio,
                 MinAmount = 100,
                 MaxAmount = 1000000,
                 CommissionRate = 100,
                 Flow = DepositFlow.Redirect,
             },
-
-            // CryptoCloud deposit methods
             new DepositMethodConfig
             {
                 Method = DepositMethod.Crypto,

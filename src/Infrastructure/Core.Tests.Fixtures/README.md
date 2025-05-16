@@ -5,6 +5,7 @@ This library provides a set of fixtures for integration testing with external de
 - PostgreSQL with `pg_uuidv7` extension support
 - Redis
 - NATS
+- RabbitMQ
 
 These fixtures use TestContainers to create isolated containers for your tests and follow the `IClassFixture` pattern from xUnit to maintain isolation between test classes.
 

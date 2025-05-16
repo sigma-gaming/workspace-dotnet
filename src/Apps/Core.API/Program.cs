@@ -49,6 +49,7 @@ if (apiOptions.EnableOpenApi)
 builder.Services.AddHttpClient();
 
 builder.Services.Core()
+    .WithEnvironment(builder.Environment)
     .AddCoreDb(builder.Configuration)
     .AddCoreCache(builder.Configuration)
     .AddCoreNats(builder.Configuration)
@@ -62,7 +63,6 @@ builder.Services.Core()
     .AddGlobalTasks()
     .AddCurrencyRates(builder.Configuration)
     .AddPayment(builder.Configuration);
-
 builder.Services.AddSessionAuth();
 
 builder.Services.AddRateLimiting(options => options

@@ -6,7 +6,7 @@ namespace Core.Tasks.Jobs;
 ///     A background job that updates currency rates
 /// </summary>
 public class UpdateCurrencyRatesJob(
-    CurrencyRatesService currencyRatesService,
+    ICurrencyRatesService currencyRatesService,
     ILogger<UpdateCurrencyRatesJob>? logger = null)
 {
     /// <summary>

@@ -1,11 +1,13 @@
 using Core.Contracts.Entities;
 using Core.Contracts.Enums;
 using Core.Contracts.Jsonb;
+using Core.Db.Context;
 using Core.Services.Finance;
 using Core.Services.Payment;
 using Core.Services.Payment.Interfaces;
 using Core.Services.Payment.Models;
 using Core.Services.Payment.Providers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -294,5 +296,58 @@ public class DepositIntegrationTests(
         // Balance should be increased by deposit amount
         var balanceAfterConfirm = await balanceService!.GetBalanceAsync(userId);
         Assert.Equal(gemAmount, balanceAfterConfirm.Available);
+    }
+
+    [Fact]
+    public async Task Should_CreditBalanceOnce_When_DepositIsConfirmedConcurrently()
+    {
+        var user = await CreateTestUserAsync();
+        var gemAmount = 500L;
+
+        var depositEntity = new DepositEntity
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            GemAmount = gemAmount,
+            Currency = Currency.Ton,
+            Provider = PaymentProvider.Plisio,
+            Status = PaymentStatus.Pending,
+            ProviderTransactionId = Guid.NewGuid().ToString(),
+            ProviderAmount = "1.0",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            FlowDetails = new DepositFlowDetailsRedirect { RedirectUrl = "https://example.com/redirect" },
+        };
+
+        DbContext.Deposits.Add(depositEntity);
+        await DbContext.SaveChangesAsync();
+
+        // Separate contexts that loaded the deposit before confirming it, as the stale deposits job does
+        var contexts = new List<CoreDbContext>();
+        for (var i = 0; i < 5; i++)
+        {
+            var db = await DbFixture.CreateDbContextAsync();
+            await db.Deposits.SingleAsync(d => d.Id == depositEntity.Id);
+            contexts.Add(db);
+        }
+
+        var results = await Task.WhenAll(contexts.Select(async db =>
+        {
+            var contextBalanceService = ActivatorUtilities.CreateInstance<BalanceService>(ServiceProvider, db);
+            var contextPaymentService =
+                ActivatorUtilities.CreateInstance<PaymentService>(ServiceProvider, db, contextBalanceService);
+            return await contextPaymentService.ConfirmDepositAsync(depositEntity.Id);
+        }));
+
+        foreach (var db in contexts) await db.DisposeAsync();
+
+        await using var context = await DbFixture.CreateDbContextAsync();
+        var balance = await context.Balances.SingleAsync(b => b.UserId == user.Id);
+        var deposits = await context.Transactions.CountAsync(t =>
+            t.UserId == user.Id && t.Type == TransactionType.Deposit);
+
+        Assert.Single(results, result => result);
+        Assert.Equal(gemAmount, balance.Available);
+        Assert.Equal(1, deposits);
     }
 }

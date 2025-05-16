@@ -14,6 +14,10 @@ x-common-env: &common-env
   CoreNats__Url: "nats://nats:4222"
   CoreNats__Password: "SECRET_REMOVED"
 
+  CoreRabbitMq__Host: "rabbitmq"
+  CoreRabbitMq__Username: "sigma"
+  CoreRabbitMq__Password: "SECRET_REMOVED"
+
 services:
   core-ws:
     build:

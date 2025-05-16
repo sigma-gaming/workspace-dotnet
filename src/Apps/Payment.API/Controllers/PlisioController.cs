@@ -1,10 +1,13 @@
+using Core.Contracts.Enums;
 using Core.Services.Payment.Providers.Plisio;
+using Core.Services.Payment.Webhooks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Payment.API.Controllers;
 
 [ApiController]
-public class PlisioController(PlisioWebhookHandler webhookHandler) : ControllerBase
+public class PlisioController(PlisioWebhookVerifier webhookVerifier, PaymentWebhookOutbox webhookOutbox)
+    : ControllerBase
 {
     [HttpPost]
     [Route("/providers/plisio/webhook")]
@@ -17,9 +20,11 @@ public class PlisioController(PlisioWebhookHandler webhookHandler) : ControllerB
         var signature = signatureValues.FirstOrDefault();
         if (string.IsNullOrEmpty(signature)) return BadRequest("Invalid signature header");
 
-        // Handle the webhook
-        var result = await webhookHandler.HandleWebhookAsync(request, signature);
+        if (!webhookVerifier.VerifySignature(request, signature)) return BadRequest();
 
-        return result ? Ok() : BadRequest();
+        // Processed by Core.Tasks, the provider gets the response without waiting for it
+        await webhookOutbox.EnqueueAsync(PaymentProvider.Plisio, request.TxnId, request);
+
+        return Ok();
     }
 }

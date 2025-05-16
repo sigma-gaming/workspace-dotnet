@@ -1,4 +1,10 @@
 {
+  "CoreRabbitMq": {
+    "Host": "",
+    "Port": 5672,
+    "Username": "",
+    "Password": ""
+  },
   "Payment": {
     "Plisio": {
       "ApiKey": "your-plisio-api-key",

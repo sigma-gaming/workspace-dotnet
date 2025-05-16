@@ -11,6 +11,7 @@ using Core.Contracts.Enums;
 using Core.Db.Context;
 using Core.Services.Auth;
 using Core.Services.Caching;
+using Core.Services.CurrencyRates;
 using Core.Services.Finance;
 using Core.Services.Payment;
 using Core.Services.Payment.Interfaces;
@@ -130,6 +131,9 @@ public abstract class PaymentIntegrationTestBase : IAsyncLifetime
         services.AddSingleton<ICacheService, CacheService>();
 
         services.AddSingleton<CoreCacheRegistry>();
+
+        // Add test currency rates service
+        services.AddSingleton<ICurrencyRatesService, TestCurrencyRatesService>();
 
         // Add mock PubSub service connected to test NATS container
         services.AddScoped<IPubSubService>(provider =>
