@@ -1,0 +1,25 @@
+{
+  "Http": {
+    "PublicPort": 5070,
+    "InternalPort": 5071
+  },
+  "Api": {
+    "PublicUrl": "",
+    "EnableOpenApi": true
+  },
+  "CoreDb": {
+    "Host": "",
+    "Port": 5432,
+    "Database": "",
+    "Username": "",
+    "Password": ""
+  },
+  "CoreCache": {
+    "Version": "",
+    "Host": "",
+    "Password": ""
+  },
+  "CoreNats": {
+    "Url": ""
+  }
+}

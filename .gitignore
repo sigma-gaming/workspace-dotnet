@@ -46,3 +46,9 @@ Thumbs.db
 
 # Affected
 /affected.*
+
+# Secrets and local development certificates
+**/appsettings.Development.json
+certs/*.key
+certs/*.crt
+certs/*.pem

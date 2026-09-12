@@ -1,0 +1,29 @@
+{
+  "Http": {
+    "PublicPort": 5140,
+    "InternalPort": 5141
+  },
+  "Api": {
+    "ClientUrl": "",
+    "PublicUrl": "",
+    "EnableOpenApi": true
+  },
+  "CoreDb": {
+    "Host": "",
+    "Port": 5432,
+    "Database": "",
+    "Username": "",
+    "Password": ""
+  },
+  "CoreCache": {
+    "Version": "",
+    "Host": "",
+    "Password": ""
+  },
+  "Telegram": {
+    "BotToken": ""
+  },
+  "Vk": {
+    "ServiceToken": ""
+  }
+}

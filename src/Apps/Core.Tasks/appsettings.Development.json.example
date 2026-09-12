@@ -1,0 +1,48 @@
+{
+  "Http": {
+    "PublicPort": 5110,
+    "InternalPort": 5111
+  },
+  "CoreDb": {
+    "Host": "",
+    "Port": 5432,
+    "Database": "",
+    "Username": "",
+    "Password": ""
+  },
+  "CoreCache": {
+    "Version": "",
+    "Host": "",
+    "Password": ""
+  },
+  "CoreNats": {
+    "Url": ""
+  },
+  "CoreRabbitMq": {
+    "Host": "",
+    "Port": 5672,
+    "Username": "",
+    "Password": "",
+    "PaymentWebhooks": {
+      "PrefetchCount": 20,
+      "Concurrency": 4,
+      "MaxAttempts": 5,
+      "RetryDelay": "00:00:30"
+    }
+  },
+  "Telegram": {
+    "BotToken": ""
+  },
+  "Payment": {
+    "Coincap": {
+      "ApiKey": ""
+    },
+    "Plisio": {
+      "ApiKey": ""
+    },
+    "CryptoCloud": {
+      "ApiKey": "",
+      "SecretKey": ""
+    }
+  }
+}
